@@ -204,7 +204,11 @@
   />
 </div>
 
+{#if $searchStore.state.value.dirty}
+dirty - {$searchStore.state.value.dirty}
+{:else}
 {$searchStore.state.value}
+{/if}
 
 <style>
   :global(*) {
