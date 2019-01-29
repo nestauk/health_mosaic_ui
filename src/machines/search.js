@@ -3,13 +3,13 @@ import { writable } from 'svelte/store';
 const searchMachine = Machine(
   {
     id: 'search',
-    initial: 'ready',
+    initial: 'clean',
     on: {
       CHANGED: 'dirty',
-      SAME: 'ready',
+      SAME: 'clean',
     },
     states: {
-      ready: {},
+      clean: {},
       dirty: {
         initial: 'idle',
         id: 'dirty',
@@ -22,7 +22,7 @@ const searchMachine = Machine(
             invoke: {
               src: 'postRequest',
               onDone: {
-                target: '#search.ready',
+                target: '#search.clean',
                 actions: (ctx, event) => {
                   ctx.update(v => ({ ...v, data: event.data }));
                   console.log(event, data);

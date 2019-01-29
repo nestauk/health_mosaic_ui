@@ -177,7 +177,7 @@
       <button type="button" on:click="{negateValueString}">NOT</button>
       <button type="button" on:click="{newRule}">AND ,</button>
       <button type="button" on:click="{newQuery}">OR ⏎</button>
-      <button on:click="{() => search.send({type:'SEARCH', value:value.toString()}) }">SEND</button>
+      <button disabled="{$searchStore.state.value === 'clean'}" on:click="{() => search.send({type:'SEARCH', value:value.toString()}) }">SEND</button>
     </span>
   </form>
 
@@ -211,6 +211,9 @@ dirty - {$searchStore.state.value.dirty}
 {/if}
 
 <style>
+  button[disabled] {
+    opacity: 0.3;
+  }
   :global(*) {
     margin: 0;
     padding: 0;
