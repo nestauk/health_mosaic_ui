@@ -183,8 +183,8 @@
 
     <span class="button-wrap">
       <button type="button" on:click="{negateValueString}">NOT</button>
-      <button type="button" on:click="{newRule}">AND ,</button>
-      <button type="button" on:click="{newQuery}">OR ⏎</button>
+      <button type="button" on:click="{newRule}">OR ,</button>
+      <button type="button" on:click="{newQuery}">AND ⏎</button>
       <button type="button" disabled="{$searchStore.state.value === 'clean'}" on:click="{() => search.send({type:'SEARCH', value:value.toString()}) }">SEND</button>
     </span>
   </form>
