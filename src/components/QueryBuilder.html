@@ -6,6 +6,7 @@
 
   let currentData;
   const dispatch = createEventDispatcher();
+
   afterUpdate(() => {
     if ($searchStore.data && $searchStore.data !== currentData) {
       dispatch('data', { data: $searchStore.data });
@@ -31,18 +32,19 @@
 
   $: {
     rules = parseInput(rules, value);
-
+    checkDirty();
   }
 
-   function  handleEnter(e) {
-    console.log($searchStore.value, value.toString())
-
+  function checkDirty() {
     if ($searchStore.value !== value.toString()) {
-
       search.send('CHANGED');
     } else {
       search.send('SAME');
     }
+  }
+
+  function  handleEnter(e) {
+
     if (e.key !== 'Enter') return;
     newRule();
   }
