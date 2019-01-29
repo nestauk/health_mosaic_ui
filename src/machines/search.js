@@ -4,20 +4,22 @@ import { writable } from 'svelte/store';
 const searchMachine = Machine(
   {
     id: 'search',
-    initial: 'idle',
+    initial: 'ready',
     on: {
       SEARCH: {
         target: 'pending',
       },
-      CHANGED: 'idle'
+      CHANGED: 'dirty',
+      SAME: 'ready',
     },
     states: {
-      idle: {},
+      ready: {},
+      dirty: {},
       pending: {
         invoke: {
           src: 'postRequest',
           onDone: {
-            target: 'idle',
+            target: 'ready',
             actions: (ctx, event) => {
               ctx.update(v => ({ ...v, data: event.data }));
               console.log(event, data);
@@ -36,7 +38,10 @@ const searchMachine = Machine(
   },
   {
     services: {
-      postRequest: (ctx, evt) => fakeGet(evt.payload),
+      postRequest: (ctx, evt) => {
+        ctx.update(v => ({ ...v, value: evt.value }));
+        return fakeGet(evt.payload);
+      },
     },
   }
 );
@@ -49,7 +54,7 @@ const fakeGet = () => {
   });
 };
 
-export const searchStore = writable({});
+export const searchStore = writable({ value: [''] });
 export const search = interpret(
   searchMachine.withContext({ update: searchStore.update })
 );

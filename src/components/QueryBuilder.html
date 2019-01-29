@@ -23,10 +23,18 @@
 
   $: {
     rules = parseInput(rules, value);
-    search.send('CHANGED')
+
   }
 
-  function handleEnter(e) {
+   function  handleEnter(e) {
+    console.log($searchStore.value, value)
+
+    if ($searchStore.value !== value.toString()) {
+
+      search.send('CHANGED');
+    } else {
+      search.send('SAME');
+    }
     if (e.key !== 'Enter') return;
     newRule();
   }
@@ -160,7 +168,7 @@
       id="search-builder"
       bind:this="{input}"
       bind:value="{value[current]}"
-      on:keydown="{handleEnter}"
+      on:keyup="{handleEnter}"
       on:input="{updateInputLocation}"
       on:click="{updateInputLocation}"
     />
@@ -169,7 +177,7 @@
       <button type="button" on:click="{negateValueString}">NOT</button>
       <button type="button" on:click="{newRule}">AND ,</button>
       <button type="button" on:click="{newQuery}">OR ⏎</button>
-      <button on:click="{() => search.send('SEARCH', value)}">SEND</button>
+      <button on:click="{() => search.send({type:'SEARCH', value:value.toString()}) }">SEND</button>
     </span>
   </form>
 
