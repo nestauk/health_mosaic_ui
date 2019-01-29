@@ -10,6 +10,14 @@
     if ($searchStore.data && $searchStore.data !== currentData) {
       dispatch('data', { data: $searchStore.data });
     }
+    if ($searchStore.state.value.dirty) {
+      console.log('dirty')
+      dispatch('change', {status: 'dirty'})
+    }
+    if ($searchStore.state.value === 'clean') {
+      console.log('clean')
+      dispatch('change', {status: 'clean'})
+    }
   })
 
 
@@ -27,7 +35,7 @@
   }
 
    function  handleEnter(e) {
-    console.log($searchStore.value, value)
+    console.log($searchStore.value, value.toString())
 
     if ($searchStore.value !== value.toString()) {
 
@@ -177,7 +185,7 @@
       <button type="button" on:click="{negateValueString}">NOT</button>
       <button type="button" on:click="{newRule}">AND ,</button>
       <button type="button" on:click="{newQuery}">OR ⏎</button>
-      <button disabled="{$searchStore.state.value === 'clean'}" on:click="{() => search.send({type:'SEARCH', value:value.toString()}) }">SEND</button>
+      <button type="button" disabled="{$searchStore.state.value === 'clean'}" on:click="{() => search.send({type:'SEARCH', value:value.toString()}) }">SEND</button>
     </span>
   </form>
 

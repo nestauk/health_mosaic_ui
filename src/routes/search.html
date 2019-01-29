@@ -9,6 +9,7 @@
   import QueryBuilder from '../components/QueryBuilder.html';
 
   const store = writable({});
+  let grey = false;
 </script>
 
 <svelte:head>
@@ -16,14 +17,16 @@
 </svelte:head>
 
 <div class="search">
-  <QueryBuilder on:data="{({detail}) => store.update(v => ({...v, data:detail.data})) }" />
+  <QueryBuilder
+    on:change="{ ({detail}) => grey = detail.status === 'dirty' }"
+    on:data="{ ({detail}) => store.update(v => ({...v, data:detail.data})) }" />
 </div>
 
 <div class="content">
     {#if $store.data}
 
 <h1>Results</h1>
-<ul>
+<ul class:dirty={grey}>
   {#each $store.data.hits.hits as {_source} }
     <li>
       <h2>{_source.title_of_project}</h2>
@@ -51,6 +54,10 @@
   li {
     border-bottom: 1px solid #ccc;
     margin-bottom: 30px;
+  }
+
+  .dirty {
+    color: grey;
   }
 
 </style>
