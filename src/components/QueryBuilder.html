@@ -23,7 +23,7 @@
 
   $: {
     rules = parseInput(rules, value);
-    //if ($searchStore.rules !== value) search.send('QUERY_CHANGED')
+    search.send('CHANGED')
   }
 
   function handleEnter(e) {

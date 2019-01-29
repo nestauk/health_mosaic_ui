@@ -9,6 +9,7 @@ const searchMachine = Machine(
       SEARCH: {
         target: 'pending',
       },
+      CHANGED: 'idle'
     },
     states: {
       idle: {},
