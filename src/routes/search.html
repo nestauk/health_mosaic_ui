@@ -1,0 +1,56 @@
+<script context="module">
+  export async function preload({ params, query }) {
+    return;
+  }
+</script>
+
+<script>
+  import {writable} from 'svelte/store';
+  import QueryBuilder from '../components/QueryBuilder.html';
+
+  const store = writable({});
+</script>
+
+<svelte:head>
+  <title>Search</title>
+</svelte:head>
+
+<div class="search">
+  <QueryBuilder on:data="{({detail}) => store.update(v => ({...v, data:detail.data})) }" />
+</div>
+
+<div class="content">
+    {#if $store.data}
+
+<h1>Results</h1>
+<ul>
+  {#each $store.data.hits.hits as {_source} }
+    <li>
+      <h2>{_source.title_of_project}</h2>
+      <h3>{_source.title_of_organisation}</h3>
+      <p>{_source.placeName_city_organisation}, {_source.placeName_state_organisation}, {_source.placeName_country_organisation}</p>
+    </li>
+
+  {/each}
+</ul>
+{/if}
+
+</div>
+
+
+<style>
+  .search {
+    width: 30%;
+
+  }
+  .content {
+    margin-left: 100px;
+    width: 70%;
+  }
+
+  li {
+    border-bottom: 1px solid #ccc;
+    margin-bottom: 30px;
+  }
+
+</style>

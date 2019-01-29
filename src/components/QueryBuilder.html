@@ -1,0 +1,277 @@
+<script>
+  import {createEventDispatcher, afterUpdate} from 'svelte';
+
+  import SearchQueries from './SearchQueries.html';
+  import {search, searchStore} from '../machines/search';
+
+  let currentData;
+  const dispatch = createEventDispatcher();
+  afterUpdate(() => {
+    if ($searchStore.data && $searchStore.data !== currentData) {
+      dispatch('data', { data: $searchStore.data });
+    }
+  })
+
+
+  export let tabs = 1;
+  let rules = [[]],
+    value = [''],
+    current = 0,
+    input,
+    inputLocation = 0,
+    currentTab = 0;
+
+  $: {
+    rules = parseInput(rules, value);
+    //if ($searchStore.rules !== value) search.send('QUERY_CHANGED')
+  }
+
+  function handleEnter(e) {
+    if (e.key !== 'Enter') return;
+    newRule();
+  }
+
+  const parseInput = (rulesArr, valueStr) => valueStr.map(el =>
+        el
+          .split(',')
+          .filter(v => {
+            const trimmed = v.trim();
+            return (
+              trimmed.length > 0 &&
+              !(trimmed.length === 1 && trimmed[0] === '-')
+            );
+          })
+          .map(v => {
+            const value = v.trim();
+            const status = value[0] === '-' ? 'not' : 'and';
+            return {
+              status,
+              value: status === 'and' ? value : value.slice(1),
+            };
+          })
+      );
+
+
+  function removeRule(i) {
+    const tempValues = [...value];
+    tempValues.splice(i, 1);
+
+    value = tempValues;
+    current = tempValues.length;
+    value[current] = '';
+  }
+
+  function removeQuery(i, j) {
+    value = value
+        .map((str, strIndex) => {
+          if (strIndex === i) {
+            return str
+              .split(',')
+              .filter((v, index) => index !== j)
+              .join(',');
+          } else {
+            return str;
+          }
+        })
+        .filter(v => v);
+
+
+    if (!value[current]) {
+      current = value.length;
+      value[current] = '';
+    }
+  }
+
+  function selectRule(i) {
+    current = i;
+    input.focus();
+  }
+
+  function newRule() {
+    current = current + 1;
+    value[current] = '';
+    input.focus();
+  }
+
+  function newQuery() {
+    value = value.map((v, i) => (i === current ? v + ', ' : v));
+
+    input.focus();
+  }
+
+  // these two functions do a similar thing but in a very different way,
+  // there is some overlap that i'll pull out and share
+
+  const formatANDString = str =>
+    str.trim()[0] === '-' //  don't even ask
+      ? ` ${str //  eslint-disable-next-line
+          .trim() //  eslint-disable-next-line
+          .slice(1) //  eslint-disable-next-line
+          .trim()}`
+      : ` -${str.trim()}`;
+
+  function negateValueString() {
+    let charCount = 0;
+    value =  value.map((v, i) => {
+        if (i !== current) return v;
+        return v
+          .split(',')
+          .map(el => {
+            charCount = charCount + el.length + 1;
+            if (
+              inputLocation >= charCount - el.length - 1 &&
+              inputLocation <= charCount
+            ) {
+              return formatANDString(el);
+            } else {
+              return el;
+            }
+          }, 0)
+          .join(',');
+      });
+
+
+    input.focus();
+  }
+
+  function negateValueClick(valueIndex, queryIndex) {
+    value = value.map((valArr, i) => {
+        if (valueIndex !== i) return valArr;
+        return valArr
+          .split(',')
+          .map((query, j) => {
+            if (queryIndex !== j) return query;
+
+            return formatANDString(query);
+          })
+          .join(',');
+      });
+
+  }
+
+  const updateInputLocation = () => inputLocation = input.selectionStart;
+</script>
+
+<div class="main-container">
+  <form on:submit="{e => e.preventDefault()}">
+    <label for="search-builder">Search:</label>
+    <input
+      autocomplete="off"
+      id="search-builder"
+      bind:this="{input}"
+      bind:value="{value[current]}"
+      on:keydown="{handleEnter}"
+      on:input="{updateInputLocation}"
+      on:click="{updateInputLocation}"
+    />
+
+    <span class="button-wrap">
+      <button type="button" on:click="{negateValueString}">NOT</button>
+      <button type="button" on:click="{newRule}">AND ,</button>
+      <button type="button" on:click="{newQuery}">OR ⏎</button>
+      <button on:click="{() => search.send('SEARCH', value)}">SEND</button>
+    </span>
+  </form>
+
+  <!-- <ul class="tab-selector">
+    {#each {length: tabs} as tab, i}
+    <li on:click="{() => changeTab(i)}"
+        class:active-tab={currentTab === i}>Tab {i + 1 }
+        <span class="remove-tab" on:click="{() => removeTab(i)}">Close Tab</span>
+    </li>
+    {/each}
+
+    <li on:click="{addTab}">
+      + Add Tab
+    </li>
+  </ul> -->
+
+  <SearchQueries
+    {current}
+    rules="{rules}"
+    {removeRule}
+    {removeQuery}
+    ruleSelect="{(i) => selectRule(i)}"
+    negateValue="{negateValueClick}"
+  />
+</div>
+
+{$searchStore.state.value}
+
+<style>
+  :global(*) {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  :global(body) {
+    padding: 0;
+  }
+
+  label {
+    font-size: 0;
+    opacity: 0;
+  }
+
+  form {
+    padding: 0;
+    margin: 0;
+    position: relative;
+  }
+
+  input {
+    width: 100%;
+    margin: 0;
+    padding: 20px 15px;
+    border: none;
+    border-bottom: 1px solid #ccc;
+    border-radius: 0;
+    font-size: 25px;
+    height: 59px;
+  }
+
+  .button-wrap {
+    position: absolute;
+    right: 15px;
+    top: 12px;
+  }
+
+  button {
+    margin-left: 10px;
+  }
+
+  .tab-selector {
+    display: flex;
+    /* height: 35px; */
+    list-style: none;
+    border-bottom: 1px solid #ccc;
+  }
+
+  .tab-selector li {
+    padding: 10px 10px 10px 20px;
+    border-right: 1px solid #ccc;
+    cursor: pointer;
+    display: flex;
+  }
+
+  .active-tab {
+    background: #eee;
+  }
+
+  .remove-tab {
+    background: url(./times-circle-solid.svg) no-repeat center;
+    background-size: 18px;
+    display: block;
+    width: 18px;
+    height: 100%;
+    font-size: 0px;
+    margin-left: 10px;
+    opacity: 0.6;
+    transition: 0.2s;
+  }
+
+  .remove-tab:hover {
+    opacity: 1;
+  }
+</style>

@@ -1,0 +1,118 @@
+<script>
+  export let removeQuery, removeRule, ruleSelect,negateValue, current, rules;
+</script>
+
+{#if rules.length}
+  <ul class="rules-container">
+    <!--  -->
+    {#each rules as rule, i}
+    {#if rule && rule.length > 0}
+    <li class="rule" class:active-query={i === current}>
+
+      <!--  -->
+      <ul class="query-container" on:click="{() => ruleSelect(i)}">
+        {#each rule as query, j}
+          <li class="query {query.status}" on:click="{() => negateValue(i, j)}">
+            {query.value}
+            <span class="remove-query"
+                  on:click|stopPropagation="{() => removeQuery(i, j)}">
+              Remove Query
+            </span>
+          </li>
+        {/each}
+      </ul>
+
+      <span class="remove-rule" on:click="{() => removeRule(i)}"></span>
+      <!--  -->
+    </li>
+    {/if}
+      {/each}
+
+      {#if rules.length - 1  === current && !rules[current].length}
+      <li class="rule query-placeholder active-query" ><span>...</span></li>
+      {/if}
+    <!--  -->
+  </ul>
+{/if}
+
+
+<style>
+ul {
+    list-style: none;
+  }
+
+  .rule {
+    border-bottom: 1px solid #ccc;
+    padding: 10px;
+    font-size: 18px;
+    position: relative;
+
+  }
+
+  .query-container {
+    display: flex;
+  }
+
+  .query {
+    padding: 5px;
+    margin: 5px;
+    border: 2px solid limegreen;
+    color: #333;
+    display: flex;
+  }
+
+  .query.not {
+    border-color: red;
+  }
+
+  .query.and {
+    border-color: limegreen;
+  }
+
+  .remove-rule {
+    background: url(times-circle-solid.svg) no-repeat center;
+    background-size: 25px;
+    display: block;
+    width: 25px;
+    height: 100%;
+    opacity: 0.5;
+    cursor: pointer;
+    transition: 0.2s;
+    position: absolute;
+    right: 20px;
+    top: 0;
+    bottom: 0;
+  }
+
+  .remove-query {
+    background: url(times-circle-solid-green.svg) no-repeat center;
+    background-size: 18px;
+    display: block;
+    width: 18px;
+    height: 100%;
+    font-size: 0px;
+    margin-left: 10px;
+  }
+
+  .not .remove-query {
+    background: url(times-circle-solid-red.svg) no-repeat center;
+  }
+
+  .remove-rule:hover {
+    opacity: 1;
+  }
+
+  .active-query {
+    background: #f6f6f6;
+  }
+
+  .query-placeholder span {
+    padding: 5px;
+    margin: 5px;
+    border: 2px solid #999;
+    color: #333;
+    display: block;
+    width: 80px;
+    font-weight: bold;
+  }
+</style>
