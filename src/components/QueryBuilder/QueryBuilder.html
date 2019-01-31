@@ -26,8 +26,10 @@
   }
 
   function  handleEnter(e) {
+    console.log(rules)
+
     if (e.key !== 'Enter') return;
-    if (e.metaKey) return send(rules.filter(v => v.some(r => !!r.value)))
+    if (e.metaKey) return send(rules.filter(v => v.length > 0 && v.some(r => !!r.value)))
 
     newRule();
   }
