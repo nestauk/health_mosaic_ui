@@ -5,11 +5,44 @@
 </script>
 
 <script>
-  import {writable} from 'svelte/store';
-  import QueryBuilder from '../components/QueryBuilder.html';
+  import { createEventDispatcher } from 'svelte';
 
-  const store = writable({});
-  let grey = false;
+  import QueryBuilder from '../components/QueryBuilder';
+  import { search, searchStore } from '../machines/search';
+
+  const dispatch = createEventDispatcher();
+  let currentData, value = '', grey = false;
+
+
+
+  function handleChange(input) {
+    value = input.detail;
+    checkDirty();
+  }
+
+  function handleSend(rules) {
+    search.send({type:'SEARCH', query: parseValue(rules), value})
+  }
+
+  function checkDirty() {
+    if ($searchStore.value !== value.toString()) {
+      search.send('CHANGED');
+    } else {
+      search.send('SAME');
+    }
+  }
+
+  // an unreadable mess right now
+  function parseValue(query) {
+    return query.reduce((acc, next, i, arr) => {
+      return acc + next.reduce((acc2, next2, i2, arr2) => {
+
+        return `${acc2} ${next2.status === 'not' ? '-': ''}${next2.value}` +
+        (i2 === arr2.length-1 ? ')' : '');
+      }, '(') +
+      (i === arr.length-1 ? ')' : ' AND ');
+    }, '(');
+  }
 </script>
 
 <svelte:head>
@@ -18,16 +51,17 @@
 
 <div class="search">
   <QueryBuilder
-    on:change="{ ({detail}) => grey = detail.status === 'dirty' }"
-    on:data="{ ({detail}) => store.update(v => ({...v, data:detail.data})) }" />
+    status="{$searchStore.state.value.dirty ? 'dirty' : 'clean'}"
+    on:change="{ handleChange }"
+    send="{ handleSend }" />
 </div>
 
 <div class="content">
-    {#if $store.data}
+    {#if $searchStore.data}
 
 <h1>Results</h1>
-<ul class:dirty={grey}>
-  {#each $store.data.hits.hits as {_source} }
+<ul class:dirty={!!$searchStore.state.value.dirty}>
+  {#each $searchStore.data.hits.hits as {_source} }
     <li>
       <h2>{_source.title_of_project}</h2>
       <h3>{_source.title_of_organisation}</h3>

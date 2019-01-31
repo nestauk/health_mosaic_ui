@@ -2,27 +2,17 @@
   import {createEventDispatcher, afterUpdate} from 'svelte';
 
   import SearchQueries from './SearchQueries.html';
-  import {search, searchStore} from '../machines/search';
+  //import {search, searchStore} from '../../machines/search';
 
-  let currentData;
+  // let currentData;
   const dispatch = createEventDispatcher();
 
   afterUpdate(() => {
-    if ($searchStore.data && $searchStore.data !== currentData) {
-      dispatch('data', { data: $searchStore.data });
-    }
-    if ($searchStore.state.value.dirty) {
-      console.log('dirty')
-      dispatch('change', {status: 'dirty'})
-    }
-    if ($searchStore.state.value === 'clean') {
-      console.log('clean')
-      dispatch('change', {status: 'clean'})
-    }
+   // console.log(rules)
   })
 
 
-  export let tabs = 1;
+  export let tabs = 1, send, status;
   let rules = [[]],
     value = [''],
     current = 0,
@@ -32,16 +22,11 @@
 
   $: {
     rules = parseInput(rules, value);
-    checkDirty();
+    dispatch('change', value);
+   // checkDirty();
   }
 
-  function checkDirty() {
-    if ($searchStore.value !== value.toString()) {
-      search.send('CHANGED');
-    } else {
-      search.send('SAME');
-    }
-  }
+
 
   function  handleEnter(e) {
 
@@ -187,22 +172,11 @@
       <button type="button" on:click="{negateValueString}">NOT</button>
       <button type="button" on:click="{newRule}">OR ,</button>
       <button type="button" on:click="{newQuery}">AND ⏎</button>
-      <button type="button" disabled="{$searchStore.state.value === 'clean'}" on:click="{() => search.send({type:'SEARCH', value:value.toString()}) }">SEND</button>
+      <button type="button" disabled="{status === 'clean'}" on:click="{() => send(rules)}">SEND</button>
     </span>
   </form>
 
-  <!-- <ul class="tab-selector">
-    {#each {length: tabs} as tab, i}
-    <li on:click="{() => changeTab(i)}"
-        class:active-tab={currentTab === i}>Tab {i + 1 }
-        <span class="remove-tab" on:click="{() => removeTab(i)}">Close Tab</span>
-    </li>
-    {/each}
 
-    <li on:click="{addTab}">
-      + Add Tab
-    </li>
-  </ul> -->
 
   <SearchQueries
     {current}
@@ -214,11 +188,11 @@
   />
 </div>
 
-{#if $searchStore.state.value.dirty}
+<!-- {#if $searchStore.state.value.dirty}
 dirty - {$searchStore.state.value.dirty}
 {:else}
 {$searchStore.state.value}
-{/if}
+{/if} -->
 
 <style>
   button[disabled] {

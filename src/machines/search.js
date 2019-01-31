@@ -24,14 +24,15 @@ const searchMachine = Machine(
               onDone: {
                 target: '#search.clean',
                 actions: (ctx, event) => {
-                  ctx.update(v => ({ ...v, data: event.data }));
-                  console.log(event, data);
+                  event.data
+                    .json()
+                    .then(r => ctx.update(v => ({ ...v, data: r })));
                 },
               },
               onError: {
                 target: 'error',
                 actions: (ctx, event) => {
-                  console.log(ctx, event);
+                  console.log('notdone', ctx, event);
                 },
               },
             },
@@ -44,56 +45,14 @@ const searchMachine = Machine(
   {
     services: {
       postRequest: (ctx, evt) => {
-        ctx.update(v => ({ ...v, value: evt.value }));
-        return fakeGet(evt.payload);
+        console.log('action', evt);
+        ctx.update(v => ({ ...v, value: evt.value.toString() }));
+        //return fakeGet(evt);
+        return realGet(evt.query);
       },
     },
   }
 );
-// const searchMachine = Machine(
-//   {
-//     id: 'search',
-//     initial: 'ready',
-//     on: {
-//       SEARCH: {
-//         target: 'pending',
-//       },
-//       CHANGED: 'dirty',
-//       SAME: 'ready',
-//     },
-//     states: {
-//       ready: {},
-//       dirty: {},
-//       pending: {
-//         invoke: {
-//           src: 'postRequest',
-//           onDone: {
-//             target: 'ready',
-//             actions: (ctx, event) => {
-//               ctx.update(v => ({ ...v, data: event.data }));
-//               console.log(event, data);
-//             },
-//           },
-//           onError: {
-//             target: 'error',
-//             actions: (ctx, event) => {
-//               console.log(ctx, event);
-//             },
-//           },
-//         },
-//       },
-//       error: {},
-//     },
-//   },
-//   {
-//     services: {
-//       postRequest: (ctx, evt) => {
-//         ctx.update(v => ({ ...v, value: evt.value }));
-//         return fakeGet(evt.payload);
-//       },
-//     },
-//   }
-// );
 import { data } from './data';
 const fakeGet = () => {
   return new Promise(res => {
@@ -101,6 +60,24 @@ const fakeGet = () => {
       res(data);
     }, 2000);
   });
+};
+
+const realGet = query => {
+  const endpoint = 'http://3.8.107.150:9200/rwjf_test/_search';
+  const data = {
+    query: {
+      query_string: { query, default_operator: 'AND' },
+    },
+  };
+  const options = {
+    method: 'POST',
+    mode: 'cors',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
+  };
+  return fetch(`${endpoint}`, options);
 };
 
 export const searchStore = writable({ value: [''] });
