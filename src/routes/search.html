@@ -16,7 +16,7 @@
 
 
   function handleChange(input) {
-    value = input.detail;
+    value = input.detail.filter(v => !!v);
     checkDirty();
   }
 

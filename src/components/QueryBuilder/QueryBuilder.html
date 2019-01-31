@@ -23,14 +23,12 @@
   $: {
     rules = parseInput(rules, value);
     dispatch('change', value);
-   // checkDirty();
   }
 
-
-
   function  handleEnter(e) {
-
     if (e.key !== 'Enter') return;
+    if (e.metaKey) return send(rules.filter(v => v.some(r => !!r.value)))
+
     newRule();
   }
 
@@ -91,6 +89,7 @@
   }
 
   function newRule() {
+    if (value[current].trim() === '') return;
     current = current + 1;
     value[current] = '';
     input.focus();
@@ -163,7 +162,7 @@
       id="search-builder"
       bind:this="{input}"
       bind:value="{value[current]}"
-      on:keyup="{handleEnter}"
+      on:keydown="{handleEnter}"
       on:input="{updateInputLocation}"
       on:click="{updateInputLocation}"
     />
