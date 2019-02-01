@@ -1,0 +1,57 @@
+<script>
+  import QueryBuilder from '../components/QueryBuilder';
+  import { search, searchStore } from '../machines/search';
+
+  //const dispatch = createEventDispatcher();
+  let currentData,
+    value = '',
+    grey = false;
+
+  function handleChange(input) {
+    value = input.detail.filter(v => !!v);
+    checkDirty();
+  }
+
+  function handleSend(rules) {
+    search.send({ type: 'SEARCH', query: parseValue(rules), value });
+  }
+
+  function checkDirty() {
+    if ($searchStore.value !== value.toString()) {
+      search.send('CHANGED');
+    } else {
+      search.send('SAME');
+    }
+  }
+
+  function parseValue(query) {
+    return query.reduce((acc, next, i, arr) => {
+      return (
+        acc +
+        next.reduce((acc2, next2, i2, arr2) => {
+          return (
+            acc2 +
+            (next2.status === 'not' ? ' -' : ' ') +
+            next2.value +
+            (i2 === arr2.length - 1 ? ')' : '')
+          );
+        }, '(') +
+        (i === arr.length - 1 ? ')' : ' AND ')
+      );
+    }, '(');
+  }
+</script>
+
+<div class="search">
+  <QueryBuilder
+    status="{$searchStore.state.value.dirty ? 'dirty' : 'clean'}"
+    on:change="{ handleChange }"
+    send="{ handleSend }" />
+</div>
+
+
+<style>
+  .search {
+    width: 30%;
+  }
+</style>

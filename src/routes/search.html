@@ -5,95 +5,40 @@
 </script>
 
 <script>
-  import { createEventDispatcher } from 'svelte';
+  import { Results, ResultsItem } from '../components/Results';
+  import SearchWidget from '../components/SearchWidget.html';
 
-  import QueryBuilder from '../components/QueryBuilder';
-  import { search, searchStore } from '../machines/search';
-
-  const dispatch = createEventDispatcher();
-  let currentData, value = '', grey = false;
-
-
-
-  function handleChange(input) {
-    value = input.detail.filter(v => !!v);
-    checkDirty();
-  }
-
-  function handleSend(rules) {
-    search.send({type:'SEARCH', query: parseValue(rules), value})
-  }
-
-  function checkDirty() {
-    if ($searchStore.value !== value.toString()) {
-      search.send('CHANGED');
-    } else {
-      search.send('SAME');
-    }
-  }
-
-  // an unreadable mess right now
-  function parseValue(query) {
-    return query.reduce((acc, next, i, arr) => {
-      return acc + next.reduce((acc2, next2, i2, arr2) => {
-        return acc2 +
-        (next2.status === 'not' ? ' -': ' ') +
-        next2.value +
-        (i2 === arr2.length-1 ? ')' : '')
-
-      }, '(') +
-      (i === arr.length-1 ? ')' : ' AND ');
-    }, '(');
-  }
+  import { searchStore } from '../machines/search';
 </script>
 
 <svelte:head>
   <title>Search</title>
 </svelte:head>
 
-<div class="search">
-  <QueryBuilder
-    status="{$searchStore.state.value.dirty ? 'dirty' : 'clean'}"
-    on:change="{ handleChange }"
-    send="{ handleSend }" />
-</div>
+<SearchWidget />
 
 <div class="content">
-    {#if $searchStore.data && $searchStore.data.hits && $searchStore.data.hits.total > 0}
+  {#if $searchStore.data && $searchStore.data.hits && $searchStore.data.hits.total > 0}
 
-<h1>Results</h1>
-<ul class:dirty={!!$searchStore.state.value.dirty}>
-  {#each $searchStore.data.hits.hits as {_source} }
-    <li>
-      <h2>{_source.title_of_project}</h2>
-      <h3>{_source.title_of_organisation}</h3>
-      <p>{_source.placeName_city_organisation}, {_source.placeName_state_organisation}, {_source.placeName_country_organisation}</p>
-    </li>
+    <Results dirty={!!$searchStore.state.value.dirty}>
+      {#each $searchStore.data.hits.hits as {_source} }
+        <ResultsItem data={_source}></ResultsItem>
+      {/each}
+    </Results>
 
-  {/each}
-</ul>
-{/if}
-
+  {/if}
 </div>
 
 
 <style>
-  .search {
-    width: 30%;
 
-  }
   .content {
     margin-left: 100px;
     width: 70%;
   }
 
-  li {
-    border-bottom: 1px solid #ccc;
-    margin-bottom: 30px;
-  }
 
-  .dirty {
-    color: grey;
-  }
+
+
 
 </style>

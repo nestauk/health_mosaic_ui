@@ -1,18 +1,10 @@
 <script>
-  import {createEventDispatcher, afterUpdate} from 'svelte';
-
+  import { createEventDispatcher } from 'svelte';
   import SearchQueries from './SearchQueries.html';
-  //import {search, searchStore} from '../../machines/search';
-
-  // let currentData;
-  const dispatch = createEventDispatcher();
-
-  afterUpdate(() => {
-   // console.log(rules)
-  })
-
 
   export let tabs = 1, send, status;
+
+  const dispatch = createEventDispatcher();
   let rules = [[]],
     value = [''],
     current = 0,
@@ -25,11 +17,13 @@
     dispatch('change', value);
   }
 
-  function  handleEnter(e) {
-    console.log(rules)
+  function sendSearch() {
+    send(rules.filter(v => v.length > 0 && v.some(r => !!r.value)))
+  }
 
+  function  handleEnter(e) {
     if (e.key !== 'Enter') return;
-    if (e.metaKey) return send(rules.filter(v => v.length > 0 && v.some(r => !!r.value)))
+    if (e.metaKey) return sendSearch()
 
     newRule();
   }
@@ -103,9 +97,6 @@
     input.focus();
   }
 
-  // these two functions do a similar thing but in a very different way,
-  // there is some overlap that i'll pull out and share
-
   const formatANDString = str =>
     str.trim()[0] === '-' //  don't even ask
       ? ` ${str //  eslint-disable-next-line
@@ -170,10 +161,23 @@
     />
 
     <span class="button-wrap">
-      <button type="button" on:click="{negateValueString}">NOT</button>
-      <button type="button" on:click="{newRule}">OR ,</button>
-      <button type="button" on:click="{newQuery}">AND ⏎</button>
-      <button type="button" disabled="{status === 'clean'}" on:click="{() => send(rules)}">SEND</button>
+      <button type="button"
+              on:click="{negateValueString}">
+        NOT
+      </button>
+      <button type="button"
+              on:click="{newRule}">
+        OR ,
+      </button>
+      <button type="button"
+              on:click="{newQuery}">
+        AND ⏎
+      </button>
+      <button type="button"
+              disabled="{status === 'clean'}"
+              on:click="{sendSearch}">
+        SEND
+      </button>
     </span>
   </form>
 
