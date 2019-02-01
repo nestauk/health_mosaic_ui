@@ -36,9 +36,11 @@
   function parseValue(query) {
     return query.reduce((acc, next, i, arr) => {
       return acc + next.reduce((acc2, next2, i2, arr2) => {
+        return acc2 +
+        (next2.status === 'not' ? '-': '') +
+        next2.value +
+        (i2 === arr2.length-1 ? ')' : '')
 
-        return `${acc2} ${next2.status === 'not' ? '-': ''}${next2.value}` +
-        (i2 === arr2.length-1 ? ')' : '');
       }, '(') +
       (i === arr.length-1 ? ')' : ' AND ');
     }, '(');
