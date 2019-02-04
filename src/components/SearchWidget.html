@@ -1,6 +1,6 @@
 <script>
   import QueryBuilder from '../components/QueryBuilder';
-  import { search, searchStore } from '../machines/search';
+  import { store, state } from '../machines/search';
   import { goto } from '../../__sapper__/client.js'
 
   //const dispatch = createEventDispatcher();
@@ -14,16 +14,16 @@
   }
 
   function handleSend(rules) {
-    search.send({ type: 'SEARCH', query: parseValue(rules), value });
+    state.send({ type: 'SEARCH', query: parseValue(rules), value });
     console.log(parseValue(rules).replace(/[()\s]/g, ''))
     goto(`search?q=${parseValue(rules).replace(/\s/g, ',').replace(/OR/g, '~').replace(/[()]/g,'') }`)
   }
 
   function checkDirty() {
-    if ($searchStore.value !== value.toString()) {
-      search.send('CHANGED');
+    if ($state.value !== value.toString()) {
+      state.send('CHANGED');
     } else {
-      search.send('SAME');
+      state.send('SAME');
     }
   }
 
@@ -48,7 +48,7 @@
 
 <div class="search">
   <QueryBuilder
-    status="{$searchStore.state.value.dirty ? 'dirty' : 'clean'}"
+    status="{$state.dirty ? 'dirty' : 'clean'}"
     on:change="{ handleChange }"
     send="{ handleSend }" />
 </div>

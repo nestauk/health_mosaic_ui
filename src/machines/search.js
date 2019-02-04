@@ -80,14 +80,21 @@ const realGet = query => {
   return fetch(`${endpoint}`, options);
 };
 
-export const searchStore = writable({ value: [''] });
-export const search = interpret(
-  searchMachine.withContext({ update: searchStore.update })
+export const store = writable({ value: [''] });
+
+const searchState = writable({});
+const searchService = interpret(
+  searchMachine.withContext({ update: store.update })
 );
 
-search.onTransition(nextState => {
+export const state = {
+  subscribe: searchState.subscribe,
+  send: searchService.send,
+};
+
+searchService.onTransition(nextState => {
   console.log(nextState);
-  searchStore.update(v => ({ ...v, state: nextState }));
+  searchState.set(nextState.value);
 });
 
-search.start();
+searchService.start();

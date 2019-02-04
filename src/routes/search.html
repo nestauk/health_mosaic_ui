@@ -9,7 +9,7 @@
   import { Results, ResultsItem } from '../components/Results';
   import SearchWidget from '../components/SearchWidget.html';
 
-  import { searchStore } from '../machines/search';
+  import { store, state } from '../machines/search';
 </script>
 
 <svelte:head>
@@ -19,10 +19,10 @@
 <SearchWidget />
 
 <div class="content">
-  {#if $searchStore.data && $searchStore.data.hits && $searchStore.data.hits.total > 0}
+  {#if $store.data && $store.data.hits && $store.data.hits.total > 0}
 
-    <Results dirty={!!$searchStore.state.value.dirty}>
-      {#each $searchStore.data.hits.hits as {_source} }
+    <Results dirty={!!$state.dirty}>
+      {#each $store.data.hits.hits as {_source} }
         <ResultsItem data={_source}></ResultsItem>
       {/each}
     </Results>
