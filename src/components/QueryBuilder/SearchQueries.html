@@ -3,41 +3,41 @@
 </script>
 
 {#if rules.length}
-  <ul class="rules-container">
+<ul class="rules-container">
+  <!--  -->
+  {#each rules as rule, i} {#if rule && rule.length > 0}
+  <li class="rule" class:active-query="{i === current}">
     <!--  -->
-    {#each rules as rule, i}
-    {#if rule && rule.length > 0}
-    <li class="rule" class:active-query={i === current}>
-
-      <!--  -->
-      <ul class="query-container" on:click="{() => ruleSelect(i)}">
-        {#each rule as query, j}
-          <li class="query {query.status}" on:click="{() => negateValue(i, j)}">
-            {query.value}
-            <span class="remove-query"
-                  on:click|stopPropagation="{() => removeQuery(i, j)}">
-              Remove Query
-            </span>
-          </li>
-        {/each}
-      </ul>
-
-      <span class="remove-rule" on:click="{() => removeRule(i)}"></span>
-      <!--  -->
-    </li>
-    {/if}
+    <ul class="query-container" on:click="{() => ruleSelect(i)}">
+      {#each rule as query, j}
+      <li class="query {query.status}" on:click="{() => negateValue(i, j)}">
+        {query.value}
+        <span
+          class="remove-query"
+          on:click|stopPropagation="{() => removeQuery(i, j)}"
+        >
+          Remove Query
+        </span>
+      </li>
       {/each}
+    </ul>
 
-      {#if rules.length - 1  === current && !rules[current].length}
-      <li class="rule query-placeholder active-query" ><span>...</span></li>
-      {/if}
+    <span class="remove-rule" on:click="{() => removeRule(i)}"></span>
     <!--  -->
-  </ul>
+  </li>
+  {/if}
+  <!--  -->
+  {/each}
+  <!--  -->
+  {#if rules.length - 1 === current && !rules[current].length}
+  <li class="rule query-placeholder active-query"><span>...</span></li>
+  {/if}
+  <!--  -->
+</ul>
 {/if}
 
-
 <style>
-ul {
+  ul {
     list-style: none;
   }
 
@@ -46,7 +46,6 @@ ul {
     padding: 10px;
     font-size: 18px;
     position: relative;
-
   }
 
   .query-container {
