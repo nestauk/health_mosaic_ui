@@ -19,16 +19,17 @@
 <SearchWidget />
 
 <div class="content">
-  {#if $store.data && $store.data.hits && $store.data.hits.total > 0}
+  {#if $store.data && $store.data.length }
 
     <Results dirty={!!$state.dirty}>
-      {#each $store.data.hits.hits as {_source} }
+      {#each $store.data as {_source} }
         <ResultsItem data={_source}></ResultsItem>
       {/each}
     </Results>
-
   {/if}
 </div>
+
+
 
 
 <style>

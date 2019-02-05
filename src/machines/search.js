@@ -1,5 +1,7 @@
 import { Machine, interpret } from 'xstate';
 import { writable } from 'svelte/store';
+import { query } from '../actions/queryAPI';
+
 const searchMachine = Machine(
   {
     id: 'search',
@@ -24,9 +26,7 @@ const searchMachine = Machine(
               onDone: {
                 target: '#search.clean',
                 actions: (ctx, event) => {
-                  event.data
-                    .json()
-                    .then(r => ctx.update(v => ({ ...v, data: r })));
+                  console.log(event);
                 },
               },
               onError: {
@@ -44,42 +44,28 @@ const searchMachine = Machine(
   },
   {
     services: {
-      postRequest: (ctx, evt) => {
-        console.log('action', evt);
-        ctx.update(v => ({ ...v, value: evt.value.toString() }));
-        //return fakeGet(evt);
-        return realGet(evt.query);
+      postRequest: async (ctx, evt) => {
+        ctx.update(v => ({
+          ...v,
+          value: evt.value.toString(),
+          pages: v.pages ? v.pages.concat(v.next) : [v.next],
+        }));
+        let id;
+        let req = evt.req;
+        if (evt.id) {
+          id = evt.id;
+          req = 'nextScroll';
+        }
+        const q = await query(evt.query, req, id);
+        ctx.update(v => ({
+          ...v,
+          data: q.hits.hits,
+          next: q._scroll_id,
+        }));
       },
     },
   }
 );
-import { data } from './data';
-const fakeGet = () => {
-  return new Promise(res => {
-    setTimeout(() => {
-      res(data);
-    }, 2000);
-  });
-};
-
-const realGet = query => {
-  const endpoint = 'http://3.8.107.150:9200/rwjf_test/_search';
-  const data = {
-    query: {
-      query_string: { query, default_operator: 'AND' },
-    },
-  };
-  const options = {
-    method: 'POST',
-    mode: 'cors',
-    headers: {
-      'Content-Type': 'application/json',
-      'Access-Control-Allow-Origin': '*',
-    },
-    body: JSON.stringify(data),
-  };
-  return fetch(`${endpoint}`, options);
-};
 
 export const store = writable({ value: [''] });
 
