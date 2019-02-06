@@ -1,7 +1,7 @@
 <script>
   import { createEventDispatcher } from 'svelte';
   import SearchQueries from './SearchQueries.html';
-
+  import {parseInput} from '../../util/parse'
   export let tabs = 1, send, status;
 
   const dispatch = createEventDispatcher();
@@ -13,12 +13,13 @@
     currentTab = 0;
 
   $: {
-    rules = parseInput(rules, value);
+    rules = parseInput(value);
+    console.log(rules)
     dispatch('change', value);
   }
 
   function sendSearch() {
-    send(rules.filter(v => v.length > 0 && v.some(r => !!r.value)))
+    send(rules.filter(v => v.length > 0 && v.some(r => !!r.value || !!r.field)))
   }
 
   function  handleEnter(e) {
@@ -27,26 +28,6 @@
 
     newRule();
   }
-
-  const parseInput = (rulesArr, valueStr) => valueStr.map(el =>
-        el
-          .split(',')
-          .filter(v => {
-            const trimmed = v.trim();
-            return (
-              trimmed.length > 0 &&
-              !(trimmed.length === 1 && trimmed[0] === '-')
-            );
-          })
-          .map(v => {
-            const value = v.trim();
-            const status = value[0] === '-' ? 'not' : 'and';
-            return {
-              status,
-              value: status === 'and' ? value : value.slice(1),
-            };
-          })
-      );
 
 
   function removeRule(i) {
@@ -193,12 +174,6 @@
   />
 </div>
 
-<!-- {#if $searchStore.state.value.dirty}
-dirty - {$searchStore.state.value.dirty}
-{:else}
-{$searchStore.state.value}
-{/if} -->
-
 <style>
   button[disabled] {
     opacity: 0.3;
@@ -247,7 +222,6 @@ dirty - {$searchStore.state.value.dirty}
 
   .tab-selector {
     display: flex;
-    /* height: 35px; */
     list-style: none;
     border-bottom: 1px solid #ccc;
   }
