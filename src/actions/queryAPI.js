@@ -67,7 +67,6 @@ function generateBody(type, querystring, id = 0) {
       },
     },
   };
-  console.log('TYPE', type);
   return body[type];
 }
 
