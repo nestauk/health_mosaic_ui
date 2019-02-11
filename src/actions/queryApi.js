@@ -1,8 +1,7 @@
 import { baseUrl, size } from '../config';
 
-export async function query(querystring, type, id) {
+export async function query(querystring, type = 'single', id) {
   const data = generateBody(type, querystring, id);
-
   const options = {
     method: 'POST',
     mode: 'cors',
@@ -28,7 +27,6 @@ export async function query(querystring, type, id) {
   } catch (e) {
     result = { type: e.type, reason: e.reason };
   }
-
   return result;
 }
 
@@ -67,7 +65,6 @@ function generateBody(type, querystring, id = 0) {
       },
     },
   };
-
   return body[type];
 }
 

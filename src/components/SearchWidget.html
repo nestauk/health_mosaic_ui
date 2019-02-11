@@ -1,11 +1,10 @@
 <script>
   import QueryBuilder from '../components/QueryBuilder';
   import { store, state } from '../machines/search';
-  import { goto } from '../../__sapper__/client.js';
+  import { querify } from '../util/parse';
 
   let currentData,
-    value = '',
-    grey = false;
+    value = '';
 
   function handleChange(input) {
     value = input.detail.filter(v => !!v);
@@ -13,8 +12,8 @@
   }
 
   function handleSend(rules) {
-    const opts = { type: 'SEARCH', query: parseValue(rules), value, req: 'scroll' };
-    state.send(opts);
+    console.log(querify(rules), rules)
+    state.send({ type: 'SEARCH', query: querify(rules), value });
   }
 
   function checkDirty() {
@@ -23,24 +22,6 @@
     } else {
       state.send('SAME');
     }
-  }
-
-  function parseValue(query) {
-    return query.reduce((acc, next, i, arr) => {
-      return (
-        acc +
-        next.reduce((acc2, next2, i2, arr2) => {
-          const mid = (next2.status === 'not' ? ' -' : ' ') +
-                      next2.value;
-          return (
-            acc2 +
-            mid.trim() +
-            (i2 === arr2.length - 1 ? ')' : ' ')
-          );
-        }, '(') +
-        (i === arr.length - 1 ? ')' : 'OR')
-      );
-    }, '(');
   }
 </script>
 

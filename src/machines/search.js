@@ -1,6 +1,6 @@
 import { Machine, interpret } from 'xstate';
 import { writable } from 'svelte/store';
-import { query } from '../actions/queryAPI';
+import { query } from '../actions/queryApi';
 
 const searchMachine = Machine(
   {

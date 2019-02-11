@@ -4,7 +4,7 @@ module.exports = {
   coveragePathIgnorePatterns: ['node_modules', '.+fixtures.+'],
   testPathIgnorePatterns: ['/node_modules/', '/cypress/'],
   testEnvironment: 'node',
-  setupFiles: ['./setupJest.js'],
+
   globals: {
     'ts-jest': {
       diagnostics: {
