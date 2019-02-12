@@ -4,7 +4,7 @@ import {
   shell,
   // routes
   // eslint-disable-next-line
-} from '../__sapper__/service-worker.js';
+} from '@sapper/service-worker';
 
 const ASSETS = `cache${timestamp}`;
 

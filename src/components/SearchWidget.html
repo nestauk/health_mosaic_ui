@@ -1,7 +1,9 @@
 <script>
   import QueryBuilder from '../components/QueryBuilder';
   import { store, state } from '../machines/search';
-  import { querify } from '../util/parse';
+  //import { querify } from '../util/parse';
+  import {subjectFields, contentFields} from '../config';
+  import {dslBuilder, createFields} from '../util/parse';
 
   let currentData,
     value = '';
@@ -12,21 +14,38 @@
   }
 
   function handleSend(rules) {
-    console.log(querify(rules), rules)
-    state.send({ type: 'SEARCH', query: querify(rules), value });
+    let joinedRules = rules.map(v => ({
+      visible: v.visible,
+      value: v.value,
+      fields: [].concat(
+        createFields(contentFields, v.content),
+        createFields(subjectFields, v.subject)
+      )
+    }));
+
+    joinedRules = joinedRules.reduce((acc, next) => {
+      if (!next.visible) return acc;
+      return  acc + dslBuilder(next.value, next.fields);
+    }, '')
+
+    state.send({ type: 'SEARCH', query: joinedRules, value });
   }
 
   function checkDirty() {
-    if ($store.value !== value.toString()) {
-      state.send('CHANGED');
-    } else {
-      state.send('SAME');
-    }
+    state.send('CHANGED');
+
+    // if ($store.value !== value.toString()) {
+    //   state.send('CHANGED');
+    // } else {
+    //   state.send('SAME');
+    // }
   }
 </script>
 
 <div class="search">
   <QueryBuilder
+    {subjectFields}
+    {contentFields}
     status="{$state.dirty ? 'dirty' : 'clean'}"
     on:change="{ handleChange }"
     send="{ handleSend }" />
@@ -35,6 +54,6 @@
 
 <style>
   .search {
-    width: 30%;
+    width: 100%;
   }
 </style>

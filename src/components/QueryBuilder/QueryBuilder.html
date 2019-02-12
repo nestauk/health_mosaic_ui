@@ -1,190 +1,149 @@
 <script>
-  import { createEventDispatcher } from 'svelte';
+  import { createEventDispatcher, onMount , tick} from 'svelte';
   import SearchQueries from './SearchQueries.html';
-  import { parseInput } from '../../util/parse.js';
+  import {
+    search,
+    rules,
+    updateValue,
+    selectRule,
+    newRule,
+    copyRule,
+    handleSelect,
+  } from './store.js';
 
-  export let tabs = 1, send, status;
+  export let tabs = 1,
+    send,
+    status;
+
+  let input;
 
   const dispatch = createEventDispatcher();
-  let rules = [[]],
-    value = [''],
-    current = 0,
-    input,
-    inputLocation = 0,
-    currentTab = 0;
 
-  $: {
-    rules = parseInput(value);
-    console.log(rules)
-    dispatch('change', value);
-  }
+  $: dispatch('change', $search.value.map(v => v.value));
+  $: subjectDefault = $search.value[$search.current].subject.every(v => v.status === 'default')
+  $: contentDefault = $search.value[$search.current].content.every(v => v.status === 'default')
 
   function sendSearch() {
-    console.log('RULES', rules)
-    send(rules.filter(v => v.length > 0 && v.some(r => !!r.value || !!r.field)))
+    send($rules.filter(v => v.value.length > 0));
   }
 
-  function  handleEnter(e) {
+  function handleEnter(e, isWindow = false) {
+    console.log('boo', e)
     if (e.key !== 'Enter') return;
-    if (e.metaKey) return sendSearch()
+    if (e.metaKey) return sendSearch();
+    if (isWindow) return;
+    createNewRule();
+    selectRule($search.value.length - 1)
 
+  }
+
+  function setRule(i) {
+    selectRule(i);
+    input.focus();
+  }
+
+  function createNewRule() {
     newRule();
-  }
-
-  function removeRule(i) {
-    const tempValues = [...value];
-    tempValues.splice(i, 1);
-
-    value = tempValues;
-    current = tempValues.length;
-    value[current] = '';
-  }
-
-  function removeQuery(i, j) {
-    value = value
-        .map((str, strIndex) => {
-          if (strIndex === i) {
-            return str
-              .split(',')
-              .filter((v, index) => index !== j)
-              .join(',');
-          } else {
-            return str;
-          }
-        })
-        .filter(v => v);
-
-
-    if (!value[current]) {
-      current = value.length;
-      value[current] = '';
-    }
-  }
-
-  function selectRule(i) {
-    current = i;
     input.focus();
   }
 
-  function newRule() {
-    if (value[current].trim() === '') return;
-    current = current + 1;
-    value[current] = '';
-    input.focus();
-  }
+  function createCopyRule(i) {
+    copyRule(i);
 
-  function newQuery() {
-    value = value.map((v, i) => (i === current ? v + ', ' : v));
+    selectRule($search.value.length - 1)
 
     input.focus();
   }
 
-  const formatANDString = str =>
-    str.trim()[0] === '-' //  don't even ask
-      ? ` ${str //  eslint-disable-next-line
-          .trim() //  eslint-disable-next-line
-          .slice(1) //  eslint-disable-next-line
-          .trim()}`
-      : ` -${str.trim()}`;
-
-  function negateValueString() {
-    let charCount = 0;
-    value =  value.map((v, i) => {
-        if (i !== current) return v;
-        return v
-          .split(',')
-          .map(el => {
-            charCount = charCount + el.length + 1;
-            if (
-              inputLocation >= charCount - el.length - 1 &&
-              inputLocation <= charCount
-            ) {
-              return formatANDString(el);
-            } else {
-              return el;
-            }
-          }, 0)
-          .join(',');
-      });
-
-
-    input.focus();
-  }
-
-  function negateValueClick(valueIndex, queryIndex) {
-    value = value.map((valArr, i) => {
-        if (valueIndex !== i) return valArr;
-        return valArr
-          .split(',')
-          .map((query, j) => {
-            if (queryIndex !== j) return query;
-
-            return formatANDString(query);
-          })
-          .join(',');
-      });
-
-  }
-
-  const updateInputLocation = () => inputLocation = input.selectionStart;
+  onMount(() => {
+    setTimeout(() => {
+      input.focus();
+    }, 0);
+  });
 </script>
+
+<svelte:window on:keydown="{(e) => handleEnter(e, true)}"/>
 
 <div class="main-container">
   <form on:submit="{e => e.preventDefault()}">
-    <label for="search-builder">Search:</label>
-    <input
-      autocomplete="off"
-      id="search-builder"
-      bind:this="{input}"
-      bind:value="{value[current]}"
-      on:keydown="{handleEnter}"
-      on:input="{updateInputLocation}"
-      on:click="{updateInputLocation}"
-    />
+    <div class="input-wrap">
+      <label class="input" for="search-builder">Search:</label>
+      <input
+        autocomplete="off"
+        id="search-builder"
+        bind:this="{input}"
+        value="{$search.value[$search.current].value}"
+        on:keydown="{handleEnter}"
+        on:input="{(e) => updateValue(e.target.value)}"
+        placeholder="example: cancer, -breast"
+      />
+      {#if $search.value[$search.current].value.length !== 0}
+      <span class="label tip">Press return to add a new query</span>
+      {/if}
 
-    <span class="button-wrap">
-      <button type="button"
-              on:click="{negateValueString}">
-        NOT
-      </button>
-      <button type="button"
-              on:click="{newRule}">
-        OR ,
-      </button>
-      <button type="button"
-              on:click="{newQuery}">
-        AND ⏎
-      </button>
-      <button type="button"
-              disabled="{status === 'clean'}"
-              on:click="{sendSearch}">
-        SEND
-      </button>
-    </span>
+    </div>
+    <div>
+      <fieldset>
+        {#each $search.value[$search.current].subject as {field, status}, i}
+        <label
+          class="{status}"
+          on:click="{() => handleSelect('subject', i)}"
+          for="subject-{field}"
+        >
+          {field}
+        </label>
+        <select class="sr-only" id="subject-{field}">
+          <!-- <select bind:value={subject[i].status} class="sr-only" id="subject-{field}"> -->
+
+          <option value="default">Default</option>
+          <option value="include">Include</option>
+          <option value="exclude">Exclude</option>
+        </select>
+        {/each}
+      </fieldset>
+      <span class="label {subjectDefault ? 'default' : 'changed'}">Subject</span>
+    </div>
+    <div>
+      <fieldset>
+        {#each $search.value[$search.current].content as {field, status}, i}
+        <label
+          class="{status}"
+          on:click="{() => handleSelect('content', i)}"
+          for="subject-{field}"
+        >
+          {field}
+        </label>
+        <select class="sr-only" id="subject-{field}">
+          <!-- <select bind:value={content[i].status} class="sr-only" id="subject-{field}"> -->
+          <option value="default">Default</option>
+          <option value="inlcude">Include</option>
+          <option value="exclude">Exclude</option>
+        </select>
+        {/each}
+
+      </fieldset>
+      <span class="label {contentDefault ? 'default' : 'changed'}">Content</span>
+    </div>
+    <button on:click="{() => sendSearch()}">Search</button>
   </form>
 
-
-
-  <SearchQueries
-    {current}
-    rules="{rules}"
-    {removeRule}
-    {removeQuery}
-    ruleSelect="{(i) => selectRule(i)}"
-    negateValue="{negateValueClick}"
-  />
+  <SearchQueries ruleselect="{(i) => setRule(i)}"
+                 copyRule={createCopyRule}
+                 {rules} />
 </div>
 
-<!-- {#if $searchStore.state.value.dirty}
-dirty - {$searchStore.state.value.dirty}
-{:else}
-{$searchStore.state.value}
-{/if} -->
-
 <style>
-  button[disabled] {
-    opacity: 0.3;
+  button {
+    height: 2.2rem;
+    margin-top: 15px;
+    background: #eee;
+    border: 1px solid #aaa;
+    padding: 10px 15px;
+    border-radius: 2px;
+    font-size: 12px;
+    cursor: pointer;
   }
+
   :global(*) {
     margin: 0;
     padding: 0;
@@ -195,7 +154,31 @@ dirty - {$searchStore.state.value.dirty}
     padding: 0;
   }
 
-  label {
+  .label {
+    margin-left: 15px;
+
+    display: block;
+    font-size: 0.8rem;
+    margin-top: -10px;
+  }
+
+  .label.tip {
+    margin-left: 15px;
+    padding-top: 1px;
+    display: block;
+    font-size: 0.8rem;
+    margin-top: 5px;
+  }
+
+  .label.default {
+    color: limegreen;
+  }
+
+  .label.changed {
+    color: grey;
+  }
+
+  .input {
     font-size: 0;
     opacity: 0;
   }
@@ -204,17 +187,76 @@ dirty - {$searchStore.state.value.dirty}
     padding: 0;
     margin: 0;
     position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: 30px;
+  }
+
+  fieldset {
+    cursor: pointer;
+    margin: 15px;
+    font-weight: 300;
+    user-select: none;
+    border: solid 1px #ddd;
+    padding: 5px 10px;
+    border-radius: 2px;
+    /* margin-left: -6px; */
+  }
+
+  fieldset:last-of-type {
+    border-top-right-radius: 2px;
+    border-bottom-right-radius: 2px;
+  }
+
+  fieldset:first-of-type {
+    border-top-right-radius: 2px;
+    border-bottom-right-radius: 2px;
+  }
+
+  fieldset label {
+    cursor: pointer;
+    margin: 0 5px;
+    font-weight: 300;
+    user-select: none;
+  }
+
+  label.excluded {
+    color: red;
+  }
+  label.included {
+    color: limegreen;
+  }
+  label.default {
+    color: #ccc;
   }
 
   input {
-    width: 100%;
     margin: 0;
+    margin-top: -20px;
     padding: 20px 15px;
     border: none;
     border-bottom: 1px solid #ccc;
     border-radius: 0;
     font-size: 25px;
-    height: 59px;
+    background: transparent;
+    outline: none;
+    transition: 0.2s;
+    width: 100%;
+    height: 100%;
+  }
+
+  input::placeholder {
+    font-size: 16px;
+
+  }
+
+  input:focus {
+    border-bottom: 1px solid #333;
+  }
+
+  .input-wrap {
+    width: 40%;
+    height: 2rem;
   }
 
   .button-wrap {
@@ -223,22 +265,11 @@ dirty - {$searchStore.state.value.dirty}
     top: 12px;
   }
 
-  button {
-    margin-left: 10px;
-  }
-
   .tab-selector {
     display: flex;
     /* height: 35px; */
     list-style: none;
     border-bottom: 1px solid #ccc;
-  }
-
-  .tab-selector li {
-    padding: 10px 10px 10px 20px;
-    border-right: 1px solid #ccc;
-    cursor: pointer;
-    display: flex;
   }
 
   .active-tab {
@@ -259,5 +290,17 @@ dirty - {$searchStore.state.value.dirty}
 
   .remove-tab:hover {
     opacity: 1;
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
   }
 </style>

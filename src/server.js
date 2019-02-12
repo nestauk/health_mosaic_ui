@@ -2,7 +2,7 @@ import sirv from 'sirv';
 import polka from 'polka';
 import compression from 'compression';
 // eslint-disable-next-line
-import * as sapper from '../__sapper__/server.js';
+import * as sapper from '@sapper/server';
 
 const { PORT, NODE_ENV } = process.env;
 const dev = NODE_ENV === 'development';
