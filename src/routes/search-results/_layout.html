@@ -1,0 +1,149 @@
+<script context="module">
+  export async function preload({ path }) {
+
+  }
+</script>
+
+<script>
+  import { page } from '@sapper/app';
+
+
+  import {goto} from '@sapper/app';
+  import { quintOut } from 'svelte/easing';
+  import { onMount } from 'svelte';
+
+  import { Results, ResultsItem } from '../../components/Results';
+  import SearchWidget from '../../components/SearchWidget.html';
+  import { store, state } from '../../machines/search';
+
+  let search, index = 0;
+  const images = ['puppy01.jpg', 'puppy02.jpg', 'puppy03.jpg', 'puppy04.jpg', 'puppy05.jpg', 'puppy06.jpg'];
+  const states = {
+    current: 'open',
+    open: 'close',
+    close: 'open'
+  };
+
+  $: {
+    if (search && states.current === 'close') {
+      const { height } = search.getBoundingClientRect();
+      search.style.transform = `translateY(-${height - (3.5 * 10) + 1}px)`;
+    } else if (search) {
+      search.style.transform = 'translateY(0)';
+    }
+  }
+
+  page.subscribe(({ path }) => {
+    const newIndex = parseInt(path.replace('/search-results/puppy', ''));
+    console.log(newIndex)
+    index = isNaN(newIndex) ? 0 : newIndex;
+  });
+
+
+  const changeIndex = () => {
+    if (index === images.length -1) return;
+
+    window.removeEventListener('wheel', changeIndex)
+    goto(`/search-results/puppy${index + 1}`);
+    setTimeout(() => {
+      window.addEventListener('wheel', changeIndex)
+
+    }, 1500);
+  }
+
+  onMount(() => {
+    window.addEventListener('wheel', changeIndex)
+  });
+
+  function snappy(node, {duration = 500, i = 0}) {
+    Object.assign(node.style, {
+      zIndex: i === -1 ? 2 : 0
+    });
+
+    return {
+      duration,
+      delay: 0,
+      easing: quintOut,
+      css: (t, u) => `transform: scale(${1+2*u}); opacity: ${t}; `
+    }
+  }
+</script>
+
+<svelte:head>
+  <title>Search with snappy results</title>
+</svelte:head>
+
+<div class="search" bind:this="{search}">
+    <SearchWidget />
+<div class="close-label" on:click="{() => states.current = states[states.current]}">
+  {states.current === 'close' ? 'OPEN' : 'CLOSE'}
+</div>
+
+</div>
+<div class="content">
+  <!-- {#if $store.data && $store.data.length }
+  {/if} -->
+  {#each images as img, i (img)}
+    {#if i ===  index || i === index + 1}
+      <img class="image-{i - index}"
+           src="./test-images/puppy0{i+1}.jpg"
+           out:snappy="{{duration: 2000, i: i - index}}"
+           alt=""  />
+    {/if}
+  {/each}
+</div>
+
+
+
+
+<style>
+
+  .search {
+    position: absolute;
+    width: 100%;
+    top: 0;
+    left: 0;
+    box-shadow: 0 1px 5px 1px rgba(0,0,0,0.2);
+    padding: 0 3em 3em 3em;
+    transition: 0.5s;
+    z-index: 3;
+    background: #fff;
+  }
+
+  .close-label {
+    position: absolute;
+    bottom: 0;
+    text-align: center;
+    background: #333;
+    color: #eee;
+    left: -30px;
+    right: -30px;
+    width: calc(100% + 30px);
+    padding: 5px 0;
+    cursor:pointer;
+  }
+
+  .content {
+    width: 100%;
+    height: calc(100vh - 3.5rem);
+    position: relative;
+    overflow: hidden;
+  }
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 0;
+  }
+  .image-0 {
+    z-index: 1
+  }
+
+  .image-1 {
+    z-index: 0;
+  }
+</style>

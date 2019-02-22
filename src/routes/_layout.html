@@ -1,14 +1,14 @@
-<Nav segment={child.segment}/>
+<Nav />
 
 <main>
-	<svelte:component this={child.component} {...child.props}/>
+	<slot></slot>
 </main>
 
 <style>
 	main {
 		position: relative;
 		width: 100%;
-		padding: 2em;
+		/* padding: 2em; */
 		margin: 0;
     box-sizing: border-box;
 	}
@@ -16,6 +16,5 @@
 
 <script>
 	import Nav from '../components/Nav.html'
-	export let child;
-	export let path;
+
 </script>
