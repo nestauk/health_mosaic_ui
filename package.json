@@ -12,6 +12,7 @@
     "test": "jest"
   },
   "dependencies": {
+    "animejs": "^3.0.1",
     "compression": "^1.7.1",
     "just-debounce": "^1.0.0",
     "lamb": "^0.57.0",
@@ -45,7 +46,7 @@
     "rollup-plugin-terser": "^1.0.1",
     "rollup-plugin-typescript": "^1.0.0",
     "sapper": "^0.26.0-alpha.9",
-    "svelte": "3.0.0-beta.3",
+    "svelte": "3.0.0-beta.8",
     "ts-jest": "^23.10.5",
     "ts-lib": "^0.0.5",
     "typescript": "^3.2.4",

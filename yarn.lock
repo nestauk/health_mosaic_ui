@@ -724,6 +724,11 @@ ajv@^6.5.5, ajv@^6.9.1:
     json-schema-traverse "^0.4.1"
     uri-js "^4.2.2"
 
+animejs@^3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/animejs/-/animejs-3.0.1.tgz#8b808bad575e3b6106489d8b04b92bc4062166fe"
+  integrity sha512-7mMoBQScvA7s4zm3EVgnuXXrtOu6TJNAhU+Ajo7HsXYH0NwbuZIcRHMO65a9NyUlmAXz4VPxlK5cENNOQbCi8g==
+
 ansi-escapes@^3.0.0, ansi-escapes@^3.2.0:
   version "3.2.0"
   resolved "https://registry.yarnpkg.com/ansi-escapes/-/ansi-escapes-3.2.0.tgz#8780b98ff9dbf5638152d1f1fe5c1d7b4442976b"
@@ -5007,10 +5012,10 @@ supports-color@^6.0.0, supports-color@^6.1.0:
   dependencies:
     has-flag "^3.0.0"
 
-svelte@3.0.0-beta.3:
-  version "3.0.0-beta.3"
-  resolved "https://registry.yarnpkg.com/svelte/-/svelte-3.0.0-beta.3.tgz#7989243e028f0eeed48d27d3af45d5d6a4e82082"
-  integrity sha512-kEPbvpmzZqVsUMgMQ1DFx1W+05hWiHVSQaQYPv55AzcCAeXHRZD9N55Pv4LKH6sOHvvNhkb4GVLSK2yBQZn5CQ==
+svelte@3.0.0-beta.8:
+  version "3.0.0-beta.8"
+  resolved "https://registry.yarnpkg.com/svelte/-/svelte-3.0.0-beta.8.tgz#a7cd0dbcc30dcebcf94bd4ba87f58bac5dbf6e93"
+  integrity sha512-9cJHYdEs5h/6TJPwY+vfzwrznCLDjfS1rlJQz8SzPKfUJHCPxnDCbIZ95iPzATkv8aLHGcn1a/nLthyG+xh2IQ==
 
 symbol-tree@^3.2.2:
   version "3.2.2"

@@ -1,22 +1,22 @@
 <script context="module">
-  export async function preload({ path }) {
+  export async function preload() {
 
   }
 </script>
 
 <script>
-  import { page } from '@sapper/app';
+  import { page, goto } from '@sapper/app';
 
-
-  import {goto} from '@sapper/app';
   import { quintOut } from 'svelte/easing';
-  import { onMount } from 'svelte';
+  import { onMount, tick } from 'svelte';
 
-  import { Results, ResultsItem } from '../../components/Results';
+  // import { Results, ResultsItem } from '../../components/Results';
   import SearchWidget from '../../components/SearchWidget.html';
-  import { store, state } from '../../machines/search';
+  // import { store, state } from '../../machines/search';
 
-  let search, index = 0;
+  import anime from 'animejs';
+
+  let search, index = 0, activeImg = [], animation, animation2;
   const images = ['puppy01.jpg', 'puppy02.jpg', 'puppy03.jpg', 'puppy04.jpg', 'puppy05.jpg', 'puppy06.jpg'];
   const states = {
     current: 'open',
@@ -24,7 +24,11 @@
     close: 'open'
   };
 
-  $: {
+
+  async function animateSearch() {
+    states.current = states[states.current];
+    // await tick();
+
     if (search && states.current === 'close') {
       const { height } = search.getBoundingClientRect();
       search.style.transform = `translateY(-${height - (3.5 * 10) + 1}px)`;
@@ -32,40 +36,153 @@
       search.style.transform = 'translateY(0)';
     }
   }
+  // $: {
+
+  // }
 
   page.subscribe(({ path }) => {
     const newIndex = parseInt(path.replace('/search-results/puppy', ''));
-    console.log(newIndex)
     index = isNaN(newIndex) ? 0 : newIndex;
   });
 
-
+  let done;
   const changeIndex = () => {
     if (index === images.length -1) return;
 
-    window.removeEventListener('wheel', changeIndex)
-    goto(`/search-results/puppy${index + 1}`);
-    setTimeout(() => {
-      window.addEventListener('wheel', changeIndex)
+    window.removeEventListener('wheel', changeIndex);
+    //console.log(window);
+    //if (!window) return changeImage();
+    // console.log(activeImg);
+    animation.play();
 
-    }, 1500);
-  }
+    animation.finished.then(() => {
+      done = true;
+      // console.log('wooooooo');
+      // goto(`/search-results/puppy${index + 1}`);
+      window.addEventListener('wheel', changeIndex);
+    });
+
+
+  };
 
   onMount(() => {
-    window.addEventListener('wheel', changeIndex)
+    window.addEventListener('wheel', changeIndex);
+    animation = anime.timeline({
+      autoplay: false,
+      duration: 500,
+      easing: 'easeOutQuint',
+    })
+      .add({
+        targets: activeImg,
+        scale: 0.25,
+        rotateY: '20deg',
+        translateZ: (t, i, l) => i * 40 + 'px ',
+        translateX: (t, i, l) => i * 40 + 'px ',
+        // translateY: (t, i, l) => i * 20 + 'px ',
+        duration: 250
+      })
+      .add({
+        targets: activeImg,
+        translateZ: (t, i, l) => i * (50 * (i+1)) + 'px',
+        translateX: (t, i, l) => i * (50 * (i+1)) + 'px',
+        translateY: (t, i, l) => i * (25 * (i+1)) + 'px',
+      });
+    // animation = new anime({
+    //   autoplay: false,
+    //   targets: activeImg,
+    //   scale: 0.25,
+    //   rotateY: '30deg',
+    //   translateZ: (t, i, l) => i * 100 + 'px ',
+    //   translateX: (t, i, l) => i * 100 + 'px ',
+    //   translateY: (t, i, l) => i * 50 + 'px ',
+    //   duration: 500,
+    //   easing: 'easeOutQuint',
+    //   loop: false,
+    // });
+
+
   });
+
+  // function snappy(node, {duration = 500, i = 0}) {
+  //   Object.assign(node.style, {
+  //     zIndex: i === -1 ? 2 : 0
+  //   });
+
+  //   return {
+  //     duration,
+  //     delay: 0,
+  //     easing: quintOut,
+  //     css: (t, u) => `transform: scale(${1+2*u}); opacity: ${t}; `
+  //   }
+  // }
 
   function snappy(node, {duration = 500, i = 0}) {
     Object.assign(node.style, {
       zIndex: i === -1 ? 2 : 0
     });
-
     return {
       duration,
       delay: 0,
       easing: quintOut,
-      css: (t, u) => `transform: scale(${1+2*u}); opacity: ${t}; `
-    }
+      tick: () => ``
+    };
+  }
+
+  function whoosh(i) {
+    if (!done) return;
+    const l = activeImg.length;
+
+   anime.timeline({
+      autoplay: true,
+      duration: 500,
+      easing: 'easeOutQuint',
+    })
+      .add({
+        targets: activeImg[i],
+        // scale: 0.25,
+        // rotateY: '0deg',
+        // translateZ: (t, i, l) => i * 40 + 'px ',
+        translateX: () => (i * (50 * (i+1))) - ((l-i) * (50 * (i+1))) + 'px',
+        // translateY: (t, i, l) => i * 20 + 'px ',
+        duration: 250
+      });
+
+    // anime.timeline({
+    //   autoplay: true,
+    //   duration: 500,
+    //   easing: 'easeOutQuint',
+    // })
+    //   .add({
+    //     targets: activeImg,
+    //     // scale: 0.25,
+    //     // rotateY: '0deg',
+    //     translateZ: (t, index, l) => {
+    //       if (index <= i) return index * (50 * (index+1)) + 'px';
+    //       if (index > i) return index * (10 * (index+1)) + 200 + 'px';
+    //       // return i * 20 + 'px '
+    //     },
+    //     //translateX: () => (i * (50 * (i+1))) - ((l-i) * (50 * (i+1))) + 'px',
+    //     // translateY: (t, i, l) => i * 20 + 'px ',
+    //     duration: 250
+    //   })
+  }
+
+  function whooshBack(i) {
+    if (!done) return;
+    animation = anime.timeline({
+      autoplay: true,
+      duration: 500,
+      easing: 'easeOutQuint',
+    })
+      .add({
+        targets: activeImg[i],
+        // scale: 0.25,
+        // rotateY: '0deg',
+        // translateZ: (t, i, l) => i * 40 + 'px ',
+        translateX: () => i * (50 * (i+1)) + 'px',
+        // translateY: (t, i, l) => i * 20 + 'px ',
+        duration: 250
+      })
   }
 </script>
 
@@ -75,7 +192,7 @@
 
 <div class="search" bind:this="{search}">
     <SearchWidget />
-<div class="close-label" on:click="{() => states.current = states[states.current]}">
+<div class="close-label" on:click="{animateSearch}">
   {states.current === 'close' ? 'OPEN' : 'CLOSE'}
 </div>
 
@@ -84,12 +201,13 @@
   <!-- {#if $store.data && $store.data.length }
   {/if} -->
   {#each images as img, i (img)}
-    {#if i ===  index || i === index + 1}
-      <img class="image-{i - index}"
+    <!-- {#if i ===  index } -->
+      <img bind:this={activeImg[i]} class="image-{i - index}"
            src="./test-images/puppy0{i+1}.jpg"
-           out:snappy="{{duration: 2000, i: i - index}}"
+           on:mouseenter={() => whoosh(i)}
+           on:mouseleave={() => whooshBack(i)}
            alt=""  />
-    {/if}
+    <!-- {/if} -->
   {/each}
 </div>
 
@@ -128,6 +246,8 @@
     height: calc(100vh - 3.5rem);
     position: relative;
     overflow: hidden;
+    perspective: 3000px;
+
   }
 
   img {
@@ -138,12 +258,20 @@
     top: 0;
     left: 0;
     z-index: 0;
+    transform-origin: 20% 20%;
+    /* transition: 1s;
+    transition-delay: 2s;
+    opacity: 0; */
+    /* box-shadow:  -10px -10px 85px 33px rgba(0,0,0,0.2) */
   }
   .image-0 {
-    z-index: 1
+    /* z-index: 2;
+    opacity: 1; */
   }
 
   .image-1 {
-    z-index: 0;
+    /* z-index: 1; */
+    /* transform: scale(0.8); */
+    /* opacity: 0.5; */
   }
 </style>
