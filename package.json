@@ -43,7 +43,7 @@
     "rollup-plugin-svelte": "^5.0.3",
     "rollup-plugin-terser": "^1.0.1",
     "rollup-plugin-typescript": "^1.0.0",
-    "sapper": "^0.26.0-alpha.8",
+    "sapper": "0.26.0-alpha.8",
     "svelte": "3.0.0-beta.3",
     "ts-jest": "^23.10.5",
     "ts-lib": "^0.0.5",

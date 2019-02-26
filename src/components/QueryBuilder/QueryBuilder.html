@@ -32,9 +32,13 @@
     if (e.key !== 'Enter') return;
     if (e.metaKey) return sendSearch();
     if (isWindow) return;
-    createNewRule();
-    selectRule($search.value.length - 1)
+    handleNewQuery();
 
+  }
+
+  function handleNewQuery() {
+    createNewRule();
+    selectRule($search.value.length - 1);
   }
 
   function setRule(i) {
@@ -60,12 +64,22 @@
       input.focus();
     }, 0);
   });
+
+  let tooltip = false;
 </script>
 
 <svelte:window on:keydown="{(e) => handleEnter(e, true)}"/>
 
 <div class="main-container">
   <form on:submit="{e => e.preventDefault()}">
+    <div class="button">
+      <button on:mouseenter="{() => tooltip = true}"
+              on:mouseleave="{() => tooltip = false}"
+              type="button" on:click="{handleNewQuery}">+</button>
+      {#if tooltip}
+      <span>Add new query (return)</span>
+      {/if}
+    </div>
     <div class="input-wrap">
       <label class="input" for="search-builder">Search:</label>
       <input
@@ -82,6 +96,7 @@
       {/if}
 
     </div>
+
     <div>
       <fieldset>
         {#each $search.value[$search.current].subject as {field, status}, i}
@@ -302,5 +317,30 @@
     clip: rect(0, 0, 0, 0);
     white-space: nowrap;
     border: 0;
+  }
+
+  .button {
+    margin-right: 15px;
+    font-size: 20px;
+    position: relative;
+  }
+
+  .button button {
+    font-size: 1.4rem;
+    padding: 0 15px;
+  }
+
+  .button span {
+    position:absolute;
+    /* width: 100px;
+    height: 20px; */
+    background: #333;
+    font-size: 12px;
+    font-weight: 300;
+    width: 9.3rem;
+    top: -1rem;
+    color: #eee;
+    padding: 4px 8px;
+    border-radius: 2px;
   }
 </style>
