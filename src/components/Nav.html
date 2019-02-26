@@ -1,3 +1,10 @@
+<script>
+  import Spinner from './Spinner.html';
+  import { state } from '../machines/search.js';
+
+  export let segment;
+</script>
+
 <nav>
   <ul>
     <li>
@@ -9,17 +16,25 @@
       >
     </li>
   </ul>
+  {#if $state.dirty && $state.dirty === 'pending'}
+  <span><Spinner/></span>
+  {/if}
 </nav>
 
 <style>
+  span {
+    height: 3.5rem;
+    margin-top: -0.25rem;
+  }
   nav {
     border-bottom: 1px solid rgba(170, 30, 30, 0.1);
     font-weight: 300;
     padding: 0 1em;
+    display: flex;
+    justify-content: space-between;
+    background: #fff;
     position: relative;
     z-index: 4;
-    background: #f6f6f6;
-    height: 3.5em;
   }
 
   ul {
