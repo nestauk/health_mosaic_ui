@@ -1,4 +1,4 @@
-<Nav />
+<Nav segment={child.segment}/>
 
 <main>
   <svelte:component this={child.component} {...child.props}/>
@@ -9,8 +9,8 @@
 	main {
 		position: relative;
 		width: 100%;
-		padding: 2em;
-		margin: 50px auto;
+		/* padding: 2em; */
+		/* margin: 50px auto; */
     box-sizing: border-box;
 	}
 </style>

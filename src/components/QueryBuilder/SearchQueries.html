@@ -75,9 +75,9 @@
             <li class="tags {sub.status}"
                 on:mouseenter="{() => hoverProp(i, sub.field, 'subject')}"
                 on:mouseleave="{() => unHoverProp(i, sub.field, 'subject')}"
-                style="{ visible ? '' : 'opacity: 0.5;'} transition: 0.3s;"
+                style="{ visible ? '' : 'opacity: 0.5;'} transition:opacity 0.3s;"
                 >
-              <span style="{sub.visible ? '' : 'opacity: 0.5;'} transition: 0.3s;">
+              <span style="{sub.visible ? '' : 'opacity: 0.5;'} transition:opacity 0.3s;">
                 {sub.field}
                 <span class="icon-wrap">
 
@@ -111,7 +111,7 @@
 
             {cont.field}
 
-          <span class="icon-wrap" style="{cont.visible ? '' : 'opacity: 0.5;'} transition: 0.3s;">
+          <span class="icon-wrap" style="{cont.visible ? '' : 'opacity: 0.5;'} transition: opacity 0.3s;">
               {#if cont.hovered}
               <QueryControls status="{cont.status}"
                              visible={cont.visible}
@@ -149,7 +149,8 @@
   .rules-container {
     display: flex;
     flex-wrap: wrap;
-
+    transition: 0.2s 0.2s;
+    transform-origin: 0 100%;
   }
   .excluded  {
     color: red
