@@ -16,7 +16,6 @@
     },
     "outDir": "./build"
   },
-
   "include": ["src"],
   "exclude": ["cypress", "node_modules", "test", "*test*"]
 }

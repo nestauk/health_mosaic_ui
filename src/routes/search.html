@@ -7,22 +7,37 @@
 
 <script>
   import { Results, ResultsItem } from '../components/Results';
-  import SearchWidget from '../components/SearchWidget.html';
+  import QueryManager from '../components/QueryManager.html';
 
   import { store, state } from '../machines/search';
+
+  let tab = 0;
+  $: console.log(tab);
+
+  function deleteResults({detail}) {
+    store.update(s => ({
+        ...s,
+        data: {
+          ...s.data,
+          [detail.removed]: []
+        }
+    }));
+    tab = detail.tab
+  }
 </script>
 
 <svelte:head>
   <title>Search</title>
 </svelte:head>
 
-<SearchWidget />
+<QueryManager on:tab="{(e) => tab = e.detail}"
+              on:deletetab="{deleteResults}"/>
 
 <div class="content">
-  {#if $store.data && $store.data.length }
+  {#if $store.data && $store.data[tab] && $store.data[tab].length }
 
     <Results dirty={!!$state.dirty}>
-      {#each $store.data as {_source} }
+      {#each $store.data[tab] as {_source} }
         <ResultsItem data={_source}></ResultsItem>
       {/each}
     </Results>

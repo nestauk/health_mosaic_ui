@@ -59,8 +59,7 @@ const searchMachine = Machine(
         const q = await query(evt.query, req, id);
         ctx.update(v => ({
           ...v,
-          data: q.hits.hits,
-          next: q._scroll_id,
+          data: { ...v.data, [evt.searchId]: q.hits.hits },
         }));
       },
     },
@@ -80,7 +79,7 @@ export const state = {
 };
 
 searchService.onTransition(nextState => {
-  console.log(nextState);
+  // console.log(nextState);
   searchState.set(nextState.value);
 });
 

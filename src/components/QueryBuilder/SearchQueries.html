@@ -5,43 +5,44 @@
   import QueryControls from './QueryControls.html';
   import Query from './Query.html';
 
-  import { search, rules, removeRule, setRuleVisibility, negateValueClick, updateStatus, updateVisibility} from './store.js';
+  export let copyRule, ruleselect, search, rules;
 
-  export let copyRule,  ruleselect;
-
-  $: filteredRules =  $rules.map(q => ({
+  $: filteredRules = $rules.map(q => ({
     value: q.value,
     subs: q.subject.filter(s => s.status !== 'default'),
     conts: q.content.filter(s => s.status !== 'default'),
-    visible: q.visible
+    visible: q.visible,
   }));
 
   function hoverProp(i, s, cat) {
-    const index =  $rules[i][cat].findIndex(v => v.field === s)
-     $rules[i][cat][index].hovered = true;
+    const index = $rules[i][cat].findIndex(v => v.field === s);
+    $rules[i][cat][index].hovered = true;
   }
 
   function unHoverProp(i, s, cat) {
-    const index =  $rules[i][cat].findIndex(v => v.field === s)
+    const index = $rules[i][cat].findIndex(v => v.field === s);
 
-     $rules[i][cat][index].hovered = false;
+    $rules[i][cat][index].hovered = false;
   }
 
   function toggleVisibility(i, s, cat) {
     const index = $search.value[i][cat].findIndex(v => v.field === s);
 
-    updateVisibility(cat, i, index);
+    search.updateVisibility(cat, i, index);
   }
 
-  function removeProperty(i,s, obj) {
+  function removeProperty(i, s, obj) {
     const index = $search.value[i][obj].findIndex(v => v.field === s);
-    updateStatus(obj, i, index, 'default');
+    search.updateStatus(obj, i, index, 'default');
   }
 
   function toggleStatus(i, s, obj) {
     const index = $search.value[i][obj].findIndex(v => v.field === s);
-    const val = $search.value[i][obj][index].status === 'excluded' ? 'included' : 'excluded';
-    updateStatus(obj, i, index, val);
+    const val =
+      $search.value[i][obj][index].status === 'excluded'
+        ? 'included'
+        : 'excluded';
+    search.updateStatus(obj, i, index, val);
   }
 </script>
 
@@ -60,7 +61,7 @@
       <ul class="query-container" style="{visible ? '' : 'opacity: 0.5;'} transition: 0.3s;">
         {#each value as query, j}
           {#if query.value}
-          <li class="query {query.status}" on:click="{() => negateValueClick(i, j)}" >
+          <li class="query {query.status}" on:click="{() => search.negateValueClick(i, j)}" >
             {query.value}
             <!-- <QueryControls status="{query.status}"/> -->
           </li>
@@ -129,9 +130,9 @@
       </ul>
       {/if}
       <RuleControlsMaster selected={$search.current === i}>
-        <RuleControls on:visibility="{() => setRuleVisibility(i)}" {visible}
+        <RuleControls on:visibility="{() => search.setRuleVisibility(i)}" {visible}
                       on:copy="{() => copyRule(i)}"
-                      on:delete="{() => removeRule(i)}" />
+                      on:delete="{() => search.removeRule(i)}" />
       </RuleControlsMaster>
       <!-- <span class="remove-rule" on:click="{() => removeRule(i)}"></span> -->
       <!--  -->
@@ -145,23 +146,22 @@
 
 
 <style>
-
   .rules-container {
     display: flex;
     flex-wrap: wrap;
     transition: 0.2s 0.2s;
     transform-origin: 0 100%;
   }
-  .excluded  {
-    color: red
+  .excluded {
+    color: red;
   }
-  .included{
-    color: limegreen
+  .included {
+    color: limegreen;
   }
-  .default{
-    color: #ccc
+  .default {
+    color: #ccc;
   }
-ul {
+  ul {
     list-style: none;
   }
   .tag-container {
@@ -179,7 +179,7 @@ ul {
 
   .tags {
     cursor: pointer;
-    margin: 0 ;
+    margin: 0;
     font-weight: 400;
     line-height: 1;
     position: relative;
@@ -197,7 +197,7 @@ ul {
     height: 100%;
     width: 100%;
     position: absolute;
-    transform: translateY(0.5px)
+    transform: translateY(0.5px);
   }
   .rule {
     font-size: 18px;
@@ -207,23 +207,19 @@ ul {
     border: 1px solid #ccc;
     margin: 10px;
     border-radius: 1.7rem;
-    padding:0 12px;
+    padding: 0 12px;
     transition: 0.2s;
   }
 
-
-
-
-
   /* .rule.active-query {
-    border-color: #333;
+        border-color: #333;
 
-  }
-   */
+      }
+       */
 
   .query-container {
     display: flex;
-    margin:  10px 15px 0 0;
+    margin: 10px 15px 0 0;
     padding: 5px;
     border: none;
     border: 1px solid #aaa;
@@ -253,7 +249,6 @@ ul {
   .active-query {
     background: #fff;
     border: 1px solid #999;
-
   }
 
   .query-placeholder span {

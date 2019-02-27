@@ -1,60 +1,54 @@
 <script>
-  import { createEventDispatcher, onMount , tick} from 'svelte';
+  import { createEventDispatcher, onMount, tick } from 'svelte';
   import SearchQueries from './SearchQueries.html';
-  import {
-    search,
-    rules,
-    updateValue,
-    selectRule,
-    newRule,
-    copyRule,
-    handleSelect,
-  } from './store.js';
+  import { createStore } from './store.js';
+
 
   export let tabs = 1,
     send,
-    status;
+    status, savedQueries, key;
+
 
   let input;
 
+  const { search, rules } = createStore(savedQueries.value && savedQueries.value.length ? savedQueries : undefined);
+
   const dispatch = createEventDispatcher();
 
-  $: dispatch('change', $search.value.map(v => v.value));
-  $: subjectDefault = $search.value[$search.current].subject.every(v => v.status === 'default')
-  $: contentDefault = $search.value[$search.current].content.every(v => v.status === 'default')
+  $: dispatch('change', { values: $search, queries: $search.value.map(v => v.value) });
+  $: subjectDefault = $search.value[$search.current].subject.every(v => v.status === 'default');
+  $: contentDefault = $search.value[$search.current].content.every(v => v.status === 'default');
 
   function sendSearch() {
     send($rules.filter(v => v.value.length > 0));
   }
 
   function handleEnter(e, isWindow = false) {
-    console.log('boo', e)
     if (e.key !== 'Enter') return;
     if (e.metaKey) return sendSearch();
     if (isWindow) return;
     handleNewQuery();
-
   }
 
   function handleNewQuery() {
     createNewRule();
-    selectRule($search.value.length - 1);
+    search.selectRule($search.value.length - 1);
   }
 
   function setRule(i) {
-    selectRule(i);
+    search.selectRule(i);
     input.focus();
   }
 
   function createNewRule() {
-    newRule();
+    search.newRule();
     input.focus();
   }
 
   function createCopyRule(i) {
-    copyRule(i);
+    search.copyRule(i);
 
-    selectRule($search.value.length - 1)
+    search.selectRule($search.value.length - 1);
 
     input.focus();
   }
@@ -88,7 +82,7 @@
         bind:this="{input}"
         value="{$search.value[$search.current].value}"
         on:keydown="{handleEnter}"
-        on:input="{(e) => updateValue(e.target.value)}"
+        on:input="{(e) => search.updateValue(e.target.value)}"
         placeholder="example: cancer, -breast"
       />
       {#if $search.value[$search.current].value.length !== 0}
@@ -102,7 +96,7 @@
         {#each $search.value[$search.current].subject as {field, status}, i}
         <label
           class="{status}"
-          on:click="{() => handleSelect('subject', i)}"
+          on:click="{() => search.handleSelect('subject', i)}"
           for="subject-{field}"
         >
           {field}
@@ -123,7 +117,7 @@
         {#each $search.value[$search.current].content as {field, status}, i}
         <label
           class="{status}"
-          on:click="{() => handleSelect('content', i)}"
+          on:click="{() => search.handleSelect('content', i)}"
           for="subject-{field}"
         >
           {field}
@@ -144,7 +138,9 @@
 
   <SearchQueries ruleselect="{(i) => setRule(i)}"
                  copyRule={createCopyRule}
-                 {rules} />
+                 {rules}
+                 {search}
+                 />
 </div>
 
 <style>
@@ -262,7 +258,6 @@
 
   input::placeholder {
     font-size: 16px;
-
   }
 
   input:focus {
@@ -331,9 +326,9 @@
   }
 
   .button span {
-    position:absolute;
+    position: absolute;
     /* width: 100px;
-    height: 20px; */
+      height: 20px; */
     background: #333;
     font-size: 12px;
     font-weight: 300;
@@ -342,6 +337,6 @@
     color: #eee;
     padding: 4px 8px;
     border-radius: 2px;
-    z-index: 99
+    z-index: 99;
   }
 </style>

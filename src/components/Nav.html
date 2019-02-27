@@ -1,19 +1,41 @@
 <script>
+  import {createEventDispatcher} from 'svelte';
   import Spinner from './Spinner.html';
   import { state } from '../machines/search.js';
 
-  export let segment;
+  import closeIcon from 'ionicons/dist/ionicons/svg/ios-close-circle-outline.svg';
+  import addIcon from 'ionicons/dist/ionicons/svg/ios-add-circle-outline.svg';
+
+  export let tabs, activeTab;
+
+  const dispatch = createEventDispatcher();
+
+  function createTab() {
+    dispatch('newtab')
+  }
+
+  function changeTab(i) {
+    dispatch('changetab', i)
+  }
+
+  function deleteTab(i) {
+    dispatch('deletetab', i)
+  }
 </script>
 
 <nav>
   <ul>
+    {#each tabs as {tab}}
     <li>
-      <a class='{segment === undefined ? "selected" : ""}' href=".">home</a>
+      <a on:click="{() => changeTab(tab)}"  class='{tab === activeTab ? "selected" : ""}'>Tab {tab + 1}</a>
+      {#if tabs.length > 1}
+        <span on:click="{() => deleteTab(tab)}" class="remove"><img src="{closeIcon}"></span>
+      {/if}
+
     </li>
-    <li>
-      <a class='{segment === "search" ? "selected" : ""}' href="search"
-        >search</a
-      >
+    {/each}
+    <li class="close-container">
+        <span on:click="{createTab}" class="newtab remove"><img src="{addIcon}"></span>
     </li>
   </ul>
   {#if $state.dirty && $state.dirty === 'pending'}
@@ -52,6 +74,10 @@
   li {
     display: block;
     float: left;
+    display: flex;
+    align-items: center;
+    border-right: 1px solid #ccc;
+    padding: 0 10px;
   }
 
   .selected {
@@ -73,5 +99,35 @@
     text-decoration: none;
     padding: 1em 0.5em;
     display: block;
+    cursor: pointer;
+  }
+
+  .remove {
+    height: 22px;
+    width: 22px;
+    cursor: pointer;
+    margin: 0 5px;
+    opacity: 0.5;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .remove:hover {
+    opacity: 1;
+  }
+
+  .newtab {
+    margin: auto;
+    opacity: 1;
+  }
+
+  .close-container {
+    flex-direction: column;
+    justify-content: center;
+    height: 100%;
+    margin-left: 10px;
+    border-right: none;
   }
 </style>
