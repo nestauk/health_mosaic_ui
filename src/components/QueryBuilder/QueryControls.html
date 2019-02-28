@@ -5,7 +5,7 @@
 </script>
 
 <div class="rule-controls">
-  <span on:click="{() => dispatch('toggle')}">
+  <span on:click|stopPropagation="{() => dispatch('toggle')}">
     <svg
       class="{visible ? 'on' : 'off'}"
       width="100%"
@@ -32,7 +32,7 @@
     </svg>
   </span>
   {#if status === 'included'}
-  <span on:click="{() => dispatch('change')}">
+  <span on:click|stopPropagation="{() => dispatch('change')}">
     <svg
       version="1.1"
       id="Layer_1"
@@ -59,7 +59,7 @@
     </svg>
   </span>
   {:else}
-  <span on:click="{() => dispatch('change')}">
+  <span on:click|stopPropagation="{() => dispatch('change')}">
     <svg
       version="1.1"
       id="Layer_1"

@@ -166,25 +166,33 @@ export function handleSelect(obj, index, status) {
 export function updateStatus(obj, index, jindex, status) {
   search.update(state => ({
     ...state,
-    value: updateIndex(state.value, index || state.current, v => ({
-      ...v,
-      [obj]: updateIndex(v[obj], jindex, f => ({
-        ...f,
-        status: status ? status : states[f.status],
-      })),
-    })),
+    value: updateIndex(
+      state.value,
+      index === undefined ? state.current : index,
+      v => ({
+        ...v,
+        [obj]: updateIndex(v[obj], jindex, f => ({
+          ...f,
+          status: status ? status : states[f.status],
+        })),
+      })
+    ),
   }));
 }
 
 export function updateVisibility(obj, index, jindex) {
   search.update(state => ({
     ...state,
-    value: updateIndex(state.value, index || state.current, v => ({
-      ...v,
-      [obj]: updateIndex(v[obj], jindex, f => ({
-        ...f,
-        visible: !f.visible,
-      })),
-    })),
+    value: updateIndex(
+      state.value,
+      index === undefined ? state.current : index,
+      v => ({
+        ...v,
+        [obj]: updateIndex(v[obj], jindex, f => ({
+          ...f,
+          visible: !f.visible,
+        })),
+      })
+    ),
   }));
 }

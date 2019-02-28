@@ -71,7 +71,7 @@
 
       <ul class="tag-container"  >
 
-        {#each subs as sub, s}
+        {#each subs as sub}
             <li class="tags {sub.status}"
                 on:mouseenter="{() => hoverProp(i, sub.field, 'subject')}"
                 on:mouseleave="{() => unHoverProp(i, sub.field, 'subject')}"
