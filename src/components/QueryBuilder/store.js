@@ -1,7 +1,7 @@
 import { writable, derive } from 'svelte/store';
 import { updateIndex, pipe, filterWith, updateAt } from 'lamb';
 import { subjectFields, contentFields } from '../../config';
-import { parseQuery } from '../../util/parse.js';
+import { parseQuery } from '../../util/parse.ts';
 
 export const createStore = queries => {
   const subject = Object.keys(subjectFields).map(v => ({

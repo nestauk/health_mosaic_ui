@@ -50,7 +50,7 @@ export const dslBuilder = (query, fields) => {
     .trim();
 };
 
-const fieldBuilder = (fieldArr, q, type) =>
+const fieldBuilder = (fieldArr, q, type = '') =>
   fieldArr.reduce((acc, next) => {
     // if (!next.visible) return acc;
     return (

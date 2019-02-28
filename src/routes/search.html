@@ -1,28 +1,28 @@
 <script context="module">
-  export async function preload({ params, query }) {
+  export async function preload({params,query}) {
     //console.log('')
     return;
   }
 </script>
 
 <script>
-  import { Results, ResultsItem } from '../components/Results';
+  import {Results,ResultsItem} from '../components/Results';
   import QueryManager from '../components/QueryManager.html';
 
-  import { store, state } from '../machines/search';
+  import {store,state} from '../machines/search';
 
-  let tab = 0;
+  let tab=0;
   $: console.log(tab);
 
   function deleteResults({detail}) {
     store.update(s => ({
-        ...s,
-        data: {
-          ...s.data,
-          [detail.removed]: []
-        }
+      ...s,
+      data: {
+        ...s.data,
+        [detail.removed]: []
+      }
     }));
-    tab = detail.tab
+    tab=detail.tab
   }
 </script>
 
@@ -31,7 +31,7 @@
 </svelte:head>
 
 <QueryManager on:tab="{(e) => tab = e.detail}"
-              on:deletetab="{deleteResults}"/>
+              on:deletetab="{deleteResults}" />
 
 <div class="content">
   {#if $store.data && $store.data[tab] && $store.data[tab].length }
@@ -47,8 +47,15 @@
 
 
 
-<style>
-.content {
-  padding: 6rem 30px 30px 30px;
-}
+<style lang='less'>
+  @import '../styles/sample.less';
+
+  @padding: 6rem 30px 30px 30px;
+
+  .content {
+    padding: @padding;
+    color: @var;
+    padding:@var;
+  }
+
 </style>
