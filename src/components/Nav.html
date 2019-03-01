@@ -1,6 +1,7 @@
 <script>
   import {createEventDispatcher} from 'svelte';
   import Spinner from './Spinner.html';
+  import Alert from './Icons/Alert.html';
   import { state } from '../machines/search.js';
 
   import closeIcon from 'ionicons/dist/ionicons/svg/ios-close-circle-outline.svg';
@@ -40,6 +41,8 @@
   </ul>
   {#if $state.dirty && $state.dirty === 'pending'}
   <span><Spinner/></span>
+  {:elseif $state.dirty && $state.dirty === 'error'}
+  <span class="error"><Alert color="red"/></span>
   {/if}
 </nav>
 
@@ -47,6 +50,13 @@
   span {
     height: 3.5rem;
     margin-top: -0.25rem;
+  }
+
+  .error {
+    height: 2rem;
+    width: 2rem;
+    align-self: center;
+    margin-right: 15px;
   }
   nav {
     border-bottom: 1px solid rgba(170, 30, 30, 0.1);
