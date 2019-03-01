@@ -65,7 +65,7 @@
 <svelte:window on:keydown="{(e) => handleEnter(e, true)}"/>
 
 <div class="main-container">
-  <form on:submit="{e => e.preventDefault()}">
+  <form on:submit|preventDefault>
     <div class="button">
       <button on:mouseenter="{() => tooltip = true}"
               on:mouseleave="{() => tooltip = false}"
@@ -133,7 +133,7 @@
       </fieldset>
       <span class="label {contentDefault ? 'default' : 'changed'}">Content</span>
     </div>
-    <button on:click="{() => sendSearch()}">Search</button>
+    <button class="search-button" on:click="{() => sendSearch()}">Search</button>
   </form>
 
   <SearchQueries ruleselect="{(i) => setRule(i)}"
@@ -141,6 +141,7 @@
                  {rules}
                  {search}
                  />
+
 </div>
 
 <style>
@@ -153,6 +154,17 @@
     border-radius: 2px;
     font-size: 12px;
     cursor: pointer;
+    float: right;
+  }
+
+  .search-button {
+    position: absolute;
+
+    cursor: pointer;
+
+    right: 80px;
+    bottom: 20px;
+    transition: 0.2s;
   }
 
   :global(*) {
@@ -197,7 +209,6 @@
   form {
     padding: 0;
     margin: 0;
-    position: relative;
     display: flex;
     flex-wrap: wrap;
     margin-bottom: 30px;
