@@ -105,9 +105,6 @@ export default {
           module: true,
         }),
     ],
-
-    // temporary, pending Rollup 1.0
-    experimentalCodeSplitting: true,
   },
 
   server: {
@@ -137,9 +134,6 @@ export default {
       require('module').builtinModules ||
         Object.keys(process.binding('natives'))
     ),
-
-    // temporary, pending Rollup 1.0
-    experimentalCodeSplitting: true,
   },
 
   serviceworker: {
