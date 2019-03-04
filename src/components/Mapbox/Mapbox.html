@@ -1,0 +1,30 @@
+<script>
+  import { onMount } from 'svelte';
+
+  export let apiKey, styleUrl;
+  let map, mapboxgl;
+
+  onMount(async () => {
+    mapboxgl = await import('mapbox-gl');
+
+    mapboxgl = mapboxgl.default;
+    mapboxgl.accessToken = apiKey;
+
+    const mapbox = new mapboxgl.Map({
+      container: map,
+      style: styleUrl,
+    });
+  });
+</script>
+
+<svelte:head>
+  <link href="./mapbox-gl.css" rel="stylesheet" />
+</svelte:head>
+
+<div bind:this="{map}" class="map-container"></div>
+
+<style>
+  .map-container {
+    height: 100%;
+  }
+</style>

@@ -21,3 +21,8 @@ export const contentFields = {
   terms: ['terms_mesh_abstract', 'terms_descriptive_project'],
   category: ['terms_sdg_project'],
 };
+
+export const MAPBOXGL_STYLEURL =
+  'mapbox://styles/nesta-uk/cjja7cb0s0bcw2rmvflhof4io';
+export const MAPBOXGL_ACCESSTOKEN =
+  'pk.eyJ1IjoibmVzdGEtdWsiLCJhIjoiY2ozbjUzY2drMDAwNzJxbnl6a21uM253cSJ9.3RTMySEVk0LC4gQvGoG-Zw';

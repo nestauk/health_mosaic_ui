@@ -8,6 +8,7 @@ import { terser } from 'rollup-plugin-terser';
 import config from 'sapper/config/rollup.js';
 import less from 'less';
 import typescript from 'rollup-plugin-typescript';
+import copy from 'rollup-copy-plugin';
 import pkg from './package.json';
 
 const mode = process.env.NODE_ENV;
@@ -60,6 +61,9 @@ export default {
       warn(message);
     },
     plugins: [
+      copy({
+        'node_modules/mapbox-gl/dist/mapbox-gl.css': 'static/mapbox-gl.css',
+      }),
       replace({
         'process.browser': true,
         'process.env.NODE_ENV': JSON.stringify(mode),
@@ -76,6 +80,7 @@ export default {
         output: 'static',
       }),
       typescript(),
+
       legacy &&
         babel({
           extensions: ['.js', '.html', '.svelte'],
