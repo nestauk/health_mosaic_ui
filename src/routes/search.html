@@ -6,16 +6,16 @@
 </script>
 
 <script>
-  import {Results,ResultsItem} from '../components/Results';
+  import { Results, ResultsItem } from '../components/Results';
   import QueryManager from '../components/QueryManager.html';
 
-  import {store,state} from '../machines/search';
+  import { searchStore, searchMachine } from '../machines/search.ts';
 
   let tab=0;
   $: console.log(tab);
 
   function deleteResults({detail}) {
-    store.update(s => ({
+    searchStore.update(s => ({
       ...s,
       data: {
         ...s.data,
@@ -34,10 +34,10 @@
               on:deletetab="{deleteResults}" />
 
 <div class="content">
-  {#if $store.data && $store.data[tab] && $store.data[tab].length }
+  {#if $searchStore.data && $searchStore.data[tab] && $searchStore.data[tab].length }
 
-    <Results dirty={!!$state.dirty}>
-      {#each $store.data[tab] as {_source} }
+    <Results dirty={!!$searchMachine.dirty}>
+      {#each $searchStore.data[tab] as {_source} }
         <ResultsItem data={_source}></ResultsItem>
       {/each}
     </Results>
@@ -55,7 +55,6 @@
   .content {
     padding: @padding;
     color: @var;
-    padding:@var;
   }
 
 </style>

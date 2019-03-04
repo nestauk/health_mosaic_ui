@@ -1,17 +1,129 @@
 <script>
-  import Mapbox from '../components/Mapbox/Mapbox.html';
-  import {MAPBOXGL_STYLEURL, MAPBOXGL_ACCESSTOKEN } from '../config.js';
+  import { Mapbox, Editor, Controls} from '../components/Map';
+  import { MAPBOXGL_STYLEURL, MAPBOXGL_ACCESSTOKEN } from '../config.js';
+  import { memoMachineConfig, memoMachineOptions } from '../machines/memo.ts';
+  import { createBoundsStore, createMemoStore } from '../stores'
+  import { createMachina } from '../util/xstateHelper.ts';
+  import {  onMount, tick } from 'svelte';
+  let editState;
+
+  $: {
+    if ($memoMachine.matches('idle') || $memoMachine.matches('transforming')) {
+      editState = 'unselected';
+    }
+
+    if ($memoMachine.matches('pinned')) {
+      editState = 'selected';
+    }
+
+    if ($memoMachine.matches('editing')) {
+      editState = 'editing';
+    }
+  }
+
+  const initialBounds = [
+    [134.44830750095474, 7.3313397810897385],
+    [134.51392190152154, 7.351823467712293]
+  ];
+
+  const { machine: memoMachine, contextStores: { bounds, memo } } = createMachina(
+    memoMachineConfig, memoMachineOptions, {
+      bounds: createBoundsStore(initialBounds),
+      memo: createMemoStore()
+    }
+  );
+
+  let editor,
+    mapbox,
+    currentNoteValue = {title:'', description: ''};
+
+  function syncLocalNoteValue() {
+    if ($memo.currentPin === false) return;
+
+    currentNoteValue.title = $memo.pins[$memo.currentPin].title
+    currentNoteValue.description = $memo.pins[$memo.currentPin].description
+  }
+
+  function savePin() {
+    memoMachine.send({type: 'UPDATEPIN', updates: {...currentNoteValue} });
+  }
+
+  function deletePin({detail}) {
+    memoMachine.send({type: 'DELETEPIN'})
+  }
+
+  function editPin() {
+    memoMachine.send({type: 'EDITPIN'});
+  }
+
+  async function addPin() {
+    currentNoteValue = {title:'', description: ''};
+    memoMachine.send({type: 'PIN' });
+
+    await tick();
+  }
+
+  function selectPin({detail: {id }}) {
+    memoMachine.send({type: 'SELECTPIN', id});
+    syncLocalNoteValue();
+  }
+
+  function discardEdit() {
+    syncLocalNoteValue();
+    memoMachine.send({type: 'DISCARDEDIT'});
+  }
+
+  const txstart = () => memoMachine.send('TXSTART');
+  const txend = ({detail}) => memoMachine.send({type:'TXEND', bounds:detail});
+
+  onMount(() => {
+    syncLocalNoteValue();
+  })
+
 </script>
 
-<div>
+<div class="container">
   <Mapbox
+    bind:this="{mapbox}"
+    bounds="{$bounds}"
     apiKey="{MAPBOXGL_ACCESSTOKEN}"
     styleUrl="{MAPBOXGL_STYLEURL}"
+    on:txstart="{txstart}"
+    on:txend="{txend}"
   />
+
+  {#if $memoMachine.matches('editing') || $memoMachine.matches('pinned')}
+    <Editor
+      bind:this="{editor}"
+      editing="{$memoMachine.matches('editing')}"
+      on:change="{({detail}) => currentNoteValue = detail }"
+      title="{currentNoteValue.title}"
+      description="{currentNoteValue.description}"
+    />
+  {/if}
+
+  <Controls
+    on:add="{addPin}"
+    on:select="{selectPin}"
+    on:save="{savePin}"
+    on:discard="{discardEdit}"
+    on:delete="{deletePin}"
+    on:edit="{editPin}"
+    state="{editState}"
+    pins="{$memo.pins}"
+    currentPin="{$memo.currentPin}"
+  />
+
+
 </div>
 
 <style>
-  div {
+  .container {
     height: 100vh;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
   }
 </style>

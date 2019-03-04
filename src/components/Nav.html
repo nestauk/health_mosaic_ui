@@ -2,7 +2,7 @@
   import {createEventDispatcher} from 'svelte';
   import Spinner from './Spinner.html';
   import Alert from './Icons/Alert.html';
-  import { state } from '../machines/search.js';
+  import { searchMachine } from '../machines/search.ts';
 
   import closeIcon from 'ionicons/dist/ionicons/svg/ios-close-circle-outline.svg';
   import addIcon from 'ionicons/dist/ionicons/svg/ios-add-circle-outline.svg';
@@ -39,9 +39,9 @@
         <span on:click="{createTab}" class="newtab remove"><img src="{addIcon}"></span>
     </li>
   </ul>
-  {#if $state.dirty && $state.dirty === 'pending'}
+  {#if $searchMachine.matches('dirty.pending') }
   <span><Spinner/></span>
-  {:elseif $state.dirty && $state.dirty === 'error'}
+  {:else if $searchMachine.matches('dirty.error')}
   <span class="error"><Alert color="red"/></span>
   {/if}
 </nav>
@@ -82,7 +82,6 @@
   }
 
   li {
-    display: block;
     float: left;
     display: flex;
     align-items: center;

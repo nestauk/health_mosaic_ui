@@ -1,0 +1,59 @@
+<script>
+  import { onMount, onDestroy, createEventDispatcher } from 'svelte';
+  export let apiKey, styleUrl, bounds, map;
+  let container, mapboxgl;
+
+  const dispatch = createEventDispatcher();
+
+  const getBounds = () => map.getBounds().toArray();
+
+  $: map && map.fitBounds(bounds, {}, { source: 'auto' });
+
+  onMount(async () => {
+    mapboxgl = await import('mapbox-gl');
+    mapboxgl = mapboxgl.default;
+    mapboxgl.accessToken = apiKey;
+
+    map = new mapboxgl.Map({
+      container,
+      style: styleUrl,
+      bounds: bounds,
+    }).on('load', () => {
+      map.on('movestart', txstart);
+      map.on('moveend', txend);
+    });
+  });
+
+  function txend(mbEvent) {
+    if (mbEvent.source !== 'auto') {
+      dispatch('txend', getBounds());
+    }
+  }
+
+  function txstart(mbEvent) {
+    if (mbEvent.source !== 'auto') {
+      dispatch('txstart');
+    }
+  }
+
+  onDestroy(() => {
+    if (!map) return;
+
+    map.off('movestart', txstart);
+    map.off('moveend', txend);
+
+    map.remove();
+  });
+</script>
+
+<svelte:head>
+  <link href="./mapbox-gl.css" rel="stylesheet" />
+</svelte:head>
+
+<div bind:this="{container}" class="container"></div>
+
+<style>
+  .container {
+    height: 100%;
+  }
+</style>
