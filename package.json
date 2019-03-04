@@ -9,12 +9,17 @@
     "start": "node __sapper__/build",
     "cy:run": "cypress run",
     "cy:open": "cypress open",
-    "test": "jest"
+    "test": "jest",
+    "cleansrc": "rimraf src/node_modules",
+    "cleanall": "rimraf node_modules src/node_modules __sapper__ package-lock.json",
+    "reinstall:npm": "npm run cleanall && npm run i",
+    "reinstall:yarn": "yarn cleanall && yarn"
   },
   "dependencies": {
     "compression": "^1.7.1",
     "ionicons": "^4.5.5",
     "lamb": "^0.57.0",
+    "mapbox-gl": "^0.53.1",
     "polka": "^0.4.0",
     "sirv": "^0.2.0",
     "xstate": "^4.3.0"
@@ -38,7 +43,9 @@
     "prettier": "^1.16.0",
     "prettier-eslint": "^8.8.2",
     "prettier-stylelint": "^0.4.2",
+    "rimraf": "^2.6.3",
     "rollup": "^1.2.2",
+    "rollup-copy-plugin": "^0.1.0",
     "rollup-plugin-babel": "^4.0.2",
     "rollup-plugin-commonjs": "^9.1.6",
     "rollup-plugin-img": "^1.1.0",

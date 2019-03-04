@@ -1,0 +1,17 @@
+<script>
+  import Mapbox from '../components/Mapbox/Mapbox.html';
+  import {MAPBOXGL_STYLEURL, MAPBOXGL_ACCESSTOKEN } from '../config.js';
+</script>
+
+<div>
+  <Mapbox
+    apiKey="{MAPBOXGL_ACCESSTOKEN}"
+    styleUrl="{MAPBOXGL_STYLEURL}"
+  />
+</div>
+
+<style>
+  div {
+    height: 100vh;
+  }
+</style>
