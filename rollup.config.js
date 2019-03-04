@@ -134,6 +134,7 @@ export default {
       img({
         output: 'static',
       }),
+      typescript(),
     ],
     external: Object.keys(pkg.dependencies).concat(
       require('module').builtinModules ||

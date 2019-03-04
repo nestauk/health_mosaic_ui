@@ -1,9 +1,8 @@
 <script>
   import Nav from './Nav.html';
   import QueryBuilder from '../components/QueryBuilder';
-  import { store, state } from '../machines/search';
-  // import {rules} from './QueryBuilder/store.js';
-  //import { querify } from '../util/parse';
+  import { searchMachine, searchStore } from '../machines/search';
+
   import { subjectFields, contentFields } from '../config';
   import { dslBuilder, createFields } from '../util/parse.ts';
 
@@ -44,11 +43,11 @@
       return  acc + dslBuilder(next.value, next.fields);
     }, '')
 
-    state.send({ type: 'SEARCH', query: joinedRules, value, searchId: activeTab });
+   searchMachine.send({ type: 'SEARCH', query: joinedRules, value, searchId: activeTab });
   }
 
   function checkDirty() {
-    state.send('CHANGED');
+   searchMachine.send('CHANGED');
   }
 
   const states = {
@@ -87,7 +86,7 @@
     savedQueries.update(state => {
       if (state.length === 1) return state;
 
-      const index = state.findIndex(v => v.tab === e.detail)
+      const index = $searchStore.value.findIndex(v => v.tab === e.detail)
       const newState = [].concat(state);
       newState.splice(index, 1);
 
@@ -96,6 +95,7 @@
 
       return newState;
     });
+
     dispatch('deletetab', {tab: activeTab, removed: e.detail})
   }
 
@@ -114,7 +114,7 @@
         key={tab}
         {subjectFields}
         {contentFields}
-        status="{$state.dirty ? 'dirty' : 'clean'}"
+        status="{$searchMachine.dirty ? 'dirty' : 'clean'}"
         on:change="{({detail}) => handleChange({...detail, tab}) }"
         send="{ handleSend }" />
 

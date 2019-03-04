@@ -1,6 +1,6 @@
 <script>
   import QueryBuilder from '../components/QueryBuilder';
-  import { store, state } from '../machines/search';
+  import { searchStore, searchMachine } from '../machines/search';
   import {rules} from './QueryBuilder/store.js';
   //import { querify } from '../util/parse';
   import {subjectFields, contentFields} from '../config';
@@ -32,16 +32,16 @@
       return  acc + dslBuilder(next.value, next.fields);
     }, '')
 
-    state.send({ type: 'SEARCH', query: joinedRules, value });
+    searchMachine.send({ type: 'SEARCH', query: joinedRules, value });
   }
 
   function checkDirty() {
-    state.send('CHANGED');
+    searchMachine.send('CHANGED');
 
-    // if ($store.value !== value.toString()) {
-    //   state.send('CHANGED');
+    // if ($searchStore.value !== value.toString()) {
+    //   searchMachine.send('CHANGED');
     // } else {
-    //   state.send('SAME');
+    //   searchMachine.send('SAME');
     // }
   }
 
@@ -69,7 +69,7 @@
   <QueryBuilder
     {subjectFields}
     {contentFields}
-    status="{$state.dirty ? 'dirty' : 'clean'}"
+    status="{$searchMachine.dirty ? 'dirty' : 'clean'}"
     on:change="{ handleChange }"
     send="{ handleSend }" />
     {#if isRules}

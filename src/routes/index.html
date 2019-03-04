@@ -3,7 +3,10 @@
 </svelte:head>
 
 <h1>RWJF Playground.</h1>
-<p><a href="search">search</a></p>
+<ul>
+  <li><a href="search">search</a></li>
+  <li><a href="map">map</a></li>
+</ul>
 
 <style>
   h1 {
@@ -12,5 +15,17 @@
     text-transform: uppercase;
     font-weight: 700;
     margin: 0 0 0.5em 0;
+  }
+
+  ul {
+    list-style: none;
+    display: flex;
+    justify-content: center;
+    margin-top: 50px;
+  }
+
+  li {
+    margin: 0 20px;
+    font-size: 20px;
   }
 </style>
