@@ -5,7 +5,10 @@
   import QueryControls from './QueryControls.html';
   import Query from './Query.html';
 
-  export let copyRule, ruleselect, search, rules;
+  export let copyRule, ruleselect;
+
+  export let search;
+  export let rules;
 
   $: filteredRules = $rules.map(q => ({
     value: q.value,

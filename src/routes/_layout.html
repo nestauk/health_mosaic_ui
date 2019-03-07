@@ -1,19 +1,12 @@
 <main>
-  <svelte:component this="{child.component}" {...child.props} />
-  <!-- <slot></slot> -->
+  <slot></slot>
 </main>
 
 <style>
   main {
     position: relative;
     width: 100%;
-    /* padding: 2em; */
-    /* margin: 50px auto; */
+
     box-sizing: border-box;
   }
 </style>
-
-<script>
-  import Nav from '../components/Nav.html';
-  export let child;
-</script>

@@ -28,7 +28,7 @@
   <ul>
     {#each tabs as {tab}}
     <li>
-      <a on:click="{() => changeTab(tab)}"  class='{tab === activeTab ? "selected" : ""}'>Tab {tab + 1}</a>
+      <a on:click="{() => changeTab(tab)}"  class='{tab === activeTab ? "selected" : ""}' href="">Tab {tab + 1}</a>
       {#if tabs.length > 1}
         <span on:click="{() => deleteTab(tab)}" class="remove"><img src="{closeIcon}"></span>
       {/if}
@@ -41,7 +41,7 @@
   </ul>
   {#if $state.dirty && $state.dirty === 'pending'}
   <span><Spinner/></span>
-  {:elseif $state.dirty && $state.dirty === 'error'}
+  {:else if $state.dirty && $state.dirty === 'error'}
   <span class="error"><Alert color="red"/></span>
   {/if}
 </nav>
@@ -84,7 +84,6 @@
   li {
     display: block;
     float: left;
-    display: flex;
     align-items: center;
     border-right: 1px solid #ccc;
     padding: 0 10px;

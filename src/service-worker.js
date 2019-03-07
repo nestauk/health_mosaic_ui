@@ -2,7 +2,7 @@ import {
   timestamp,
   files,
   shell,
-  // routes
+  // routes,
   // eslint-disable-next-line
 } from '@sapper/service-worker';
 
