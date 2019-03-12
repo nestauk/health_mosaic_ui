@@ -1,4 +1,4 @@
-import { baseUrl, size } from '../config';
+import { endpointNIHSearch, size } from '../config';
 
 export async function query(querystring, type = 'single', id) {
   const data = generateBody(type, querystring, id);
@@ -35,10 +35,11 @@ export function multiple(queries) {
   return Promise.all(queries.map(q => query(q)));
 }
 
+// FIXME make the endpoint generic as an argument
 function generateBody(type, querystring, id = 0) {
   const body = {
     single: {
-      endpoint: baseUrl,
+      endpoint: endpointNIHSearch,
       body: {
         query: {
           query_string: { query: querystring, default_operator: 'AND' },
@@ -48,7 +49,7 @@ function generateBody(type, querystring, id = 0) {
     },
 
     scroll: {
-      endpoint: `${baseUrl}?scroll=100m`,
+      endpoint: `${endpointNIHSearch}?scroll=100m`,
       body: {
         query: {
           query_string: { query: querystring, default_operator: 'AND' },
@@ -58,7 +59,7 @@ function generateBody(type, querystring, id = 0) {
     },
 
     nextScroll: {
-      endpoint: `${baseUrl}/scroll`,
+      endpoint: `${endpointNIHSearch}/scroll`,
       body: {
         size,
         scroll_id: id,
