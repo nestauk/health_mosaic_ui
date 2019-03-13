@@ -1,6 +1,7 @@
 <script>
-  import { Mapbox, Editor, Controls} from '../components/Map';
-  import { MAPBOXGL_STYLEURL, MAPBOXGL_ACCESSTOKEN } from '../config.js';
+  import { Mapbox, Editor, Controls, Layer, Source} from '../components/Map';
+  import { MAPBOXGL_STYLEURL, MAPBOXGL_ACCESSTOKEN, testLayer, testSource } from '../config.js';
+
   import { memoMachineConfig, memoMachineOptions } from '../machines/memo.ts';
   import { createBoundsStore, createMemoStore } from '../stores'
   import { createMachina } from '../util/xstateHelper.ts';
@@ -22,8 +23,8 @@
   }
 
   const initialBounds = [
-    [134.44830750095474, 7.3313397810897385],
-    [134.51392190152154, 7.351823467712293]
+    [-122.64854939024758, 37.47760138694859],
+    [-121.8608088493005, 38.104949573347426]
   ];
 
   const { machine: memoMachine, contextStores: { bounds, memo } } = createMachina(
@@ -33,9 +34,7 @@
     }
   );
 
-  let editor,
-    mapbox,
-    currentNoteValue = {title:'', description: ''};
+  let currentNoteValue = {title:'', description: ''};
 
   function syncLocalNoteValue() {
     if ($memo.currentPin === false) return;
@@ -79,22 +78,24 @@
   onMount(() => {
     syncLocalNoteValue();
   })
-
 </script>
 
 <div class="container">
   <Mapbox
-    bind:this="{mapbox}"
     bounds="{$bounds}"
     apiKey="{MAPBOXGL_ACCESSTOKEN}"
-    styleUrl="{MAPBOXGL_STYLEURL}"
+    styleURL="{MAPBOXGL_STYLEURL}"
     on:txstart="{txstart}"
     on:txend="{txend}"
-  />
+  >
+    <Source source="{testSource}" sourceId="test">
+      <Layer layer="{testLayer}"/>
+    </Source>
+
+  </Mapbox>
 
   {#if $memoMachine.matches('editing') || $memoMachine.matches('pinned')}
     <Editor
-      bind:this="{editor}"
       editing="{$memoMachine.matches('editing')}"
       on:change="{({detail}) => currentNoteValue = detail }"
       title="{currentNoteValue.title}"

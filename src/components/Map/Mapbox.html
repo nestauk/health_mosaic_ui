@@ -1,7 +1,28 @@
+<script context="module">
+  export const MAPBOX = {};
+</script>
+
 <script>
-  import { onMount, onDestroy, createEventDispatcher } from 'svelte';
-  export let apiKey, styleUrl, bounds, map;
-  let container, mapboxgl;
+  import {
+    onMount,
+    onDestroy,
+    createEventDispatcher,
+    setContext,
+  } from 'svelte';
+
+  export let apiKey,
+    styleURL,
+    bounds,
+    map,
+    interactive = true;
+
+  let container,
+    mapboxgl,
+    loaded = false;
+
+  setContext(MAPBOX, {
+    getMap: () => map,
+  });
 
   const dispatch = createEventDispatcher();
 
@@ -9,20 +30,11 @@
 
   $: map && map.fitBounds(bounds, {}, { source: 'auto' });
 
-  onMount(async () => {
-    mapboxgl = await import('mapbox-gl');
-    mapboxgl = mapboxgl.default;
-    mapboxgl.accessToken = apiKey;
-
-    map = new mapboxgl.Map({
-      container,
-      style: styleUrl,
-      bounds: bounds,
-    }).on('load', () => {
-      map.on('movestart', txstart);
-      map.on('moveend', txend);
-    });
-  });
+  function txstart(mbEvent) {
+    if (mbEvent.source !== 'auto') {
+      dispatch('txstart');
+    }
+  }
 
   function txend(mbEvent) {
     if (mbEvent.source !== 'auto') {
@@ -30,11 +42,22 @@
     }
   }
 
-  function txstart(mbEvent) {
-    if (mbEvent.source !== 'auto') {
-      dispatch('txstart');
-    }
-  }
+  onMount(async () => {
+    mapboxgl = await import('mapbox-gl');
+    mapboxgl = mapboxgl.default;
+    mapboxgl.accessToken = apiKey;
+
+    map = new mapboxgl.Map({
+      interactive,
+      container,
+      style: styleURL,
+      bounds: bounds,
+    }).on('load', () => {
+      map.on('movestart', txstart);
+      map.on('moveend', txend);
+      loaded = true;
+    });
+  });
 
   onDestroy(() => {
     if (!map) return;
@@ -50,7 +73,11 @@
   <link href="./mapbox-gl.css" rel="stylesheet" />
 </svelte:head>
 
-<div bind:this="{container}" class="container"></div>
+<div bind:this="{container}" class="container">
+  {#if loaded}
+  <slot></slot>
+  {/if}
+</div>
 
 <style>
   .container {

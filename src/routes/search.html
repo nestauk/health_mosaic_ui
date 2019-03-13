@@ -4,8 +4,7 @@
 
   import { searchStore, searchMachine } from '../machines/search.ts';
 
-  let tab=0;
-  $: console.log(tab);
+  let tab = 0;
 
   function deleteResults({detail}) {
     searchStore.update(s => ({
@@ -37,20 +36,3 @@
   {/if}
 </div>
 
-
-
-
-<!-- <style lang="less">
-   @import '../styles/sample.less';
-
-   @padding: 6rem 30px 30px 30px;
-
-  .content {
-    color: @var;
-<<<<<<< HEAD
-    padding:@padding;
-=======
->>>>>>> Implement working map UI with notes and edit controls. Closes #54
-  }
-
-</style> -->

@@ -41,9 +41,9 @@ const searchMachineConfig = {
 const searchMachineOptions = {
   services: {
     postRequest: async (ctx, evt) => {
-      ctx.update(v => ({
+      ctx.search.update(v => ({
         ...v,
-        value: evt.value.toString(),
+        value: evt.value,
         pages: v.pages ? v.pages.concat(v.next) : [v.next],
       }));
       let id;
@@ -53,7 +53,7 @@ const searchMachineOptions = {
         req = 'nextScroll';
       }
       const q = await query(evt.query, req, id);
-      ctx.update(v => ({
+      ctx.search.update(v => ({
         ...v,
         data: { ...v.data, [evt.searchId]: q.hits.hits },
       }));

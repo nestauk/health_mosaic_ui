@@ -1,147 +1,148 @@
 <script>
-    import {createEventDispatcher} from 'svelte';
-    import Spinner from './Spinner.html';
-    import Alert from './Icons/Alert.html';
-    import { state } from '../machines/search.js';
+  import {createEventDispatcher} from 'svelte';
+  import Spinner from './Spinner.html';
+  import Alert from './Icons/Alert.html';
+  import { searchMachine } from '../machines/search.ts';
 
-    import closeIcon from 'ionicons/dist/ionicons/svg/ios-close-circle-outline.svg';
-    import addIcon from 'ionicons/dist/ionicons/svg/ios-add-circle-outline.svg';
+  import closeIcon from 'ionicons/dist/ionicons/svg/ios-close-circle-outline.svg';
+  import addIcon from 'ionicons/dist/ionicons/svg/ios-add-circle-outline.svg';
 
-    export let tabs, activeTab;
+  export let tabs, activeTab;
 
-    const dispatch = createEventDispatcher();
+  const dispatch = createEventDispatcher();
 
-    function createTab() {
-      dispatch('newtab')
-    }
+  function createTab() {
+    dispatch('newtab')
+  }
 
-    function changeTab(i) {
-      dispatch('changetab', i)
-    }
+  function changeTab(i) {
+    dispatch('changetab', i)
+  }
 
-    function deleteTab(i) {
-      dispatch('deletetab', i)
-    }
-  </script>
+  function deleteTab(i) {
+    dispatch('deletetab', i)
+  }
+</script>
 
-  <nav>
-    <ul>
-      {#each tabs as {tab}}
-      <li>
-        <a on:click="{() => changeTab(tab)}"  class='{tab === activeTab ? "selected" : ""}' href="">Tab {tab + 1}</a>
-        {#if tabs.length > 1}
-          <span on:click="{() => deleteTab(tab)}" class="remove"><img src="{closeIcon}"></span>
-        {/if}
+<nav>
+  <ul>
+    {#each tabs as {tab}}
+    <li>
+      <a on:click|preventDefault="{() => changeTab(tab)}"  class='{tab === activeTab ? "selected" : ""}' href="">Tab {tab + 1}</a>
+      {#if tabs.length > 1}
+        <span on:click="{() => deleteTab(tab)}" class="remove"><img alt="delete tab" src="{closeIcon}"></span>
+      {/if}
 
-      </li>
-      {/each}
-      <li class="close-container">
-          <span on:click="{createTab}" class="newtab remove"><img src="{addIcon}"></span>
-      </li>
-    </ul>
-    {#if $state.dirty && $state.dirty === 'pending'}
-    <span><Spinner/></span>
-    {:else if $state.dirty && $state.dirty === 'error'}
-    <span class="error"><Alert color="red"/></span>
-    {/if}
-  </nav>
+    </li>
+    {/each}
+    <li class="close-container">
+        <span on:click="{createTab}" class="newtab remove"><img alt="creat tab" src="{addIcon}"></span>
+    </li>
+  </ul>
+  {#if $searchMachine.matches('dirty.pending') }
+  <span><Spinner/></span>
+  {:else if $searchMachine.matches('dirty.error')}
+  <span class="error"><Alert color="red"/></span>
+  {/if}
+</nav>
 
-  <style>
-    span {
-      height: 3.5rem;
-      margin-top: -0.25rem;
-    }
+<style>
+  span {
+    height: 3.5rem;
+    margin-top: -0.25rem;
+  }
 
-    .error {
-      height: 2rem;
-      width: 2rem;
-      align-self: center;
-      margin-right: 15px;
-    }
-    nav {
-      border-bottom: 1px solid rgba(170, 30, 30, 0.1);
-      font-weight: 300;
-      padding: 0 1em;
-      display: flex;
-      justify-content: space-between;
-      background: #fff;
-      position: relative;
-      z-index: 4;
-    }
+  .error {
+    height: 2rem;
+    width: 2rem;
+    align-self: center;
+    margin-right: 15px;
+  }
+  nav {
+    border-bottom: 1px solid rgba(170, 30, 30, 0.1);
+    font-weight: 300;
+    padding: 0 1em;
+    display: flex;
+    justify-content: space-between;
+    background: #fff;
+    position: relative;
+    z-index: 4;
+  }
 
-    ul {
-      margin: 0;
-      padding: 0;
-    }
+  ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
 
-    /* clearfix */
-    ul::after {
-      content: '';
-      display: block;
-      clear: both;
-    }
+  /* clearfix */
+  ul::after {
+    content: '';
+    display: block;
+    clear: both;
+  }
 
-    li {
-      display: block;
-      float: left;
-      align-items: center;
-      border-right: 1px solid #ccc;
-      padding: 0 10px;
-    }
+  li {
+    float: left;
+    display: flex;
+    align-items: center;
+    border-right: 1px solid #ccc;
+    padding: 0 10px;
+  }
 
-    .selected {
-      position: relative;
-      display: inline-block;
-    }
+  .selected {
+    position: relative;
+    display: inline-block;
+  }
 
-    .selected::after {
-      position: absolute;
-      content: '';
-      width: calc(100% - 1em);
-      height: 2px;
-      background-color: rgb(170, 30, 30);
-      display: block;
-      bottom: -1px;
-    }
+  .selected::after {
+    position: absolute;
+    content: '';
+    width: calc(100% - 1em);
+    height: 2px;
+    background-color: rgb(170, 30, 30);
+    display: block;
+    bottom: -1px;
+  }
 
-    a {
-      text-decoration: none;
-      padding: 1em 0.5em;
-      display: block;
-      cursor: pointer;
-    }
+  a {
+    text-decoration: none;
+    padding: 1em 0.5em;
+    display: block;
+    cursor: pointer;
+  }
 
-    .remove {
-      height: 22px;
-      width: 22px;
-      cursor: pointer;
-      margin: 0 5px;
-      opacity: 0.5;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-    }
+  .remove {
+    height: 22px;
+    width: 22px;
+    cursor: pointer;
+    margin: 0 5px;
+    opacity: 0.5;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
 
-    .remove:hover {
-      opacity: 1;
-    }
+  .remove:hover {
+    opacity: 1;
+  }
 
-    .newtab {
-      margin: auto;
-      opacity: 1;
-    }
+  .newtab {
+    margin: auto;
+    opacity: 1;
+  }
 
-    .close-container {
-      flex-direction: column;
-      justify-content: center;
-      height: 100%;
-      margin-left: 10px;
-      border-right: none;
-    }
+  .close-container {
+    flex-direction: column;
+    justify-content: center;
+    height: 100%;
+    margin-left: 10px;
+    border-right: none;
+  }
 
-    .remove img {
-      width: 100%;
-      height: 100%;
-    }
-  </style>
+  .remove img {
+    width: 100%;
+    height: 100%;
+  }
+</style>

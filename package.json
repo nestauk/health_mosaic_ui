@@ -61,7 +61,7 @@
     "sapper": "^0.26.0-alpha.12",
     "stylelint": "^9.10.1",
     "stylelint-config-recommended": "^2.1.0",
-    "svelte": "^3.0.0-beta.15",
+    "svelte": "^3.0.0-beta.20",
     "ts-jest": "^23.10.5",
     "ts-lib": "^0.0.5",
     "typescript": "^3.2.4",

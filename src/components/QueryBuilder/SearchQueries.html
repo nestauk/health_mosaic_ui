@@ -10,7 +10,7 @@
   export let search;
   export let rules;
 
-  $: filteredRules = $rules.map(q => ({
+  $: filteredRules = rules.map(q => ({
     value: q.value,
     subs: q.subject.filter(s => s.status !== 'default'),
     conts: q.content.filter(s => s.status !== 'default'),
@@ -18,14 +18,14 @@
   }));
 
   function hoverProp(i, s, cat) {
-    const index = $rules[i][cat].findIndex(v => v.field === s);
-    $rules[i][cat][index].hovered = true;
+    const index = rules[i][cat].findIndex(v => v.field === s);
+    rules[i][cat][index].hovered = true;
   }
 
   function unHoverProp(i, s, cat) {
-    const index = $rules[i][cat].findIndex(v => v.field === s);
+    const index = rules[i][cat].findIndex(v => v.field === s);
 
-    $rules[i][cat][index].hovered = false;
+    rules[i][cat][index].hovered = false;
   }
 
   function toggleVisibility(i, s, cat) {
@@ -112,10 +112,10 @@
             on:mouseleave="{() => unHoverProp(i, cont.field, 'content')}"
             style="{ visible ? '' : 'opacity: 0.5'}"
         >
-
+        <span style="{cont.visible ? '' : 'opacity: 0.5;'} transition: opacity 0.3s;">
             {cont.field}
 
-          <span class="icon-wrap" style="{cont.visible ? '' : 'opacity: 0.5;'} transition: opacity 0.3s;">
+          <span class="icon-wrap">
               {#if cont.hovered}
               <QueryControls status="{cont.status}"
                              visible={cont.visible}
@@ -125,6 +125,7 @@
 
               {/if}
           </span>
+        </span>
         </li>
 
         <!-- {/if} -->
