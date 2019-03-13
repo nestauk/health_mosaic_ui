@@ -24,9 +24,10 @@ interface Memo {
   currentPin: number | boolean;
 }
 
-const initialValue: Memo = {
+const defaultValue: Memo = {
   pins: [],
   currentPin: false,
 };
 
-export const createMemoStore = () => writable(initialValue);
+export const createMemoStore = (initialValue = defaultValue) =>
+  writable(initialValue);

@@ -1,6 +1,10 @@
 <script>
   import { onMount, onDestroy, createEventDispatcher } from 'svelte';
-  export let apiKey, styleUrl, bounds, map;
+  export let apiKey,
+    styleUrl,
+    bounds,
+    map,
+    interactive = true;
   let container, mapboxgl;
 
   const dispatch = createEventDispatcher();
@@ -15,6 +19,7 @@
     mapboxgl.accessToken = apiKey;
 
     map = new mapboxgl.Map({
+      interactive,
       container,
       style: styleUrl,
       bounds: bounds,
