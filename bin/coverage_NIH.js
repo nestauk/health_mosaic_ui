@@ -28,6 +28,10 @@ const makeApplyRules = _.pipe([
   pickAndTransformValues,
 ]);
 
+// test
+// const _rules = {string: [x => 1, x => 2], date: [x => 3, x => 4]}
+// console.log(makeApplyRules(_rules))
+
 /*
 // fieldTypes
 {
@@ -55,6 +59,11 @@ const applyTypeRules = (fieldTypes, rules) =>
   allValues(
     makeApplyRules(rules)(fieldTypes)
   );
+
+// test
+// console.log(
+//   applyTypeRules(fieldTypes, {string: [makeStringFieldIsNotEmpty]})
+// )
 
 const mapToAllValues = fn => _.pipe([_.values, _.flatten, _.mapWith(fn)]);
 
@@ -101,32 +110,10 @@ const fieldTypes = {
   ]
 };
 
-const makeBody = fieldTypes => ({
-  query: {
-    bool: {
-      must: makeAllFieldExists(fieldTypes),
-      must_not: [
-        applyTypeRules(fieldTypes, {
-          string: [makeStringFieldIsNotEmpty]
-        })
-        // ...strings.map(makeStringFieldIsNotEmpty)
-      ]
-    }
-  }
-});
-
-// console.log(JSON.stringify(makeBody(fieldTypes), null, 2))
-
 /*
 {
-  foo: [
-    "a",
-    "b",
-  ],
-  bar: [
-    "c",
-    "d",
-  ]
+  foo: ["a", "b"],
+  bar: ["c", "d"]
 }
 =>
 [
@@ -183,29 +170,83 @@ const makeFieldTypes = _.pipe([
   _.mapValuesWith(_.mapWith(_.getAt(1))),
   // tapValue,
 ]);
-// makeFieldTypes([{foo: "b"}, {bar: "c"}, {bar: "d"}]);
 
-const makeQueriesPermutations = _.pipe([
+const makeBody = fieldTypes => ({
+  query: {
+    bool: {
+      must: makeAllFieldExists(fieldTypes),
+      must_not: [
+        ...applyTypeRules(fieldTypes, {
+          string: [makeStringFieldIsNotEmpty]
+        })
+        // ...strings.map(makeStringFieldIsNotEmpty)
+        , {term: {booleanFlag_duplicate_abstract: true}}
+      ]
+    }
+  }
+});
+
+// console.log(JSON.stringify(makeBody(fieldTypes), null, 2))
+
+const groupBiPermutationByFirstFieldName = _.groupBy(_.pipe([
+  _.getAt(0),
+  _.pairs,
+  _.getPath("0.1")]
+));
+const indexBiPermutationBySecondFieldName = _.indexBy(_.pipe([
+  _.getAt(1),
+  _.pairs,
+  _.getPath("0.1")]
+));
+
+const makeQueriesTree = _.pipe([
   // tapValue,
   makeKeyedPairs,
   makeBiPermutations,
-  _.groupBy(_.pipe([_.getAt(0), _.pairs, _.getPath("0.1")])),
+  groupBiPermutationByFirstFieldName, // bi-permutations by field name
   _.mapValuesWith(
-    _.mapWith(_.pipe([
-      makeFieldTypes,
-      makeBody
-    ]))
+    _.pipe([
+      indexBiPermutationBySecondFieldName,
+      _.mapValuesWith(
+        _.pipe([
+          makeFieldTypes,
+          makeBody
+        ])
+      )
+    ])
   )
+  // _.mapValuesWith(
+  //   _.mapWith(_.pipe([
+  //     makeFieldTypes,
+  //     makeBody
+  //   ]))
+  // )
 ]);
 
-const fetchPermutations = obj => {
+/*
+// TODO make recursive, now hard-coded 2 depth levels
+{a: {b: 1, c: 2}, d: {e: 3, f: 4}}
+=>
+[1, 2, 3, 4]
+*/
+const flattenObject2 = _.pipe([
+  _.mapValuesWith(_.values),
+  _.values,
+  _.flatten
+]);
+
+// test
+// const promises = flattenObject2({a: {b: 1, c: 2}, d: {e: 3, f: 4}});
+// console.log(promises);
+
+const fetchPermutations = tree => {
   const data = {}
   const todo = {}
 
-  const promisesObj = _.mapValues(obj, (bodies, key) => {
-    data[key] = new Array(bodies.length);
+  const promisesTree = _.mapValues(tree, (targetsObj, sourceKey) => {
+    data[sourceKey] = {};
 
-    return _.map(bodies, (body, index) =>
+    return _.mapValues(targetsObj, (body, targetKey) =>
       fetch(endpointNIHCount, {
         method: 'post',
         body: JSON.stringify(body),
@@ -215,500 +256,288 @@ const fetchPermutations = obj => {
       })
       .then(res => res.json())
       .then(json => {
-        data[key][index] = json.count
-        console.log(key, index, data[key])
+        data[sourceKey][targetKey] = json.count
+        console.log(sourceKey, targetKey, json.count)
       })
       .catch(err => {
-        console.log("!!!", key, index, err.message)
-        if (!_.has(todo, key)) {
-          todo[key] = [index]
+        console.log("!!!", sourceKey, targetKey, err.message)
+        if (!_.has(todo, sourceKey)) {
+          todo[sourceKey] = [targetKey]
         } else {
-          todo[key].push(index)
+          todo[sourceKey].push(targetKey)
         }
       })
     )
   });
-  const promises = _.flatten(_.values(promisesObj))
+  const promises = flattenObject2(promisesTree);
 
   Promise.all(promises)
   .then(json => {
-    console.log("data", JSON.stringify(data, null, 2))
+    console.log("ok: data", JSON.stringify(data, null, 2))
   })
   .catch(err => {
-    console.log("data", JSON.stringify(data, null, 2))
-    console.log("todo", JSON.stringify(todo, null, 2))
+    console.log("err: data", JSON.stringify(data, null, 2))
+    console.log("err: todo", JSON.stringify(todo, null, 2))
   })
 }
 
-const queryPermutations = makeQueriesPermutations(fieldTypes);
-console.log(JSON.stringify(queryPermutations, null, 2));
+const queryPermutations = makeQueriesTree(fieldTypes);
+// console.log(JSON.stringify(queryPermutations, null, 2));
 
 fetchPermutations(queryPermutations)
 
-
-// test: makeApplyRules
-// const _rules = {string: [x => 1, x => 2], date: [x => 3, x => 4]}
-// console.log(makeApplyRules(_rules))
-
-// test: applyTypeRules
-// console.log(
-//   applyTypeRules(fieldTypes, {
-//     string: [makeStringFieldIsNotEmpty]
-//   })
-// )
-
 /*
-RWJF
+nih_v2
 data {
   "id_of_project": [
-    1574246,
-    1574246,
-    1574246,
-    1873113,
-    1574246,
-    1873113,
-    1541377,
-    1496483,
-    1510794,
-    1505972,
-    1540447,
-    1540447,
-    1540447,
-    2371476,
-    1380667,
-    1383617,
-    1540447,
-    2371476,
-    2371476,
-    1509945
-  ],
+    1542158
+    1542158
+    1542158
+    1689936
+    1542158
+    1689936
+    1542158
+    1464874
+    1542158
+    1474217
+    1508551
+    1508551
+    1508551
+    2188299
+    1355228
+    1357845
+    1508551
+    2188299
+    2188299
+    1478125
+  ]
   "title_of_organisation": [
-    1574390,
-    1574390,
-    1346105,
-    1574390,
-    1346105,
-    1541380,
-    1496486,
-    1510797,
-    1505975,
-    1540450,
-    1540450,
-    1540450,
-    1574390,
-    1380702,
-    1383650,
-    1540450,
-    1574390,
-    1574390,
-    1509948
-  ],
+    1542297
+    1542297
+    1314012
+    1542297
+    1314012
+    1542297
+    1464877
+    1542297
+    1474220
+    1508554
+    1508554
+    1508554
+    1542297
+    1355263
+    1357878
+    1508554
+    1542297
+    1542297
+    1478128
+  ]
   "title_of_project": [
-    1574390,
-    1346105,
-    1574390,
-    1346105,
-    1541380,
-    1496486,
-    1510797,
-    1505975,
-    1540450,
-    1540450,
-    1540450,
-    1574390,
-    1380702,
-    1383650,
-    1540450,
-    1574390,
-    1574390,
-    1509948
-  ],
+    1542297
+    1314012
+    1542297
+    1314012
+    1542297
+    1464877
+    1542297
+    1474220
+    1508554
+    1508554
+    1508554
+    1542297
+    1355263
+    1357878
+    1508554
+    1542297
+    1542297
+    1478128
+  ]
   "textBody_descriptive_project": [
-    1346105,
-    1574390,
-    1346105,
-    1541380,
-    1496486,
-    1510797,
-    1505975,
-    1540450,
-    1540450,
-    1540450,
-    1574390,
-    1380702,
-    1383650,
-    1540450,
-    1574390,
-    1574390,
-    1509948
-  ],
+    1314012
+    1542297
+    1314012
+    1542297
+    1464877
+    1542297
+    1474220
+    1508554
+    1508554
+    1508554
+    1542297
+    1355263
+    1357878
+    1508554
+    1542297
+    1542297
+    1478128
+  ]
   "textBody_abstract_project": [
-    1346105,
-    1873239,
-    1314843,
-    1279314,
-    1287832,
-    1286278,
-    1314725,
-    1314725,
-    1314725,
-    1873239,
-    1172240,
-    1179037,
-    1314725,
-    1873239,
-    1873239,
-    1287689
-  ],
+    1314012
+    1690057
+    1314012
+    1247705
+    1314012
+    1254523
+    1282829
+    1282829
+    1282829
+    1690057
+    1146801
+    1153265
+    1282829
+    1690057
+    1690057
+    1255869
+  ]
   "terms_descriptive_project": [
-    1346105,
-    1541380,
-    1496486,
-    1510797,
-    1505975,
-    1540450,
-    1540450,
-    1540450,
-    1574390,
-    1380702,
-    1383650,
-    1540450,
-    1574390,
-    1574390,
-    1509948
-  ],
+    1314012
+    1542297
+    1464877
+    1542297
+    1474220
+    1508554
+    1508554
+    1508554
+    1542297
+    1355263
+    1357878
+    1508554
+    1542297
+    1542297
+    1478128
+  ]
   "terms_mesh_abstract": [
-    1314843,
-    1279314,
-    1287832,
-    1286278,
-    1314725,
-    1314725,
-    1314725,
-    1873239,
-    1172240,
-    1179037,
-    1314725,
-    1873239,
-    1873239,
-    1287689
-  ],
+    1314012
+    1247705
+    1314012
+    1254523
+    1282829
+    1282829
+    1282829
+    1690057
+    1146801
+    1153265
+    1282829
+    1690057
+    1690057
+    1255869
+  ]
   "placeName_country_organisation": [
-    1496485,
-    1510797,
-    1505974,
-    1540450,
-    1540450,
-    1540450,
-    1541380,
-    1379886,
-    1382852,
-    1540450,
-    1541380,
-    1541380,
-    1509948
-  ],
+    1464877
+    1542297
+    1474220
+    1508554
+    1508554
+    1508554
+    1542297
+    1355263
+    1357878
+    1508554
+    1542297
+    1542297
+    1478128
+  ]
   "placeName_state_organisation": [
-    1496480,
-    1495915,
-    1496485,
-    1496485,
-    1496485,
-    1496486,
-    1362911,
-    1366062,
-    1496485,
-    1496486,
-    1496486,
-    1496402
-  ],
+    1464877
+    1464326
+    1464876
+    1464876
+    1464876
+    1464877
+    1337759
+    1340573
+    1464876
+    1464877
+    1464877
+    1464793
+  ]
   "placeName_city_organisation": [
-    1505971,
-    1509887,
-    1509887,
-    1509887,
-    1510797,
-    1376710,
-    1379677,
-    1509887,
-    1510797,
-    1510797,
-    1509948
-  ],
+    1474220
+    1508554
+    1508554
+    1508554
+    1542297
+    1355263
+    1357878
+    1508554
+    1542297
+    1542297
+    1478128
+  ]
   "placeName_zipcode_organisation": [
-    1505627,
-    1505627,
-    1505627,
-    1505975,
-    1372226,
-    1375315,
-    1505627,
-    1505975,
-    1505975,
-    1505564
-  ],
+    1473874
+    1473874
+    1473874
+    1474220
+    1346931
+    1349682
+    1473874
+    1474220
+    1474220
+    1473811
+  ]
   "id_iso2_country": [
-    1540450,
-    1540450,
-    1540450,
-    1378956,
-    1381924,
-    1540450,
-    1540450,
-    1540450,
-    1509754
-  ],
+    1508554
+    1508554
+    1508554
+    1353576
+    1356209
+    1508554
+    1508554
+    1508554
+    1477935
+  ]
   "id_iso3_country": [
-    1540450,
-    1540450,
-    1378956,
-    1381924,
-    1540450,
-    1540450,
-    1540450,
-    1509754
-  ],
+    1508554
+    1508554
+    1353576
+    1356209
+    1508554
+    1508554
+    1508554
+    1477935
+  ]
   "id_of_continent": [
-    1540450,
-    1378956,
-    1381924,
-    1540450,
-    1540450,
-    1540450,
-    1509754
-  ],
+    1508554
+    1353576
+    1356209
+    1508554
+    1508554
+    1508554
+    1477935
+  ]
   "currency_total_cost": [
-    1380702,
-    1383650,
-    1540450,
-    2371620,
-    2371620,
-    1509948
-  ],
+    1355263
+    1357878
+    1508554
+    2188438
+    2188438
+    1478128
+  ]
   "date_start_project": [
-    null,
-    null,
-    null,
-    null,
     null
-  ],
+    null
+    null
+    null
+    null
+  ]
   "date_end_project": [
-    null,
-    null,
-    null,
     null
-  ],
+    null
+    null
+    null
+  ]
   "id_isoNumeric_country": [
-    null,
-    null,
     null
-  ],
+    null
+    null
+  ]
   "year_fiscal_funding": [
-    null,
     null
-  ],
+    null
+  ]
   "cost_total_project": [
     null
   ]
 }
-*/
-
-
-/*
-nih_v2
-1574246
-1574246
-1574246
-1873113
-1574246
-1873113
-1574246
-1496483
-1574246
-1505972
-1540447
-1540447
-1540447
-2371476
-1380667
-1383617
-1540447
-2371476
-2371476
-1509945
-1574390
-1574390
-1346105
-1574390
-1346105
-1574390
-1496486
-1574390
-1505975
-1540450
-1540450
-1540450
-1574390
-1380702
-1383650
-1540450
-1574390
-1574390
-1509948
-1574390
-1346105
-1574390
-1346105
-1574390
-1496486
-1574390
-1505975
-1540450
-1540450
-1540450
-1574390
-1380702
-1383650
-1540450
-1574390
-1574390
-1509948
-1346105
-1574390
-1346105
-1574390
-1496486
-1574390
-1505975
-1540450
-1540450
-1540450
-1574390
-1380702
-1383650
-1540450
-1574390
-1574390
-1509948
-1346105
-1873239
-1346105
-1279314
-1346105
-1286278
-1314725
-1314725
-1314725
-1873239
-1172240
-1179037
-1314725
-1873239
-1873239
-1287689
-1346105
-1574390
-1496486
-1574390
-1505975
-1540450
-1540450
-1540450
-1574390
-1380702
-1383650
-1540450
-1574390
-1574390
-1509948
-1346105
-1279314
-1346105
-1286278
-1314725
-1314725
-1314725
-1873239
-1172240
-1179037
-1314725
-1873239
-1873239
-1287689
-1496486
-1574390
-1505975
-1540450
-1540450
-1540450
-1574390
-1380702
-1383650
-1540450
-1574390
-1574390
-1509948
-1496486
-1495915
-1496485
-1496485
-1496485
-1496486
-1362911
-1366062
-1496485
-1496486
-1496486
-1496402
-1505975
-1540450
-1540450
-1540450
-1574390
-1380702
-1383650
-1540450
-1574390
-1574390
-1509948
-1505627
-1505627
-1505627
-1505975
-1372226
-1375315
-1505627
-1505975
-1505975
-1505564
-1540450
-1540450
-1540450
-1378956
-1381924
-1540450
-1540450
-1540450
-1509754
-1540450
-1540450
-1378956
-1381924
-1540450
-1540450
-1540450
-1509754
-1540450
-1378956
-1381924
-1540450
-1540450
-1540450
-1509754
-1380702
-1383650
-1540450
-2371620
-2371620
-1509948
 */
