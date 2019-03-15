@@ -5,15 +5,16 @@ import path from 'path';
 
 import {saveObjPassthrough} from '@svizzle/file';
 
-import {fields} from '../data/fields_NIH';
-import {endpointNIHCount} from '../src/config';
+import {fields} from '../data/fields_CB';
+import {endpointCBCount} from '../src/config';
+
 import {makeQueriesTree, fetchPermutations} from './coverageUtils';
 
-const outputPath = path.resolve(__dirname, '../data/coverage_NIH.json');
+const outputPath = path.resolve(__dirname, '../data/coverage_CB.json');
 
 const queriesTree = makeQueriesTree(fields);
 
-fetchPermutations(endpointNIHCount, queriesTree)
+fetchPermutations(endpointCBCount, queriesTree)
 .then(saveObjPassthrough(outputPath, 2))
 .then(data => {
   console.log("ok: data", JSON.stringify(data, null, 2))
