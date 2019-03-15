@@ -4,131 +4,33 @@
   import * as _ from "lamb";
   import {valuesMaxWith, valuesMax} from "@svizzle/utils";
 
-  import {permutations} from "../../data/coverage_nih";
-
-  // utils
-  const getMax = valuesMaxWith(valuesMax);
-  const makeFields = _.pipe([
-    _.mapValuesWith(_.keys),
-    _.pairs,
-    _.flatten,
-    _.uniques,
-    _.sortWith()
-  ]);
-  const makeItems = _.pipe([
-    _.mapValuesWith((obj, key1) =>
-      _.values(
-        _.mapValues(obj, (value, key2) => {
-          const keys = [key1, key2].sort();
-
-          return {
-            id: keys.join('-'),
-            k1: keys[0],
-            k2: keys[1],
-            value
-          }
-        })
-      )
-    ),
-    _.values,
-    _.flatten
-  ]);
-
-  const fields = makeFields(permutations);
-  const items = makeItems(permutations);
-  const max = getMax(permutations);
-
-  let container, cWidth = 0, cHeight = 0;
-
-  $: side = Math.min(cWidth, cHeight);
-  $: center = {x: cWidth / 2, y: cHeight / 2};
-  $: origin = {x: center.x - side / 2, y: center.y - side / 2};
-  $: cellsScale =
-    d3.scaleBand()
-    .domain(fields)
-    .rangeRound([0, side]);
-  $: cellSide = cellsScale.bandwidth();
-  $: cellHalfSide = cellSide / 2;
-  $: radiusScale =
-    d3.scaleLinear()
-    // d3.scaleSqrt()
-    .domain([0, max])
-    .rangeRound([0, cellHalfSide]);
-  $: sideScale =
-    d3.scaleLinear()
-    // d3.scaleSqrt()
-    .domain([0, max])
-    .rangeRound([0, cellSide]);
-  $: layout = _.map(items, item => {
-    const side = sideScale(item.value);
-    const cx = cellHalfSide + cellsScale(item.k1);
-    const cy = cellHalfSide + cellsScale(item.k2);
-    const r = radiusScale(item.value);
-    const angle = -Math.PI / 2 + Math.PI * (max - item.value) / max;
-    const x1 = cx - r * Math.cos(angle);
-    const x2 = cx + r * Math.cos(angle);
-    const y1 = cy - r * Math.sin(angle);
-    const y2 = cy + r * Math.sin(angle);
-
-    return {...item, cx, cy, r,
-      x: cx - side / 2,
-      y: cy - side / 2,
-      side,
-      x1, x2, y1, y2
-    }
-  });
-
-  onMount(() => {
-    getSize()
-  })
-
-  const getSize = () => {
-    const {width, height} = container.getBoundingClientRect();
-    cWidth = width
-    cHeight = height
-  }
-
-  $: console.log(cWidth, cHeight);
-  $: console.log(side, center, origin);
-  // $: console.log(cellsScale('id_of_project'), cellsScale('year_fiscal_funding'));
+  import permutations_NIH from "../../data/coverage_NIH.json";
+  import permutations_CB from "../../data/coverage_CB.json";
+  import PunchCard from "../components/PunchCard.html";
 </script>
 
-<svelte:window on:resize="{getSize}"></svelte:window>
 <svelte:head>
   <title>Coverage</title>
 </svelte:head>
 
-<div class="container" bind:this="{container}">
-  <svg width="{cWidth}" height="{cHeight}">
-    <g transform="translate({origin.x}, {origin.y})">
-      {#each layout as {cx, cy, r, x, y, side, x1, x2, y1, y2}}
-      <!-- <rect {x} {y} width={side} height={side} /> -->
-        <!-- <circle {cx} {cy} {r} /> -->
-        <line {x1} {y1} {x2} {y2} />
-        <circle cx={x2} cy={y2} r={0.15*r} />
-      {/each}
-    </g>
-  </svg>
+<div class="container">
+  <div class="col">
+    <PunchCard tree={permutations_NIH}/>
+  </div>
+  <div class="col">
+    <PunchCard tree={permutations_CB}/>
+  </div>
 </div>
 
 <style lang="less">
   .container {
     width: 100%;
     height: 100%;
-    /* background-color: palegreen; */
 
-    svg {
-      circle {
-        fill: none;
-        stroke: black;
-      }
-      rect {
-        fill: none;
-        stroke: black;
-      }
-      line {
-        stroke: black;
-      }
+    display: flex;
+
+    .col {
+      flex: 1
     }
   }
 
