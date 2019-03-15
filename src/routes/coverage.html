@@ -1,0 +1,93 @@
+<script>
+  import {onMount} from "svelte";
+  import * as d3 from "../vendor/d3";
+  import * as _ from "lamb";
+  import {valuesMaxWith, valuesMax} from "@svizzle/utils";
+
+  import {permutations} from "../../data/coverage_nih";
+
+  // utils
+  const getMax = valuesMaxWith(valuesMax);
+  const makeFields = _.pipe([
+    _.mapValuesWith(_.keys),
+    _.pairs,
+    _.flatten,
+    _.uniques,
+    _.sortWith()
+  ]);
+  const makeItems = _.pipe([
+    _.mapValuesWith((obj, key1) =>
+      _.values(
+        _.mapValues(obj, (value, key2) => ({
+          id: `${key1}-${key2}`,
+          k1: key1,
+          k2: key2,
+          value
+        }))
+      )
+    ),
+    _.values,
+    _.flatten
+  ]);
+
+  let container, rect;
+
+  $: width = rect && rect.width || 0;
+  $: height = rect && rect.height || 0;
+  $: side = Math.min(width, height);
+  $: center = {x: width / 2, y: height / 2};
+  $: origin = {x: center.x - side / 2, y: 0};
+  $: fields = makeFields(permutations);
+  $: items = makeItems(permutations);
+  $: cellsScale = d3.scaleBand().domain(fields).rangeRound([0, side]);
+  $: cellSide = cellsScale.bandwidth();
+  $: cellHalfSide = cellSide / 2;
+  $: max = getMax(permutations);
+  $: radiusScale =
+    d3.scaleLinear()
+    .domain([0, max])
+    .rangeRound([0, cellHalfSide]);
+  $: layout = _.map(items, item => ({
+    ...item,
+    cx: cellHalfSide + cellsScale(item.k1),
+    cy: cellHalfSide + cellsScale(item.k2),
+    r: radiusScale(item.value)
+  }));
+
+  onMount(() => {
+    getSize()
+  })
+
+  const getSize = () => {
+    // FIXME doesn't work, weird
+    // const {width, height} = container.getBoundingClientRect()
+    rect = container.getBoundingClientRect()
+  }
+
+  $: console.log(width, height);
+  $: console.log(side, center, origin);
+  // $: console.log(cellsScale('id_of_project'), cellsScale('year_fiscal_funding'));
+</script>
+
+<svelte:window on:resize="{getSize}"></svelte:window>
+<svelte:head>
+  <title>Coverage</title>
+</svelte:head>
+
+<div class="container" bind:this="{container}">
+  <svg {width} {height}>
+    <g transform="translate({origin.x}, {origin.y})">
+      {#each layout as item}
+        <circle cx={item.cx} cy={item.cy} r={item.r} />
+      {/each}
+    </g>
+  </svg>
+</div>
+
+<style lang="less">
+  .container {
+    width: 100%;
+    height: 100%;
+    background-color: palegreen;
+  }
+</style>

@@ -20,10 +20,16 @@
 	     the current page has one -->
     %sapper.head%
   </head>
+  <style>
+    #app {
+      width: 100%;
+      height: 100%;
+    }
+  </style>
   <body>
     <!-- The application will be rendered inside this element,
 	     because `app/client.js` references it -->
-    <div id="sapper">%sapper.html%</div>
+    <div id="app">%sapper.html%</div>
 
     <!-- Sapper creates a <script> tag containing `app/client.js`
 	     and anything else it needs to hydrate the app and

@@ -4,6 +4,7 @@ import commonjs from 'rollup-plugin-commonjs';
 import svelte from 'rollup-plugin-svelte';
 import img from 'rollup-plugin-img';
 import babel from 'rollup-plugin-babel';
+import json from 'rollup-plugin-json';
 import { terser } from 'rollup-plugin-terser';
 import config from 'sapper/config/rollup.js';
 import less from 'less';
@@ -60,6 +61,9 @@ export default {
       warn(message);
     },
     plugins: [
+      json({
+        exclude: [ 'node_modules/**' ],
+      }),
       replace({
         'process.browser': true,
         'process.env.NODE_ENV': JSON.stringify(mode),
@@ -115,6 +119,9 @@ export default {
       warn(message);
     },
     plugins: [
+      json({
+        exclude: [ 'node_modules/**' ],
+      }),
       replace({
         'process.browser': false,
         'process.env.NODE_ENV': JSON.stringify(mode),
@@ -140,6 +147,9 @@ export default {
     input: config.serviceworker.input(),
     output: config.serviceworker.output(),
     plugins: [
+      json({
+        exclude: [ 'node_modules/**' ],
+      }),
       resolve(),
       replace({
         'process.browser': true,

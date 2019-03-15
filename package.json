@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "compression": "^1.7.1",
+    "d3-scale": "^2.2.2",
     "ionicons": "^4.5.5",
     "lamb": "^0.57.0",
     "polka": "^0.4.0",
@@ -45,6 +46,7 @@
     "rollup-plugin-babel": "^4.0.2",
     "rollup-plugin-commonjs": "^9.1.6",
     "rollup-plugin-img": "^1.1.0",
+    "rollup-plugin-json": "^3.1.0",
     "rollup-plugin-node-resolve": "^4.0.0",
     "rollup-plugin-replace": "^2.0.0",
     "rollup-plugin-svelte": "^5.0.3",
