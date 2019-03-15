@@ -1,10 +1,17 @@
 #! /usr/bin/env node -r esm
 
+import fs from 'fs';
+import path from 'path';
+
 import * as _ from 'lamb';
 import fetch from 'node-fetch';
 import {tapValue} from '@svizzle/utils';
+import {saveObj} from '@svizzle/file';
 
 import {endpointNIHCount} from '../src/config';
+import {fieldTypes} from '../data/fields_NIH';
+
+const outputPath = path.resolve(__dirname, '../data/converage_NIH.json');
 
 /* utils */
 
@@ -75,41 +82,6 @@ const makeAllFieldExists = mapToAllValues(makeFieldExists);
 
 /* coverage */
 
-const fieldTypes = {
-  string: [
-    "id_of_project",
-    "title_of_organisation",
-    "title_of_project",
-    "textBody_descriptive_project",
-    "textBody_abstract_project",
-    "terms_descriptive_project",
-    "terms_mesh_abstract",
-    "placeName_country_organisation",
-    "placeName_state_organisation",
-    "placeName_city_organisation",
-    "placeName_zipcode_organisation",
-    "id_iso2_country",
-    "id_iso3_country",
-    "id_of_continent",
-    "currency_total_cost",
-    // "terms_sdg_project",
-  ],
-  date: [
-    "date_start_project",
-    "date_end_project",
-  ],
-  number: [
-    "id_isoNumeric_country",
-    "year_fiscal_funding",
-    "cost_total_project",
-    // "score_crossPollination_project",
-    // "score_growth_project"
-  ],
-  coords: [
-    "coordinate_of_organisation",
-  ]
-};
-
 /*
 {
   foo: ["a", "b"],
@@ -179,7 +151,6 @@ const makeBody = fieldTypes => ({
         ...applyTypeRules(fieldTypes, {
           string: [makeStringFieldIsNotEmpty]
         })
-        // ...strings.map(makeStringFieldIsNotEmpty)
         , {term: {booleanFlag_duplicate_abstract: true}}
       ]
     }
@@ -206,15 +177,15 @@ const makeQueriesTree = _.pipe([
   makeKeyedPairs,
   tapValue,
 
+  // make the permutations tree
   _.pipe([
-    // make the permutations tree
     _.collect([
       makeSelfPermutations,
       makeBiPermutations,
     ]),
     arr => _.shallowFlatten(arr),
   ]),
-  groupBiPermutationByFirstFieldName, // bi-permutations by field name
+  groupBiPermutationByFirstFieldName,
   _.mapValuesWith(
     _.pipe([
       indexBiPermutationBySecondFieldName,
@@ -277,9 +248,11 @@ const fetchPermutations = tree => {
   const promises = flattenTree2(promisesTree);
 
   Promise.all(promises)
-  .then(json => {
+  .then(_promises => {
     console.log("ok: data", JSON.stringify(data, null, 2))
+    return data
   })
+  .then(saveObj(outputPath))
   .catch(err => {
     console.log("err: data", JSON.stringify(data, null, 2))
     console.log("err: todo", JSON.stringify(todo, null, 2))
