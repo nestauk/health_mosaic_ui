@@ -12,6 +12,8 @@ const outputPath = path.resolve(__dirname, '../data/powerset_NIH.json');
 
 const queries = makeQueries(fields);
 
+// console.log(JSON.stringify(queries, null, 2));
+
 fetchPowerset(endpointNIHCount, queries)
 .then(powerset => ({powerset, fields}))
 .then(saveObjPassthrough(outputPath, 2))

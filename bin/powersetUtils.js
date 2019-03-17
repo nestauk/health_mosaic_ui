@@ -167,9 +167,6 @@ const makeBody = cluster => ({
         ...applyRules(cluster.unpermutable, {
           bool_good: [makeBoolFieldTrue],
         }),
-        ...applyRules(cluster.difference, {
-          string: [makeStringFieldIsEmpty],
-        }),
       ],
       must_not: [
         ...applyRules(cluster.set, {
@@ -223,6 +220,10 @@ const makeComplementsPowerset = Ø([
     difference: _.difference(baseset, set)
   }))
 ]);
+
+// const baseset = ['a', 'b', 'c']
+// console.log(JSON.stringify(baseset))
+// console.log(JSON.stringify(makeComplementsPowerset(baseset)))
 
 const makeFieldsComplements = Ø([makeKeyedPairs, makeComplementsPowerset]);
 
