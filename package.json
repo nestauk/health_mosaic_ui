@@ -3,12 +3,18 @@
   "description": "skele",
   "version": "0.0.1",
   "scripts": {
-    "dev": "sapper dev",
+    "cy:open": "cypress open",
+    "cy:run": "cypress run",
     "build": "sapper build --legacy",
+    "data:coverage:nih": "node -r esm ./bin/coverage_NIH.js",
+    "data:coverage:cb": "node -r esm ./bin/coverage_CB.js",
+    "data:coverage": "npm run data:coverage:nih && npm run data:coverage:cb",
+    "data:powerset:nih": "node -r esm ./bin/powerset_NIH.js",
+    "data:powerset:cb": "node -r esm ./bin/powerset_CB.js",
+    "data:powersets": "npm run data:powerset:nih && npm run data:powerset:cb",
+    "dev": "sapper dev",
     "export": "sapper export --legacy",
     "start": "node __sapper__/build",
-    "cy:run": "cypress run",
-    "cy:open": "cypress open",
     "test": "jest"
   },
   "dependencies": {
