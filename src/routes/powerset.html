@@ -4,22 +4,22 @@
   import * as _ from "lamb";
   import {valuesMaxWith, valuesMax} from "@svizzle/utils";
 
-  import permutations_NIH from "../../data/coverage_NIH.json";
-  import permutations_CB from "../../data/coverage_CB.json";
-  import PunchCard from "../components/PunchCard.html";
+  import powerset_NIH from "../../data/powerset_NIH_unrestricted.json";
+  // import powerset_CB from "../../data/coverage_CB.json";
+  import PowersetMatrix from "../components/PowersetMatrix.html";
 </script>
 
 <svelte:head>
-  <title>Coverage</title>
+  <title>Powerset</title>
 </svelte:head>
 
 <div class="container">
+  <!-- <div class="col"> -->
+    <PowersetMatrix data={powerset_NIH}/>
+  <!-- </div>
   <div class="col">
-    <PunchCard tree={permutations_NIH}/>
-  </div>
-  <div class="col">
-    <PunchCard tree={permutations_CB}/>
-  </div>
+    <PowersetMatrix data={powerset_CB}/>
+  </div> -->
 </div>
 
 <style lang="less">
@@ -30,7 +30,7 @@
     display: flex;
 
     .col {
-      flex: 1
+      flex: 1;
     }
   }
 </style>

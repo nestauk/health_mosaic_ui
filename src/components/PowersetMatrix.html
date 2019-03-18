@@ -1,0 +1,95 @@
+<script>
+  import {afterUpdate, beforeUpdate, onMount} from "svelte";
+  import * as d3 from "../vendor/d3";
+  import * as _ from "lamb";
+  import {arrayMaxWith} from "@svizzle/utils";
+
+  // utils
+  const makeKeys = _.pipe([_.values, _.flatten, _.sort]);
+  const getMax = arrayMaxWith(_.getAt(1));
+
+  export let data;
+  let container, cWidth = 0, cHeight = 0;
+  let context;
+
+  const keys = makeKeys(data.fields.permutable);
+  console.log('keys', keys);
+
+  const clusters = _.sort(data.powerset, [_.sorterDesc(_.getAt(1))]);
+  console.log('clusters', clusters);
+
+  const max = getMax(clusters);
+  console.log('max', max);
+
+  const opacityScale = d3.scaleLinear().domain([0, max]).range([0, 1]);
+
+  $: clusterWidth = cWidth && cWidth / clusters.length;
+  $: yScale = cHeight && d3.scaleBand().domain(keys).range([0, cHeight]);
+  $: ySide = cHeight && yScale.bandwidth();
+  $: layout = cHeight && _.map(clusters, (cluster, index) => {
+    console.log('layout', cHeight);
+    // console.log(cluster[0], _.map(cluster[0], yScale));
+
+    return {
+      cluster,
+      x: index * clusterWidth,
+      ys: _.map(cluster[0], yScale),
+      opacity: opacityScale(cluster[1]),
+    }
+  });
+
+  onMount(() => {
+    console.log("onMount")
+    getSize();
+  })
+
+  beforeUpdate(() => {
+    console.log("beforeUpdate")
+  });
+  afterUpdate(() => {
+    console.log("afterUpdate")
+  });
+
+  const getSize = () => {
+    console.log("getSize")
+    const {width, height} = container.getBoundingClientRect();
+    cWidth = width
+    cHeight = height
+  }
+
+  $: console.log(cWidth, cHeight);
+  $: layout && console.log('layout', layout);
+</script>
+
+<svelte:window on:resize="{getSize}"></svelte:window>
+
+<div class="container" bind:this="{container}">
+  <svg width="{cWidth}" height="{cHeight}">
+    {#each layout as {x, ys, opacity}}
+    <g transform="translate({x},0)">
+      {#each ys as y}
+        <rect
+          {y}
+          width={clusterWidth}
+          height={ySide}
+          fill-opacity={opacity}
+        />
+      {/each}
+    </g>
+    {/each}
+  </svg>
+</div>
+
+<style lang="less">
+  .container {
+    width: 100%;
+    height: 100%;
+
+    svg {
+      rect {
+        fill: grey;
+        stroke: lightgrey;
+      }
+    }
+  }
+</style>

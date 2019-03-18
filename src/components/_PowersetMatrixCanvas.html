@@ -1,0 +1,116 @@
+<script>
+  import {afterUpdate, beforeUpdate, onMount} from "svelte";
+  import * as d3 from "../vendor/d3";
+  import * as _ from "lamb";
+  import {arrayMaxWith} from "@svizzle/utils";
+
+  // utils
+  const makeKeys = _.pipe([_.values, _.flatten, _.sort]);
+  const getMax = arrayMaxWith(_.getAt(1));
+
+  export let data;
+  let container, cWidth = 0, cHeight = 0;
+  let context;
+
+  const keys = makeKeys(data.fields.permutable);
+  console.log('keys', keys);
+
+  const clusters = _.sort(data.powerset, [_.sorterDesc(_.getAt(1))]);
+  console.log('clusters', clusters);
+
+  const max = getMax(clusters);
+  console.log('max', max);
+
+  const opacityScale = d3.scaleLinear().domain([0, max]).range([0, 1]);
+  const clusterWidth = 5;
+
+  // $: side = Math.min(cWidth, cHeight);
+  // $: center = {x: cWidth / 2, y: cHeight / 2};
+  // $: origin = {x: center.x - side / 2, y: center.y - side / 2};
+  $: yScale = cHeight && d3.scaleBand().domain(keys).range([0, cHeight]);
+  $: ySide = cHeight && yScale.bandwidth();
+  $: layout = cHeight && _.map(clusters, (cluster, index) => {
+    console.log('layout', cHeight);
+    // console.log(cluster[0], _.map(cluster[0], yScale));
+
+    return {
+      cluster,
+      x: index * clusterWidth,
+      ys: _.map(cluster[0], yScale),
+      opacity: opacityScale(cluster[1]),
+    }
+  });
+  $: layout && draw(layout)
+
+  onMount(() => {
+    console.log("onMount")
+    getSize();
+  })
+
+  beforeUpdate(() => {
+    console.log("beforeUpdate")
+  });
+  afterUpdate(() => {
+    console.log("afterUpdate")
+  });
+
+  const draw = layout => {
+    console.log("draw", layout)
+
+    context.fillStyle = "red";
+    layout.forEach(cluster => {
+      cluster.ys.forEach(y => {
+        // context.fillStyle = `rgba(0,0,0,${cluster.opacity})`;
+        context.fillRect(cluster.x, y, clusterWidth, ySide);
+      })
+    })
+  };
+
+  const getSize = () => {
+    console.log("getSize")
+    const {width, height} = container.getBoundingClientRect();
+    cWidth = width
+    cHeight = height
+  }
+
+  const canvasSetup = canvas => {
+    console.log("canvasSetup")
+    context = canvas.getContext('2d');
+  }
+
+  $: console.log(cWidth, cHeight);
+  // $: console.log(side, center, origin);
+  $: layout && console.log('layout', cHeight);
+</script>
+
+<svelte:window on:resize="{getSize}"></svelte:window>
+
+<div class="container" bind:this="{container}">
+  <canvas width="{cWidth}" height="{cHeight}" use:canvasSetup />
+</div>
+
+<style lang="less">
+  .container {
+    width: 100%;
+    height: 100%;
+
+    svg {
+      circle {
+        fill: none;
+        stroke: black;
+
+        &.ref {
+          stroke: lightgrey;
+          stroke-opacity: 0.35;
+        }
+      }
+      rect {
+        fill: none;
+        stroke: black;
+      }
+      line {
+        stroke: black;
+      }
+    }
+  }
+</style>
