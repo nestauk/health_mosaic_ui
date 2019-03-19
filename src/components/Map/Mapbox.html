@@ -1,17 +1,46 @@
+<script context="module">
+  export const MAPBOX = {};
+</script>
+
 <script>
-  import { onMount, onDestroy, createEventDispatcher } from 'svelte';
+  import {
+    onMount,
+    onDestroy,
+    createEventDispatcher,
+    setContext,
+  } from 'svelte';
+
   export let apiKey,
-    styleUrl,
+    styleURL,
     bounds,
     map,
     interactive = true;
-  let container, mapboxgl;
+
+  let container,
+    mapboxgl,
+    loaded = false;
+
+  setContext(MAPBOX, {
+    getMap: () => map,
+  });
 
   const dispatch = createEventDispatcher();
 
   const getBounds = () => map.getBounds().toArray();
 
   $: map && map.fitBounds(bounds, {}, { source: 'auto' });
+
+  function txstart(mbEvent) {
+    if (mbEvent.source !== 'auto') {
+      dispatch('txstart');
+    }
+  }
+
+  function txend(mbEvent) {
+    if (mbEvent.source !== 'auto') {
+      dispatch('txend', getBounds());
+    }
+  }
 
   onMount(async () => {
     mapboxgl = await import('mapbox-gl');
@@ -21,25 +50,14 @@
     map = new mapboxgl.Map({
       interactive,
       container,
-      style: styleUrl,
+      style: styleURL,
       bounds: bounds,
     }).on('load', () => {
       map.on('movestart', txstart);
       map.on('moveend', txend);
+      loaded = true;
     });
   });
-
-  function txend(mbEvent) {
-    if (mbEvent.source !== 'auto') {
-      dispatch('txend', getBounds());
-    }
-  }
-
-  function txstart(mbEvent) {
-    if (mbEvent.source !== 'auto') {
-      dispatch('txstart');
-    }
-  }
 
   onDestroy(() => {
     if (!map) return;
@@ -55,7 +73,11 @@
   <link href="./mapbox-gl.css" rel="stylesheet" />
 </svelte:head>
 
-<div bind:this="{container}" class="container"></div>
+<div bind:this="{container}" class="container">
+  {#if loaded}
+  <slot></slot>
+  {/if}
+</div>
 
 <style>
   .container {

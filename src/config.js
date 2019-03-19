@@ -24,5 +24,35 @@ export const contentFields = {
 
 export const MAPBOXGL_STYLEURL =
   'mapbox://styles/nesta-uk/cjja7cb0s0bcw2rmvflhof4io';
+
 export const MAPBOXGL_ACCESSTOKEN =
   'pk.eyJ1IjoibmVzdGEtdWsiLCJhIjoiY2ozbjUzY2drMDAwNzJxbnl6a21uM253cSJ9.3RTMySEVk0LC4gQvGoG-Zw';
+
+export const testLayer = {
+  id: 'population',
+  type: 'circle',
+  'source-layer': 'sf2010',
+  paint: {
+    'circle-radius': {
+      base: 1.75,
+      stops: [[12, 2], [22, 180]],
+    },
+    'circle-color': [
+      'match',
+      ['get', 'ethnicity'],
+      'White',
+      '#fbb03b',
+      'Black',
+      '#223b53',
+      'Hispanic',
+      '#e55e5e',
+      'Asian',
+      '#3bb2d0',
+      /* other */ '#ccc',
+    ],
+  },
+};
+export const testSource = {
+  type: 'vector',
+  url: 'mapbox://examples.8fgz4egr',
+};

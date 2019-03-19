@@ -1,0 +1,24 @@
+<script context="module">
+  export const MB_SOURCE = {};
+</script>
+
+<script>
+  import { onMount, getContext, setContext } from 'svelte';
+  import { MAPBOX } from './Mapbox.html';
+
+  export let source, sourceId;
+  const { getMap } = getContext(MAPBOX);
+
+  setContext(MB_SOURCE, {
+    getSourceId: () => sourceId,
+  });
+
+  onMount(() => {
+    const map = getMap();
+    map.addSource(sourceId, source);
+
+    return () => map.removeSource(sourceId);
+  });
+</script>
+
+<slot></slot>
