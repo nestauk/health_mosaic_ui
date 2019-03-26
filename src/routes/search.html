@@ -1,5 +1,5 @@
 <script>
-  import { Results, ResultsItem } from '../components/Results';
+  import { Results } from '../components/Results';
   import QueryManager from '../components/QueryManager.html';
 
   import { searchStore, searchMachine } from '../machines/search.ts';
@@ -25,7 +25,7 @@
 <QueryManager on:tab="{(e) => tab = e.detail}"
               on:deletetab="{deleteResults}" />
 
-<div class="content">
+<!-- <div class="content">
   {#if $searchStore.data && $searchStore.data[tab] && $searchStore.data[tab].length }
 
     <Results dirty={!!$searchMachine.dirty}>
@@ -34,5 +34,6 @@
       {/each}
     </Results>
   {/if}
-</div>
+</div> -->
 
+<Results />

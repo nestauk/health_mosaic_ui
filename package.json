@@ -22,7 +22,7 @@
     "mapbox-gl": "^0.53.1",
     "polka": "^0.4.0",
     "sirv": "^0.2.0",
-    "xstate": "^4.3.0"
+    "xstate": "^4.4.0"
   },
   "devDependencies": {
     "@babel/core": "^7.0.0",

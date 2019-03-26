@@ -1,14 +1,79 @@
 <script>
+  import { One, Two, Three, Four } from '../Visualisations/';
+  import {
+    resultsMachineConfig,
+    resultsMachineOptions,
+  } from '../../machines/results.ts';
+  import { createTweenStore } from '../../stores/results.ts';
+  import { createMachina } from '../../util/xstateHelper.ts';
+
   export let dirty;
+
+  const {
+    machine: resultsMachine,
+    contextStores: { tweenA, tweenB },
+  } = createMachina(resultsMachineConfig, resultsMachineOptions, {
+    tweenA: createTweenStore(0, { duration: 1000 }),
+    tweenB: createTweenStore(0, { duration: 1000 }),
+  });
+
+  const tabMap = [
+    { title: 'Tab One', event: 'T1', component: One, id: 1 },
+    { title: 'Tab Two', event: 'T2', component: Two, id: 2 },
+    { title: 'Tab Three', event: 'T3', component: Three, id: 3 },
+    { title: 'Tab Four', event: 'T4', component: Four, id: 4 },
+  ];
+
+  const getId = state => tabMap[state.replace(/tab|-.*/, '') - 1].id;
+
+  $: currentState = Object.keys($resultsMachine.value.tabs)[0];
+  $: currentTab = tabMap.find(({ id }) => getId(currentState) === id);
 </script>
 
-<h1>Results</h1>
-<ul class:dirty="{dirty}">
-  <slot></slot>
-</ul>
+<div>
+  <ul>
+    {#each tabMap as {title, event, id}, index}
+    <li
+      class:selected="{currentTab.id === id}"
+      on:click="{() => resultsMachine.send(event)}"
+    >
+      {title}
+    </li>
+    {/each}
+  </ul>
+
+  <svelte:component
+    this="{currentTab.component}"
+    txValue="{$tweenA}"
+    tx2Value="{$tweenB}"
+  />
+</div>
 
 <style>
-  .dirty {
-    color: grey;
+  div {
+    height: calc(100vh - 9.2rem);
+    margin-top: 5.6rem;
+    display: flex;
+  }
+  ul {
+    width: 200px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid #ccc;
+  }
+  li {
+    border-bottom: 1px solid #ccc;
+    padding: 20px;
+    cursor: pointer;
+  }
+
+  li:hover {
+    background: #ccc;
+  }
+
+  li.selected {
+    background: #333;
+    color: #eee;
   }
 </style>
