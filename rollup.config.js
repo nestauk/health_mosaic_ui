@@ -8,7 +8,7 @@ import { terser } from 'rollup-plugin-terser';
 import config from 'sapper/config/rollup.js';
 import less from 'less';
 import typescript from 'rollup-plugin-typescript';
-import copy from 'rollup-copy-plugin';
+import copy from 'rollup-plugin-copy-files';
 import pkg from './package.json';
 
 const mode = process.env.NODE_ENV;

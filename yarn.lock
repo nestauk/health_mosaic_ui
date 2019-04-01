@@ -6504,11 +6504,6 @@ rimraf@2.6.3, rimraf@^2.5.4, rimraf@^2.6.1, rimraf@^2.6.2, rimraf@^2.6.3, rimraf
   dependencies:
     glob "^7.1.3"
 
-rollup-copy-plugin@^0.1.0:
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/rollup-copy-plugin/-/rollup-copy-plugin-0.1.0.tgz#54017500046f5540175e16aa8f92994c9652883d"
-  integrity sha1-VAF1AARvVUAXXhaqj5KZTJZSiD0=
-
 rollup-plugin-babel@^4.0.2:
   version "4.3.2"
   resolved "https://registry.yarnpkg.com/rollup-plugin-babel/-/rollup-plugin-babel-4.3.2.tgz#8c0e1bd7aa9826e90769cf76895007098ffd1413"
@@ -6526,6 +6521,11 @@ rollup-plugin-commonjs@^9.1.6:
     magic-string "^0.25.1"
     resolve "^1.10.0"
     rollup-pluginutils "^2.3.3"
+
+rollup-plugin-copy-files@^0.1.1:
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/rollup-plugin-copy-files/-/rollup-plugin-copy-files-0.1.1.tgz#7060526e58cd0f13ccc3aaa53ec0b26c01fe18fd"
+  integrity sha512-rdnfFudED9dkQgOH/ZFE0Eg5UyWtdY9e2SDuld98nvtfFDjmrB3keHRaaOJQ0i+TuYHU0gyme5zZy0XlM0hOGA==
 
 rollup-plugin-img@^1.1.0:
   version "1.1.0"
