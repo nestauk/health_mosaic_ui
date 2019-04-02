@@ -16,7 +16,9 @@
     "reinstall:yarn": "yarn cleanall && yarn"
   },
   "dependencies": {
+    "@svizzle/utils": "^0.1.0",
     "compression": "^1.7.1",
+    "d3-scale": "^3.0.0",
     "ionicons": "^4.5.5",
     "lamb": "^0.57.0",
     "mapbox-gl": "^0.53.1",

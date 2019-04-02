@@ -16,24 +16,23 @@
     }));
     tab=detail.tab
   }
+
 </script>
 
 <svelte:head>
   <title>Search</title>
 </svelte:head>
 
-<QueryManager on:tab="{(e) => tab = e.detail}"
-              on:deletetab="{deleteResults}" />
+<QueryManager
+  on:tab="{(e) => tab = e.detail}"
+  on:deletetab="{deleteResults}"
+/>
 
-<!-- <div class="content">
-  {#if $searchStore.data && $searchStore.data[tab] && $searchStore.data[tab].length }
-
-    <Results dirty={!!$searchMachine.dirty}>
-      {#each $searchStore.data[tab] as {_source} }
-        <ResultsItem data={_source}></ResultsItem>
-      {/each}
-    </Results>
+<div>
+  {#if $searchStore.data && $searchStore.data[tab] && $searchStore.data[tab].length}
+    <Results
+      results="{$searchStore.data[tab]}"
+      dirty="{!!$searchMachine.dirty}"
+    />
   {/if}
-</div> -->
-
-<Results />
+</div>

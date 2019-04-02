@@ -1,0 +1,79 @@
+<script>
+  import { arrayMaxBy } from '@svizzle/utils';
+  import {scaleLinear} from 'd3-scale';
+
+  let container, width, height;
+  export let title, items;
+
+  const maxByValue = arrayMaxBy('value');
+
+  $: max = maxByValue(items);
+  $: scale = scaleLinear()
+    .domain([0, max])
+    .range([0, 100]);
+  $: layout = items.map(item => ({
+    ...item,
+    style: { width: scale(item.value) },
+  }));
+</script>
+
+<div class="container" bind:this="{container}">
+  {#if title}
+  <header>
+    <h3>{title}</h3>
+  </header>
+  {/if}
+  <main>
+    {#each layout as {key, style} (key)}
+    <div class="item">
+      <p>{key}</p>
+      <div class="bar" style="width: {style.width}%"></div>
+    </div>
+    {/each}
+  </main>
+</div>
+
+<style lang="less">
+  .container {
+    width: 100%;
+    height: 100%;
+    padding: 10px;
+
+    display: flex;
+    flex-direction: column;
+
+    header {
+      width: 100%;
+      flex: 0 0 2em;
+
+      display: flex;
+      align-items: center;
+    }
+
+    main {
+      width: 100%;
+      height: 100%;
+      flex: 1;
+
+      overflow: auto;
+
+      .item {
+        padding: 0.5em 0;
+
+        p {
+          line-height: 1em;
+          padding: 0;
+          margin: 0;
+          color: grey;
+          font-size: 0.9em;
+          padding-bottom: 0.15em;
+        }
+
+        .bar {
+          height: 4px;
+          background-color: black;
+        }
+      }
+    }
+  }
+</style>
