@@ -153,16 +153,18 @@
 
 <div class="map-container">
     <Mapbox
-    interactive={false}
-    bounds="{$bounds}"
-    apiKey="{MAPBOXGL_ACCESSTOKEN}"
-    styleURL="{MAPBOXGL_STYLEURL}"
-  />
+      interactive={false}
+      bounds="{$bounds}"
+      apiKey="{MAPBOXGL_ACCESSTOKEN}"
+      styleURL="{MAPBOXGL_STYLEURL}"
+    />
 </div>
 
-<div on:scroll="{throttledScroll}"
-     bind:this="{container}"
-     class="text-container">
+<div
+  on:scroll="{throttledScroll}"
+  bind:this="{container}"
+  class="text-container"
+>
 
   <h1 style="transform: translateY({headerPosition}px)">
     {$memo.pins[$memo.currentPin||0].title}
@@ -172,7 +174,8 @@
     <div
       bind:this="{noteHeadings[index]}"
       style="opacity: {calculateOpacity(transformPercent, index)}"
-      class="pin-container">
+      class="pin-container"
+    >
       <h2 style="transform: scale({currentScale(index, headerScale)})">
         {title}
       </h2>

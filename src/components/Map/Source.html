@@ -3,10 +3,12 @@
 </script>
 
 <script>
-  import { onMount, getContext, setContext } from 'svelte';
+  import { onMount, afterUpdate, getContext, setContext } from 'svelte';
   import { MAPBOX } from './Mapbox.html';
 
-  export let source, sourceId;
+  export let source, sourceId, data;
+  let mounted;
+
   const { getMap } = getContext(MAPBOX);
 
   setContext(MB_SOURCE, {
@@ -15,9 +17,16 @@
 
   onMount(() => {
     const map = getMap();
-    map.addSource(sourceId, source);
+    map.addSource(sourceId, { ...source, data });
+    mounted = true;
 
     return () => map.style && map.removeSource(sourceId);
+  });
+
+  afterUpdate(() => {
+    if (!mounted) return;
+    const map = getMap();
+    map.getSource(sourceId).setData(data);
   });
 </script>
 

@@ -1,31 +1,99 @@
 <script>
-  export let txValue, tx2Value;
+  import { Mapbox, Layer, Source } from '../Map';
+  import { MAPBOXGL_STYLEURL, MAPBOXGL_ACCESSTOKEN } from '../../config.js';
+  import { makeGeoJson } from '../../util/domain.js';
+
+  export let items;
+
+  $: geoJson = makeGeoJson(items);
+
+  const source = {
+    type: "geojson",
+    cluster: true,
+    clusterMaxZoom: 14,
+    clusterRadius: 50
+  };
+
+  const cluster = {
+    id: "clusters",
+    type: "circle",
+    source: "institutions",
+    filter: ["has", "point_count"],
+    paint: {
+      "circle-color": [
+        "step",
+        ["get", "point_count"],
+        "#51bbd6",
+        100,
+        "#f1f075",
+        750,
+        "#f28cb1"
+      ],
+      "circle-radius": [
+        "step",
+        ["get", "point_count"],
+        20,
+        100,
+        30,
+        750,
+        40
+      ]
+    }
+  };
+
+  const clusterCount = {
+    id: "cluster-count",
+    type: "symbol",
+    source: "institutions",
+    filter: ["has", "point_count"],
+    layout: {
+      "text-field": "{point_count_abbreviated}",
+      "text-font": ["DIN Offc Pro Medium", "Arial Unicode MS Bold"],
+      "text-size": 12
+    }
+  };
+
+  const unclusteredPoint = {
+    id: "unclustered-point",
+    type: "circle",
+    source: "institutions",
+    filter: ["!", ["has", "point_count"]],
+    paint: {
+      "circle-color": "#11b4da",
+      "circle-radius": 4,
+      "circle-stroke-width": 1,
+      "circle-stroke-color": "#fff"
+    }
+}
 </script>
 
+
+{#if geoJson}
 <div>
-  <h1>One</h1>
-  <span style="transform: scaleX({txValue/100})"></span>
-  <p>{Math.round(txValue, 2)}%</p>
-  <span style="transform: scaleX({tx2Value/100})"></span>
-  <p>{Math.round(tx2Value, 2)}%</p>
+<Mapbox
+  bounds="{ [[-180,-90], [180, 90]]}"
+  apiKey="{MAPBOXGL_ACCESSTOKEN}"
+  styleURL="{MAPBOXGL_STYLEURL}"
+>
+
+  <Source
+    data="{geoJson}"
+    source="{source}"
+    sourceId="institutions"
+  >
+    <Layer layer="{unclusteredPoint}"/>
+    <Layer layer="{clusterCount}"/>
+    <Layer layer="{cluster}"/>
+  </Source>
+
+</Mapbox>
 </div>
+{/if}
+
 
 <style>
-  h1 {
-    margin-top: 100px;
-    margin-left: 20px;
-  }
-
-  p {
-    margin-left: 20px;
-  }
-
-  span {
-    display: block;
-    height: 15px;
-    width: 300px;
-    background: pink;
-    margin-left: 20px;
-    transform-origin: 0 0;
+  div {
+    width: 100%;
+    height: 100%;
   }
 </style>

@@ -3,7 +3,7 @@ const dev = mode === 'development';
 
 export const baseUrl =
   'https://search-health-scanner-5cs7g52446h7qscocqmiky5dn4.eu-west-2.es.amazonaws.com/rwjf/_search';
-export const size = dev ? 200 : 1000;
+export const size = dev ? 250 : 1000;
 
 export const subjectFields = {
   name: ['title_of_organisation'],
