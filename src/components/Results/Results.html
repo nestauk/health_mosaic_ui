@@ -8,8 +8,9 @@
 
   import { countByCountry, countByCity } from '../../util/domain';
 
-  import { One, Two, Three, Four } from '../Visualisations/';
+  import { InstituteMap, Two, Three, Four } from '../Visualisations/';
   import BarChartV from '../BarChartV.html';
+  import ResultsGrid from './ResultsGrid.html';
 
   export let dirty;
   export let results;
@@ -18,41 +19,89 @@
 
   $: countryValues = countByCountry(results);
   $: cityValues = countByCity(results);
-  $: tabMap = [
-    {
+  $: tabMap = {
+    tab1: {
       title: 'Tab One',
       event: 'T1',
-      components: [{ component: One, props: { items: results } }],
+      components: [
+        {
+          component: InstituteMap,
+          props: { items: results },
+          id: 1,
+          name: 'map',
+        },
+      ],
       tabId: 1,
     },
-    {
+    tab2: {
       title: 'Tab Two',
       event: 'T2',
-      components: [{ component: Two, props: {} }],
+      components: [{ component: Two, props: {}, id: 1 }],
       tabId: 2,
     },
-    {
+    tab3: {
       title: 'Tab Three',
       event: 'T3',
       components: [
         {
           component: BarChartV,
           props: { items: countryValues, title: 'by Country' },
+          id: 1,
         },
         {
           component: BarChartV,
           props: { items: cityValues, title: 'by City' },
+          id: 2,
         },
       ],
       tabId: 3,
     },
-    {
+    tab4: {
       title: 'Tab Four',
       event: 'T4',
-      components: [{ component: Four, props: {} }],
+      components: [{ component: Four, props: {}, id: 1 }],
+      id: 1,
       tabId: 4,
     },
-  ];
+    tab5: {
+      title: 'Tab Five',
+      event: 'T5',
+      components: [
+        {
+          component: InstituteMap,
+          name: 'map',
+          props: { items: results },
+          id: 1,
+        },
+        {
+          component: BarChartV,
+          name: 'bar',
+          props: { items: cityValues, title: 'by City' },
+          id: 2,
+        },
+      ],
+      tabId: 5,
+    },
+    tab1to5: {
+      title: 'Tab One to Five',
+      event: 'T1to5',
+      components: [
+        {
+          component: InstituteMap,
+          name: 'map',
+          props: { items: results },
+          id: 1,
+        },
+        {
+          component: BarChartV,
+          name: 'bar',
+          props: { items: cityValues, title: 'by City' },
+          id: 2,
+        },
+      ],
+      tabId: 6,
+    },
+  };
 
   const {
     machine: resultsMachine,
@@ -65,48 +114,58 @@
   const getId = state => tabMap[state.replace(/tab|-.*/, '') - 1].tabId;
 
   $: currentState = Object.keys($resultsMachine.value.tabs)[0];
-  $: currentTab = tabMap.find(({ tabId }) => getId(currentState) === tabId);
+  $: console.log(currentState);
+  $: currentTab = tabMap[currentState];
+  $: console.log(currentTab);
 </script>
 
-<div class:dirty="{dirty}">
+<div class="container" class:dirty="{dirty}">
   <ul>
-    {#each tabMap as {title, event, tabId}}
+    {#each Object.entries(tabMap) as [name, {title, event, tabId}]}
+    <!--  -->
+    {#if !name.includes('to')}
     <li
       class:selected="{currentTab.tabId === tabId}"
       on:click="{() => resultsMachine.send(event)}"
     >
       {title}
     </li>
+    {/if}
+    <!--  -->
     {/each}
   </ul>
 
-  {#each currentTab.components as {component, props}}
-  <svelte:component
-    this="{component}"
-    {...props}
-    txValue="{$tweenA}"
-    tx2Value="{$tweenB}"
-  />
-  {/each}
+  <ResultsGrid tabId="{currentTab.tabId}" {currentTab} {currentState}>
+  </ResultsGrid>
 </div>
 
 <style lang="less">
-  div {
+  .container {
     height: calc(100vh - 9.2rem);
     margin-top: 5.6rem;
-    display: flex;
+    overflow: hidden;
+    position: relative;
 
     &.dirty {
       background-color: grey;
       border: 1px solid red;
     }
   }
+
+  .chart-wrap {
+    width: 100%;
+    height: 100%;
+  }
+
   ul {
     width: 200px;
     height: 100%;
     display: flex;
     flex-direction: column;
     border-right: 1px solid #ccc;
+    position: relative;
+    z-index: 1;
+    float: left;
   }
   li {
     border-bottom: 1px solid #ccc;

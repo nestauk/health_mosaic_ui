@@ -98,20 +98,55 @@ export const resultsMachineConfig = {
         T2: { target: 'tabs.tab2' },
         T3: { target: 'tabs.tab3' },
         T4: { target: 'tabs.tab4' },
+        T5: { target: 'tabs.tab5' },
       },
       states: {
         tab1: {
           ...defaultTransition,
           initial: 'static',
           on: {
-            T4: {
-              target: 'tab4.transitionFrom1',
+            T5: {
+              target: 'tab5',
+            },
+          },
+        },
+        tab1to5: {
+          initial: 'start',
+          states: {
+            start: {
+              on: {
+                NEXT: {
+                  target: 'applystart',
+                },
+              },
+            },
+            applystart: {
+              on: {
+                NEXT: {
+                  target: 'end',
+                },
+              },
+            },
+            end: {
+              on: {
+                NEXT: {
+                  target: 'applyend',
+                },
+              },
+            },
+            applyend: {
+              on: {
+                NEXT: {
+                  target: 'tab5',
+                },
+              },
             },
           },
         },
         tab2: defaultTransition,
         tab3: defaultTransition,
         tab4: complexTransition,
+        tab5: defaultTransition,
       },
     },
   },

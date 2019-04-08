@@ -1,0 +1,109 @@
+<script>
+  import { onMount } from 'svelte';
+  import debounce from 'just-debounce';
+
+  export let currentTab, currentState;
+  let container, containerHeight, containerWidth, absEls, gridEls, absContainer;
+
+  onMount(() => {});
+
+  function recalculateGrid(height, width) {
+    Object.assign(absContainer.style, {
+      transform: `translate(-${width / 3}px, -${height / 3}px)`,
+    });
+  }
+
+  const refreshStyles = debounce(() => {
+    gridEls = Array.from(container.children[0].children);
+    absEls = Array.from(container.children[1].children);
+    console.log(gridEls);
+    const positions = gridEls
+      .filter(el => el.tagName === 'DIV')
+      .map(v => v.getBoundingClientRect());
+    const containerTop = container.getBoundingClientRect().top;
+
+    absEls.forEach(async (node, i) => {
+      const { top, left, bottom, right, width, height } = positions[i];
+      Object.assign(node.style, {
+        position: 'absolute',
+        top: `${top - containerTop}px`,
+        left: `${left}px`,
+        bottom: `${bottom}px`,
+        right: `${right}px`,
+        width: `${width}px`,
+        height: `${height}px`,
+      });
+    });
+  }, 50);
+
+  onMount(async () => {
+    gridEls = Array.from(container.children[0].children);
+    absEls = Array.from(container.children[1].children);
+
+    refreshStyles();
+    window.addEventListener('resize', refreshStyles);
+
+    return () => {
+      window.removeEventListener(refreshStyles);
+    };
+  });
+
+  $: container &&
+    currentState &&
+    recalculateGrid(containerHeight, containerWidth) &&
+    refreshStyles();
+</script>
+
+<div class="container" bind:this="{container}">
+  <div
+    class="fake-grid {currentState}"
+    bind:this="{absContainer}"
+    bind:offsetHeight="{containerHeight}"
+    bind:offsetWidth="{containerWidth}"
+  >
+    {#each currentTab.components as {name}}
+    <div class="item {name}"></div>
+    {/each}
+  </div>
+
+  <div class="abs-container {currentState}">
+    {#each currentTab.components as {component, props, id, }}
+    <div class="{name}">
+      <svelte:component this="{component}" {...props} {id} />
+    </div>
+    {/each}
+  </div>
+</div>
+
+<style lang="less">
+  .container {
+    position: absolute;
+    height: 100%;
+    width: calc(100% - 196px);
+  }
+
+  .fake-grid {
+    display: grid;
+    width: 300%;
+    height: 300%;
+    margin-left: 196px;
+    grid-gap: 10px;
+    grid-template-columns:
+      1fr 1fr 1fr 1fr 1fr 1fr
+      1fr 1fr 1fr 1fr 1fr 1fr
+      1fr 1fr 1fr 1fr 1fr 1fr
+      1fr 1fr 1fr 1fr 1fr 1fr
+      1fr 1fr 1fr 1fr 1fr 1fr
+      1fr 1fr 1fr 1fr 1fr 1fr;
+    grid-template-rows:
+      1fr 1fr 1fr 1fr
+      1fr 1fr 1fr 1fr
+      1fr 1fr 1fr 1fr;
+  }
+
+  .item {
+    background: grey;
+  }
+
+  @import '../../styles/facets.less';
+</style>
