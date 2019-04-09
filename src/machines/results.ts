@@ -106,7 +106,7 @@ export const resultsMachineConfig = {
           initial: 'static',
           on: {
             T5: {
-              target: 'tab5',
+              target: 'tab1to5',
             },
           },
         },
@@ -137,7 +137,7 @@ export const resultsMachineConfig = {
             applyend: {
               on: {
                 NEXT: {
-                  target: 'tab5',
+                  target: '#results.tabs.tab5',
                 },
               },
             },

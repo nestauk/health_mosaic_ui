@@ -1,11 +1,15 @@
 <script>
-  import { onMount } from 'svelte';
+  import { onMount, tick, afterUpdate } from 'svelte';
   import debounce from 'just-debounce';
 
-  export let currentTab, currentState;
-  let container, containerHeight, containerWidth, absEls, gridEls, absContainer;
-
-  onMount(() => {});
+  export let currentTab, currentState, send;
+  let container,
+    containerHeight,
+    containerWidth,
+    absEls,
+    gridEls,
+    absContainer,
+    lastState;
 
   function recalculateGrid(height, width) {
     Object.assign(absContainer.style, {
@@ -13,10 +17,10 @@
     });
   }
 
-  const refreshStyles = debounce(() => {
+  const refreshStyles = async (animate = false) => {
     gridEls = Array.from(container.children[0].children);
     absEls = Array.from(container.children[1].children);
-    console.log(gridEls);
+
     const positions = gridEls
       .filter(el => el.tagName === 'DIV')
       .map(v => v.getBoundingClientRect());
@@ -25,6 +29,7 @@
     absEls.forEach(async (node, i) => {
       const { top, left, bottom, right, width, height } = positions[i];
       Object.assign(node.style, {
+        transition: animate ? '0.5s' : 0,
         position: 'absolute',
         top: `${top - containerTop}px`,
         left: `${left}px`,
@@ -34,29 +39,66 @@
         height: `${height}px`,
       });
     });
-  }, 50);
+
+    await tick();
+  };
 
   onMount(async () => {
     gridEls = Array.from(container.children[0].children);
     absEls = Array.from(container.children[1].children);
 
-    refreshStyles();
-    window.addEventListener('resize', refreshStyles);
+    async function resize() {
+      await tick();
+      recalculateGrid(containerHeight, containerWidth);
+      await tick();
+      refreshStyles();
+    }
+
+    await resize();
+
+    window.addEventListener('resize', resize);
 
     return () => {
-      window.removeEventListener(refreshStyles);
+      window.removeEventListener(resize);
     };
   });
 
-  $: container &&
-    currentState &&
-    recalculateGrid(containerHeight, containerWidth) &&
-    refreshStyles();
+  function generateClass(state) {
+    if (Object.values(state).includes('apply')) return '';
+    return Object.values(state);
+  }
+
+  $: stateShortname = Object.keys(currentState)[0];
+  let stateClass = '';
+  afterUpdate(async () => {
+    if (lastState === Object.values(currentState)[0]) return;
+    lastState = Object.values(currentState)[0];
+
+    if (lastState === 'start' || lastState === 'end') {
+      stateClass = generateClass(currentState);
+      await tick();
+      send('NEXT');
+      return;
+    }
+
+    if (lastState === 'applystart') {
+      await refreshStyles();
+      send('NEXT');
+      return;
+    }
+
+    if (lastState === 'applyend') {
+      refreshStyles(true);
+      await tick();
+      send('NEXT');
+    }
+    // apply start
+  });
 </script>
 
 <div class="container" bind:this="{container}">
   <div
-    class="fake-grid {currentState}"
+    class="fake-grid {stateShortname} {stateClass}"
     bind:this="{absContainer}"
     bind:offsetHeight="{containerHeight}"
     bind:offsetWidth="{containerWidth}"
@@ -99,10 +141,6 @@
       1fr 1fr 1fr 1fr
       1fr 1fr 1fr 1fr
       1fr 1fr 1fr 1fr;
-  }
-
-  .item {
-    background: grey;
   }
 
   @import '../../styles/facets.less';

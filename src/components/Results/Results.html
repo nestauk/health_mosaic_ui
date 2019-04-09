@@ -114,9 +114,7 @@
   const getId = state => tabMap[state.replace(/tab|-.*/, '') - 1].tabId;
 
   $: currentState = Object.keys($resultsMachine.value.tabs)[0];
-  $: console.log(currentState);
   $: currentTab = tabMap[currentState];
-  $: console.log(currentTab);
 </script>
 
 <div class="container" class:dirty="{dirty}">
@@ -135,7 +133,12 @@
     {/each}
   </ul>
 
-  <ResultsGrid tabId="{currentTab.tabId}" {currentTab} {currentState}>
+  <ResultsGrid
+    tabId="{currentTab.tabId}"
+    {currentTab}
+    currentState="{$resultsMachine.value.tabs}"
+    send="{(event) => resultsMachine.send(event)}"
+  >
   </ResultsGrid>
 </div>
 
