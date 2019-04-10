@@ -9,49 +9,51 @@ const defaultTransitionService = {
   },
 };
 
-const transitionMachine = Machine(
-  {
-    type: 'parallel',
-    states: {
-      track1: {
-        initial: 'step1',
-        states: {
-          step1: {
-            invoke: {
-              src: 'service1',
-              onDone: {
-                target: 'step2',
-              },
-            },
-          },
-          step2: {
-            invoke: {
-              src: 'service2',
-            },
-          },
-        },
-      },
-      track2: {
-        initial: 'step1',
-        states: {
-          step1: {
-            type: 'final',
-            invoke: {
-              src: 'service3',
-            },
-          },
-        },
-      },
-    },
-  },
-  {
-    services: {
-      service1: ctx => ctx.tweenA.set(100),
-      service2: ctx => ctx.tweenA.set(43),
-      service3: ctx => ctx.tweenB.set(23, { duration: 500, delay: 500 }),
-    },
-  }
-);
+// currently unused
+//
+// const transitionMachine = Machine(
+//   {
+//     type: 'parallel',
+//     states: {
+//       track1: {
+//         initial: 'step1',
+//         states: {
+//           step1: {
+//             invoke: {
+//               src: 'service1',
+//               onDone: {
+//                 target: 'step2',
+//               },
+//             },
+//           },
+//           step2: {
+//             invoke: {
+//               src: 'service2',
+//             },
+//           },
+//         },
+//       },
+//       track2: {
+//         initial: 'step1',
+//         states: {
+//           step1: {
+//             type: 'final',
+//             invoke: {
+//               src: 'service3',
+//             },
+//           },
+//         },
+//       },
+//     },
+//   },
+//   {
+//     services: {
+//       service1: ctx => ctx.tweenA.set(100),
+//       service2: ctx => ctx.tweenA.set(43),
+//       service3: ctx => ctx.tweenB.set(23, { duration: 500, delay: 500 }),
+//     },
+//   }
+// );
 
 const defaultTransition = {
   initial: 'transition',
@@ -61,23 +63,25 @@ const defaultTransition = {
   },
 };
 
-const complexTransition = {
-  initial: 'transition',
-  states: {
-    static: {},
-    transition: defaultTransitionService,
-    transitionFrom1: {
-      invoke: {
-        src: transitionMachine,
-        onDone: 'static',
-        data: {
-          tweenA: ctx => ctx.tweenA,
-          tweenB: ctx => ctx.tweenB,
-        },
-      },
-    },
-  },
-};
+// currently unused
+//
+// const complexTransition = {
+//   initial: 'transition',
+//   states: {
+//     static: {},
+//     transition: defaultTransitionService,
+//     transitionFrom1: {
+//       invoke: {
+//         src: transitionMachine,
+//         onDone: 'static',
+//         data: {
+//           tweenA: ctx => ctx.tweenA,
+//           tweenB: ctx => ctx.tweenB,
+//         },
+//       },
+//     },
+//   },
+// };
 
 export const resultsMachineConfig = {
   id: 'results',
@@ -97,20 +101,18 @@ export const resultsMachineConfig = {
         T1: { target: 'tabs.tab1' },
         T2: { target: 'tabs.tab2' },
         T3: { target: 'tabs.tab3' },
-        T4: { target: 'tabs.tab4' },
-        T5: { target: 'tabs.tab5' },
       },
       states: {
         tab1: {
           ...defaultTransition,
           initial: 'static',
           on: {
-            T5: {
-              target: 'tab1to5',
+            T3: {
+              target: 'tab1to3',
             },
           },
         },
-        tab1to5: {
+        tab1to3: {
           initial: 'start',
           states: {
             start: {
@@ -145,8 +147,6 @@ export const resultsMachineConfig = {
         },
         tab2: defaultTransition,
         tab3: defaultTransition,
-        tab4: complexTransition,
-        tab5: defaultTransition,
       },
     },
   },

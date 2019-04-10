@@ -7,11 +7,10 @@
   } from '../../machines/results.ts';
   import { createTweenStore } from '../../stores/results.ts';
   import { createMachina } from '../../util/xstateHelper.ts';
+  import { generateTabMap } from '../../util/charts';
 
   import { countByCountry, countByCity } from '../../util/domain';
 
-  import { InstituteMap, Two, Three, Four } from '../Visualisations/';
-  import BarChartV from '../BarChartV.html';
   import ResultsGrid from './ResultsGrid.html';
 
   export let dirty;
@@ -21,105 +20,7 @@
 
   $: countryValues = countByCountry(results);
   $: cityValues = countByCity(results);
-  $: tabMap = {
-    tab1: {
-      title: 'Tab One',
-      event: 'T1',
-      components: [
-        {
-          component: InstituteMap,
-          props: { items: results },
-          id: 1,
-          name: 'map',
-        },
-      ],
-      tabId: 1,
-    },
-    tab2: {
-      title: 'Tab Two',
-      event: 'T2',
-      components: [{ component: Two, props: {}, id: 1 }],
-      tabId: 4,
-    },
-    tab3: {
-      title: 'Tab Three',
-      event: 'T3',
-      components: [
-        {
-          component: BarChartV,
-          props: { items: countryValues, title: 'by Country' },
-          id: 3,
-        },
-        {
-          component: BarChartV,
-          props: { items: cityValues, title: 'by City' },
-          id: 2,
-        },
-      ],
-      tabId: 3,
-    },
-    tab4: {
-      title: 'Tab Four',
-      event: 'T4',
-      components: [{ component: Four, props: {}, id: 1 }],
-      id: 1,
-      tabId: 4,
-    },
-    tab5: {
-      title: 'Tab Five',
-      event: 'T5',
-      components: [
-        {
-          component: InstituteMap,
-          name: 'map',
-          props: { items: results },
-          id: 1,
-        },
-        {
-          component: BarChartV,
-          name: 'bar',
-          props: { items: cityValues, title: 'by City' },
-          id: 2,
-        },
-      ],
-      tabId: 5,
-    },
-    tab1to5: {
-      title: 'Tab One to Five',
-      event: 'T1to5',
-      components: [
-        {
-          component: InstituteMap,
-          name: 'map',
-          props: { items: results },
-          id: 1,
-        },
-        {
-          component: BarChartV,
-          name: 'bar',
-          props: { items: cityValues, title: 'by City' },
-          id: 2,
-        },
-      ],
-      tabId: 6,
-    },
-  };
-
-  $: {
-    for (let tab in tabMap) {
-      tabMap[tab].components = tabMap[tab].components.map(component => ({
-        ...component,
-        transition: tweened({
-          top: 0,
-          left: 0,
-          width: 0,
-          height: 0,
-        }),
-      }));
-    }
-
-    console.log(tabMap);
-  }
+  $: tabMap = generateTabMap(results, countryValues, cityValues);
 
   const {
     machine: resultsMachine,
