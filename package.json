@@ -20,7 +20,6 @@
     "compression": "^1.7.1",
     "d3-scale": "^3.0.0",
     "ionicons": "^4.5.5",
-    "just-debounce": "^1.0.0",
     "lamb": "^0.57.0",
     "mapbox-gl": "^0.53.1",
     "polka": "^0.4.0",

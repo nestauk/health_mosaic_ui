@@ -7,7 +7,6 @@
   import { onMount, tick, afterUpdate, setContext } from 'svelte';
   import Chart from './Chart.html';
   import { get } from 'svelte/store';
-  import debounce from 'just-debounce';
 
   export let currentTab, currentState, send;
   let container,
@@ -184,5 +183,5 @@
       1fr 1fr 1fr 1fr;
   }
 
-  @import '../../styles/facets.less';
+  @import './facets.less';
 </style>
