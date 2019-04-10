@@ -1,0 +1,26 @@
+<script>
+  import { TRANSITION } from './ResultsGrid.html';
+  import { getContext } from 'svelte';
+
+  export let component, props, id, name, transition;
+
+  getContext(TRANSITION).registerTransition(id, transition);
+</script>
+
+<div
+  class="{name}"
+  style="top: {$transition.top}px; bottom: {$transition.bottom}px; left: {$transition.left}px; right: {$transition.right}px; width: {$transition.width}px; height: {$transition.height}px;"
+>
+  <svelte:component
+    this="{component}"
+    {...props}
+    {id}
+    transition="{$transition}"
+  />
+</div>
+
+<style>
+  div {
+    position: absolute;
+  }
+</style>

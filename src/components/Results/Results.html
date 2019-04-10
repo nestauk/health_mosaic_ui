@@ -1,4 +1,6 @@
 <script>
+  import { tweened } from 'svelte/motion';
+
   import {
     resultsMachineConfig,
     resultsMachineOptions,
@@ -37,7 +39,7 @@
       title: 'Tab Two',
       event: 'T2',
       components: [{ component: Two, props: {}, id: 1 }],
-      tabId: 2,
+      tabId: 4,
     },
     tab3: {
       title: 'Tab Three',
@@ -46,7 +48,7 @@
         {
           component: BarChartV,
           props: { items: countryValues, title: 'by Country' },
-          id: 1,
+          id: 3,
         },
         {
           component: BarChartV,
@@ -102,6 +104,22 @@
       tabId: 6,
     },
   };
+
+  $: {
+    for (let tab in tabMap) {
+      tabMap[tab].components = tabMap[tab].components.map(component => ({
+        ...component,
+        transition: tweened({
+          top: 0,
+          left: 0,
+          width: 0,
+          height: 0,
+        }),
+      }));
+    }
+
+    console.log(tabMap);
+  }
 
   const {
     machine: resultsMachine,

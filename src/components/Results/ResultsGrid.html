@@ -1,5 +1,12 @@
+<script context="module">
+  export const TRANSITION = {};
+</script>
+
 <script>
-  import { onMount, tick, afterUpdate } from 'svelte';
+
+  import { onMount, tick, afterUpdate, setContext } from 'svelte';
+  import Chart from './Chart.html';
+  import { get } from 'svelte/store';
   import debounce from 'just-debounce';
 
   export let currentTab, currentState, send;
@@ -9,7 +16,8 @@
     absEls,
     gridEls,
     absContainer,
-    lastState;
+    lastState,
+    transitions = [];
 
   function recalculateGrid(height, width) {
     Object.assign(absContainer.style, {
@@ -27,21 +35,24 @@
     const containerTop = container.getBoundingClientRect().top;
 
     absEls.forEach(async (node, i) => {
-      const { top, left, bottom, right, width, height } = positions[i];
       Object.assign(node.style, {
-        transition: animate ? '0.5s' : 0,
         position: 'absolute',
-        top: `${top - containerTop}px`,
-        left: `${left}px`,
-        bottom: `${bottom}px`,
-        right: `${right}px`,
-        width: `${width}px`,
-        height: `${height}px`,
       });
     });
-
-    await tick();
+    return positions;
+    // await tick();
   };
+
+  setContext(TRANSITION, {
+    registerTransition: (id, spring) => {
+      const index = transitions.findIndex(t => t.id === id);
+      if (index === -1) {
+        transitions = transitions.concat(spring);
+      } else {
+        transitions[index] = spring;
+      }
+    }
+  })
 
   onMount(async () => {
     gridEls = Array.from(container.children[0].children);
@@ -51,7 +62,19 @@
       await tick();
       recalculateGrid(containerHeight, containerWidth);
       await tick();
-      refreshStyles();
+
+      const pos = await refreshStyles();
+      console.log(pos);
+      await Promise.all(
+        transitions.map((t, i) => {
+          const { top, left, right, bottom, width, height } = pos[i];
+          return t.set(
+            { top: top-150, left,  width, height },
+            { duration: 0 }
+          );
+        })
+      );
+      // console.log(springs.map(s => get(s)));
     }
 
     await resize();
@@ -82,18 +105,38 @@
     }
 
     if (lastState === 'applystart') {
-      await refreshStyles();
+      const pos = await refreshStyles();
+      console.log(pos)
+      await Promise.all(transitions.map((t, i) => {
+          const { top, left, right, bottom, width, height } = pos[i];
+          return t.set(
+            { top: top-150, left, width, height },
+            { duration: 0 }
+          );
+        }));
+      await tick();
       send('NEXT');
       return;
     }
 
     if (lastState === 'applyend') {
-      refreshStyles(true);
+      const pos = await refreshStyles();
+      console.log(pos)
+
+      await Promise.all(transitions.map((t, i) => {
+          const { top, left, right, bottom, width, height } = pos[i];
+          return t.set(
+            { top:top-150, left,  width, height },
+            { duration: 500 }
+          );
+        }));
       await tick();
       send('NEXT');
     }
     // apply start
   });
+
+  //$: springarray = currentTab.components.map((s, i) => get(s.transition));
 </script>
 
 <div class="container" bind:this="{container}">
@@ -109,10 +152,8 @@
   </div>
 
   <div class="abs-container {currentState}">
-    {#each currentTab.components as {component, props, id, }}
-    <div class="{name}">
-      <svelte:component this="{component}" {...props} {id} />
-    </div>
+    {#each currentTab.components as {component, props, id, name, transition }, i}
+      <Chart {component} {props} {id} {name} {transition}/>
     {/each}
   </div>
 </div>
