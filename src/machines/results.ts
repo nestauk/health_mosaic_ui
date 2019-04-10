@@ -139,7 +139,7 @@ export const resultsMachineConfig = {
             applyend: {
               on: {
                 NEXT: {
-                  target: '#results.tabs.tab5',
+                  target: '#results.tabs.tab3',
                 },
               },
             },

@@ -24,7 +24,7 @@ const countryBar = {
 
 const cityBar = {
   component: BarChartV,
-  name: 'countryBar',
+  name: 'cityBar',
   id: 3,
   transition: tweened(defaultPosition),
 };
@@ -54,7 +54,7 @@ export const generateTabMap = (results, countryValues, cityValues) => ({
     ],
     tabId: 3,
   },
-  tab1to5: {
+  tab1to3: {
     title: 'Tab One to Three',
     event: 'T1to3',
     components: [
