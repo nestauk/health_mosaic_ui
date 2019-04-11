@@ -147,6 +147,39 @@ export const resultsMachineConfig = {
         },
         tab2: defaultTransition,
         tab3: defaultTransition,
+        tab3to1: {
+          initial: 'start',
+          states: {
+            start: {
+              on: {
+                NEXT: {
+                  target: 'applystart',
+                },
+              },
+            },
+            applystart: {
+              on: {
+                NEXT: {
+                  target: 'end',
+                },
+              },
+            },
+            end: {
+              on: {
+                NEXT: {
+                  target: 'applyend',
+                },
+              },
+            },
+            applyend: {
+              on: {
+                NEXT: {
+                  target: '#results.tabs.tab1',
+                },
+              },
+            },
+          },
+        },
       },
     },
   },

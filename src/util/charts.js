@@ -46,7 +46,7 @@ export const generateTabMap = (results, countryValues, cityValues) => ({
     tabId: 2,
   },
   tab3: {
-    title: 'Tab Thre',
+    title: 'Tab Three',
     event: 'T3',
     components: [
       { ...instituteMap, props: { items: results } },
@@ -62,5 +62,14 @@ export const generateTabMap = (results, countryValues, cityValues) => ({
       { ...cityBar, props: { items: cityValues, title: 'by City' } },
     ],
     tabId: 4,
+  },
+  tab3to1: {
+    title: 'Tab One to Three',
+    event: 'T1to3',
+    components: [
+      { ...instituteMap, props: { items: results } },
+      { ...cityBar, props: { items: cityValues, title: 'by City' } },
+    ],
+    tabId: 5,
   },
 });

@@ -5,7 +5,7 @@
 <script>
 
   import { onMount, tick, afterUpdate, setContext } from 'svelte';
-  import Chart from './Chart.html';
+  import ChartWrap from './ChartWrap.html';
   import { get } from 'svelte/store';
 
   export let currentTab, currentState, send;
@@ -39,7 +39,6 @@
       });
     });
     return positions;
-    // await tick();
   };
 
   setContext(TRANSITION, {
@@ -63,7 +62,6 @@
       await tick();
 
       const pos = await refreshStyles();
-      console.log(pos);
       await Promise.all(
         transitions.map((t, i) => {
           const { top, left, right, bottom, width, height } = pos[i];
@@ -73,7 +71,6 @@
           );
         })
       );
-      // console.log(springs.map(s => get(s)));
     }
 
     await resize();
@@ -105,7 +102,6 @@
 
     if (lastState === 'applystart') {
       const pos = await refreshStyles();
-      console.log(pos)
       await Promise.all(transitions.map((t, i) => {
           const { top, left, right, bottom, width, height } = pos[i];
           return t.set(
@@ -120,7 +116,6 @@
 
     if (lastState === 'applyend') {
       const pos = await refreshStyles();
-      console.log(pos)
 
       await Promise.all(transitions.map((t, i) => {
           const { top, left, right, bottom, width, height } = pos[i];
@@ -152,7 +147,7 @@
 
   <div class="abs-container {currentState}">
     {#each currentTab.components as {component, props, id, name, transition }, i}
-      <Chart {component} {props} {id} {name} {transition}/>
+      <ChartWrap {component} {props} {id} {name} {transition}/>
     {/each}
   </div>
 </div>
