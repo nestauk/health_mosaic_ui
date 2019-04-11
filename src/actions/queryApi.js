@@ -1,4 +1,77 @@
+/* eslint-disable indent */
 import { baseUrl, size } from '../config';
+
+const makeQuery = (querystring, requiredFields) => ({
+  bool: {
+    must: [
+      {
+        query_string: { query: querystring, default_operator: 'AND' },
+      },
+      ...(requiredFields
+        ? requiredFields.reduce((acc, next) => {
+            return acc.concat([
+              {
+                regexp: {
+                  [next]: '.+',
+                },
+              },
+              {
+                exists: {
+                  field: next,
+                },
+              },
+            ]);
+          }, [])
+        : []),
+    ],
+  },
+});
+
+function generateBody(type, querystring, id = 0) {
+  const body = {
+    single: {
+      endpoint: baseUrl,
+      body: {
+        query: makeQuery(querystring, [
+          'title_of_project',
+          'placeName_city_organisation',
+          'placeName_state_organisation',
+        ]),
+        size,
+      },
+    },
+
+    scroll: {
+      endpoint: `${baseUrl}?scroll=100m`,
+      body: {
+        query: makeQuery(querystring, [
+          'title_of_project',
+          'placeName_city_organisation',
+          'placeName_state_organisation',
+        ]),
+        size,
+      },
+    },
+
+    nextScroll: {
+      endpoint: `${baseUrl}/scroll`,
+      body: {
+        size,
+        scroll_id: id,
+      },
+    },
+  };
+  return body[type];
+}
+
+class SearchError extends Error {
+  constructor(type, reason) {
+    super(`${type}: ${reason}`);
+    this.name = 'SearchError';
+    this.type = type;
+    this.reason = reason;
+  }
+}
 
 export async function query(querystring, type = 'single', id) {
   const data = generateBody(type, querystring, id);
@@ -28,51 +101,4 @@ export async function query(querystring, type = 'single', id) {
     result = { type: e.type, reason: e.reason };
   }
   return result;
-}
-
-// we don't want this
-export function multiple(queries) {
-  return Promise.all(queries.map(q => query(q)));
-}
-
-function generateBody(type, querystring, id = 0) {
-  const body = {
-    single: {
-      endpoint: baseUrl,
-      body: {
-        query: {
-          query_string: { query: querystring, default_operator: 'AND' },
-        },
-        size,
-      },
-    },
-
-    scroll: {
-      endpoint: `${baseUrl}?scroll=100m`,
-      body: {
-        query: {
-          query_string: { query: querystring, default_operator: 'AND' },
-        },
-        size,
-      },
-    },
-
-    nextScroll: {
-      endpoint: `${baseUrl}/scroll`,
-      body: {
-        size,
-        scroll_id: id,
-      },
-    },
-  };
-  return body[type];
-}
-
-class SearchError extends Error {
-  constructor(type, reason) {
-    super(`${type}: ${reason}`);
-    this.name = 'SearchError';
-    this.type = type;
-    this.reason = reason;
-  }
 }
