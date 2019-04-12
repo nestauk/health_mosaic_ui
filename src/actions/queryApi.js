@@ -24,19 +24,22 @@ const makeQuery = (querystring, requiredFields) => ({
           }, [])
         : []),
     ],
+    must_not: [
+      {
+        exists: {
+          field: 'booleanFlag_duplicate_abstract',
+        },
+      },
+    ],
   },
 });
 
-function generateBody(type, querystring, id = 0) {
+function generateBody(type, querystring, id = 0, requiredFields) {
   const body = {
     single: {
       endpoint: baseUrl,
       body: {
-        query: makeQuery(querystring, [
-          'title_of_project',
-          'placeName_city_organisation',
-          'placeName_state_organisation',
-        ]),
+        query: makeQuery(querystring, requiredFields),
         size,
       },
     },
@@ -44,11 +47,7 @@ function generateBody(type, querystring, id = 0) {
     scroll: {
       endpoint: `${baseUrl}?scroll=100m`,
       body: {
-        query: makeQuery(querystring, [
-          'title_of_project',
-          'placeName_city_organisation',
-          'placeName_state_organisation',
-        ]),
+        query: makeQuery(querystring, requiredFields),
         size,
       },
     },
@@ -73,8 +72,8 @@ class SearchError extends Error {
   }
 }
 
-export async function query(querystring, type = 'single', id) {
-  const data = generateBody(type, querystring, id);
+export async function query(querystring, type = 'single', id, requiredFields) {
+  const data = generateBody(type, querystring, id, requiredFields);
   const options = {
     method: 'POST',
     mode: 'cors',
