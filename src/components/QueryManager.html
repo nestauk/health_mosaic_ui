@@ -27,6 +27,7 @@
   }
 
   function handleSend(rules) {
+    console.log(rules)
     let joinedRules = rules.map(v => ({
       visible: v.visible,
       value: v.value,
@@ -35,11 +36,13 @@
         createFields(subjectFields, v.subject)
       )
     }));
-
+    console.log(joinedRules)
     joinedRules = joinedRules.reduce((acc, next) => {
       if (!next.visible) return acc;
       return  acc + dslBuilder(next.value, next.fields);
     }, '')
+
+    console.log(joinedRules)
 
    searchMachine.send({ type: 'SEARCH', query: joinedRules, value, searchId: activeTab });
   }
@@ -83,7 +86,7 @@
   function deleteTab(e) {
     savedQueries.update(state => {
       if (state.length === 1) return state;
-      console.log($searchStore)
+
       const index = $searchStore.value.findIndex(v => v.tab === e.detail)
       const newState = [].concat(state);
       newState.splice(index, 1);

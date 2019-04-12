@@ -1,7 +1,7 @@
 /* eslint-disable indent */
-import { baseUrl, size } from '../config';
+import { endpointScannerSearch, endpointScanner, size } from '../config';
 
-const makeQuery = (querystring, requiredFields) => ({
+export const makeQuery = (querystring, requiredFields) => ({
   bool: {
     must: [
       {
@@ -37,7 +37,7 @@ const makeQuery = (querystring, requiredFields) => ({
 function generateBody(type, querystring, id = 0, requiredFields) {
   const body = {
     single: {
-      endpoint: baseUrl,
+      endpoint: endpointScannerSearch,
       body: {
         query: makeQuery(querystring, requiredFields),
         size,
@@ -45,7 +45,7 @@ function generateBody(type, querystring, id = 0, requiredFields) {
     },
 
     scroll: {
-      endpoint: `${baseUrl}?scroll=100m`,
+      endpoint: `${endpointScanner}?scroll=100m`,
       body: {
         query: makeQuery(querystring, requiredFields),
         size,
@@ -53,7 +53,7 @@ function generateBody(type, querystring, id = 0, requiredFields) {
     },
 
     nextScroll: {
-      endpoint: `${baseUrl}/scroll`,
+      endpoint: `${endpointScanner}/scroll`,
       body: {
         size,
         scroll_id: id,

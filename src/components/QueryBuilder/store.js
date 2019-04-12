@@ -4,14 +4,14 @@ import { subjectFields, contentFields } from '../../config';
 import { parseQuery } from '../../util/parse.ts';
 
 export const createStore = queries => {
-  const subject = Object.keys(subjectFields).map(v => ({
+  const subject = Object.keys(subjectFields.NIH).map(v => ({
     field: v,
     status: 'default',
     hovered: false,
     visible: true,
   }));
 
-  const content = Object.keys(contentFields).map(v => ({
+  const content = Object.keys(contentFields.NIH).map(v => ({
     field: v,
     status: 'default',
     hovered: false,

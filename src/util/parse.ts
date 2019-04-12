@@ -15,6 +15,24 @@ export const parseQuery = inputObject => {
       .filter(v => v.value.length),
   };
 };
+const fieldBuilder = (fieldArr, q, type = '') =>
+  fieldArr.reduce((acc, next) => {
+    return (
+      acc + ' AND ' + (type === 'exclude' ? 'NOT ' : '') + next + `:(${q})`
+    );
+  }, '');
+
+const queryBuilder = query =>
+  query
+    .reduce((acc, next, i, arr) => {
+      return (
+        acc +
+        (next.status === 'not' ? '-' : '') +
+        `"${next.value}"` +
+        (arr[i + 1] ? ' OR ' : '')
+      );
+    }, '')
+    .trim();
 
 export const dslBuilder = (query, fields) => {
   const q = queryBuilder(query);
@@ -50,31 +68,16 @@ export const dslBuilder = (query, fields) => {
     .trim();
 };
 
-const fieldBuilder = (fieldArr, q, type = '') =>
-  fieldArr.reduce((acc, next) => {
-    // if (!next.visible) return acc;
-    return (
-      acc + ' AND ' + (type === 'exclude' ? 'NOT ' : '') + next + `:(${q})`
-    );
-  }, '');
+export const multiDslBuilder = (query, fieldCollection) => {
+  let dslCollection = {};
 
-const queryBuilder = query =>
-  query
-    .reduce((acc, next, i, arr) => {
-      return (
-        acc +
-        (next.status === 'not' ? '-' : '') +
-        `"${next.value}"` +
-        (arr[i + 1] ? ' OR ' : '')
-      );
-    }, '')
-    .trim();
-
-export const createFields = (map, fields) => {
-  return fields.reduce((acc, next) => {
-    if (!next.visible) return acc;
-    return acc.concat(fieldMapper(map, next));
-  }, []);
+  for (const key in fieldCollection) {
+    dslCollection = {
+      ...dslCollection,
+      [key]: dslBuilder(query, fieldCollection[key]),
+    };
+  }
+  return dslCollection;
 };
 
 const fieldMapper = (map, field) =>
@@ -83,3 +86,18 @@ const fieldMapper = (map, field) =>
     status: field.status,
     visible: field.visible,
   }));
+
+export const createFields = (fieldMap, fields) => {
+  let transformedFields = {};
+
+  for (const key in fieldMap) {
+    transformedFields = {
+      ...transformedFields,
+      [key]: fields.reduce((acc, next) => {
+        if (!next.visible) return acc;
+        return acc.concat(fieldMapper(fieldMap[key], next));
+      }, []),
+    };
+  }
+  return transformedFields;
+};

@@ -1,4 +1,9 @@
-import { parseQuery, dslBuilder, createFields } from './parse';
+import {
+  parseQuery,
+  dslBuilder,
+  createFields,
+  multiDslBuilder,
+} from './parse.ts';
 
 describe('parseQuery', () => {
   test('parse simple queries', () => {
@@ -35,150 +40,238 @@ describe('parseQuery', () => {
 describe('dslBuilder', () => {
   test('create a valid query string from a query object', () => {
     expect(
-      dslBuilder(
-        [{ value: 'hello', status: 'and' }],
-        [{ status: 'included', field: 'field' }]
-      )
-    ).toBe('field:("hello")');
+      multiDslBuilder([{ value: 'hello', status: 'and', visible: true }], {
+        i: [{ status: 'included', field: 'field', visible: true }],
+      })
+    ).toEqual({ i: 'field:("hello")' });
   });
 
   test('create a valid query string with multiple fields', () => {
     expect(
-      dslBuilder(
-        [{ value: 'hello', status: 'and' }],
-        [
-          { status: 'included', field: 'field' },
-          { status: 'included', field: 'field2' },
-        ]
-      )
-    ).toBe('field:("hello") AND field2:("hello")');
+      multiDslBuilder([{ value: 'hello', status: 'and', visible: true }], {
+        i: [
+          { status: 'included', field: 'field', visible: true },
+          { status: 'included', field: 'field2', visible: true },
+        ],
+      })
+    ).toEqual({ i: 'field:("hello") AND field2:("hello")' });
   });
 
   test('create a valid query string with more complex queries', () => {
     expect(
-      dslBuilder(
-        [{ value: 'hello world', status: 'and' }],
-        [
-          { status: 'included', field: 'field' },
-          { status: 'included', field: 'field2' },
-        ]
+      multiDslBuilder(
+        [{ value: 'hello world', status: 'and', visible: true }],
+        {
+          i: [
+            { status: 'included', field: 'field', visible: true },
+            { status: 'included', field: 'field2', visible: true },
+          ],
+        }
       )
-    ).toBe('field:("hello world") AND field2:("hello world")');
+    ).toEqual({ i: 'field:("hello world") AND field2:("hello world")' });
   });
 
   test('create a valid query string with multiple fields and queries', () => {
     expect(
-      dslBuilder(
+      multiDslBuilder(
         [
-          { value: 'hello world', status: 'and' },
-          { value: 'hello everyone', status: 'and' },
+          { value: 'hello world', status: 'and', visible: true },
+          { value: 'hello everyone', status: 'and', visible: true },
         ],
-        [
-          { field: 'field', status: 'included' },
-          { field: 'field2', status: 'included' },
-        ]
+        {
+          i: [
+            { field: 'field', status: 'included', visible: true },
+            { field: 'field2', status: 'included', visible: true },
+          ],
+        }
       )
-    ).toBe(
-      'field:("hello world" OR "hello everyone") AND field2:("hello world" OR "hello everyone")'
-    );
+    ).toEqual({
+      i:
+        'field:("hello world" OR "hello everyone") AND field2:("hello world" OR "hello everyone")',
+    });
   });
 
   test('create a valid query string with some NOTs', () => {
     expect(
-      dslBuilder(
+      multiDslBuilder(
         [
-          { value: 'hello world', status: 'not' },
-          { value: 'hello everyone', status: 'and' },
+          { value: 'hello world', status: 'not', visible: true },
+          { value: 'hello everyone', status: 'and', visible: true },
         ],
-        [
-          { field: 'field', status: 'included' },
-          { field: 'field2', status: 'included' },
-        ]
+        {
+          i: [
+            { field: 'field', status: 'included', visible: true },
+            { field: 'field2', status: 'included', visible: true },
+          ],
+        }
       )
-    ).toBe(
-      'field:(-"hello world" OR "hello everyone") AND field2:(-"hello world" OR "hello everyone")'
-    );
+    ).toEqual({
+      i:
+        'field:(-"hello world" OR "hello everyone") AND field2:(-"hello world" OR "hello everyone")',
+    });
   });
 
   test('create a valid query string excluding certain fields', () => {
     expect(
-      dslBuilder(
+      multiDslBuilder(
         [
-          { value: 'hello world', status: 'not' },
-          { value: 'hello everyone', status: 'and' },
+          { value: 'hello world', status: 'not', visible: true },
+          { value: 'hello everyone', status: 'and', visible: true },
         ],
-        [
-          { field: 'field', status: 'included' },
-          { field: 'field2', status: 'included' },
-          { field: 'field3', status: 'excluded' },
-        ]
+        {
+          i: [
+            { field: 'field', status: 'included', visible: true },
+            { field: 'field2', status: 'included', visible: true },
+            { field: 'field3', status: 'excluded', visible: true },
+          ],
+        }
       )
-    ).toBe(
-      'field:(-"hello world" OR "hello everyone") AND field2:(-"hello world" OR "hello everyone") AND NOT field3:(-"hello world" OR "hello everyone")'
-    );
+    ).toEqual({
+      i:
+        'field:(-"hello world" OR "hello everyone") AND field2:(-"hello world" OR "hello everyone") AND NOT field3:(-"hello world" OR "hello everyone")',
+    });
   });
 
   test('create a valid query string with all fields marked default', () => {
     expect(
-      dslBuilder(
+      multiDslBuilder(
         [
-          { value: 'hello world', status: 'and' },
-          { value: 'hello everyone', status: 'and' },
+          { value: 'hello world', status: 'and', visible: true },
+          { value: 'hello everyone', status: 'and', visible: true },
         ],
-        [
-          { field: 'field', status: 'default' },
-          { field: 'field2', status: 'default' },
-          { field: 'field3', status: 'default' },
-        ]
+        {
+          i: [
+            { field: 'field', status: 'default', visible: true },
+            { field: 'field2', status: 'default', visible: true },
+            { field: 'field3', status: 'default', visible: true },
+          ],
+          i2: [
+            { field: 'field_2', status: 'default', visible: true },
+            { field: 'field2_2', status: 'default', visible: true },
+            { field: 'field3_2', status: 'default', visible: true },
+          ],
+        }
       )
-    ).toBe('"hello world" OR "hello everyone"');
+    ).toEqual({
+      i: '"hello world" OR "hello everyone"',
+      i2: '"hello world" OR "hello everyone"',
+    });
   });
 
   test('create a valid query string from excluded and default fields', () => {
     expect(
-      dslBuilder(
+      multiDslBuilder(
         [
-          { value: 'hello world', status: 'and' },
-          { value: 'hello everyone', status: 'and' },
+          { value: 'hello world', status: 'and', visible: true },
+          { value: 'hello everyone', status: 'and', visible: true },
         ],
-        [
-          { field: 'field', status: 'excluded' },
-          { field: 'field2', status: 'default' },
-          { field: 'field3', status: 'default' },
-        ]
+        {
+          i: [
+            { field: 'field', status: 'excluded', visible: true },
+            { field: 'field2', status: 'default', visible: true },
+            { field: 'field3', status: 'default', visible: true },
+          ],
+          i2: [
+            { field: 'field_2', status: 'excluded', visible: true },
+            { field: 'field2_2', status: 'default', visible: true },
+            { field: 'field3_2', status: 'default', visible: true },
+          ],
+        }
       )
-    ).toBe(
-      '"hello world" OR "hello everyone" AND NOT field:("hello world" OR "hello everyone")'
-    );
+    ).toEqual({
+      i:
+        '"hello world" OR "hello everyone" AND NOT field:("hello world" OR "hello everyone")',
+      i2:
+        '"hello world" OR "hello everyone" AND NOT field_2:("hello world" OR "hello everyone")',
+    });
   });
 });
 
 describe('createFields', () => {
   const subject = {
-    name: ['title_of_organisation', 'name_of_organisation', 'name_of_group'],
-    location: [
-      'placeName_country_organisation',
-      'placeName_region_organisation',
-      'placeName_state_organisation',
-    ],
-    category: ['type_of_organisation', 'terms_category_organisation'],
+    i1: {
+      name: ['title_of_organisation', 'name_of_organisation', 'name_of_group'],
+      location: [
+        'placeName_country_organisation',
+        'placeName_region_organisation',
+        'placeName_state_organisation',
+      ],
+      category: ['type_of_organisation', 'terms_category_organisation'],
+    },
+    i2: {
+      name: [
+        'title_of_organisation2',
+        'name_of_organisation2',
+        'name_of_group2',
+      ],
+      location: [
+        'placeName_country_organisation2',
+        'placeName_region_organisation2',
+        'placeName_state_organisation2',
+      ],
+      category: ['type_of_organisation2', 'terms_category_organisation2'],
+    },
   };
   test('create full field list from subject list and a field map', () => {
     expect(
       createFields(subject, [
-        { field: 'name', status: 'included' },
-        { field: 'location', status: 'excluded' },
-        { field: 'category', status: 'default' },
+        { field: 'name', status: 'included', visible: true },
+        { field: 'location', status: 'excluded', visible: true },
+        { field: 'category', status: 'default', visible: true },
       ])
-    ).toEqual([
-      { field: 'title_of_organisation', status: 'included' },
-      { field: 'name_of_organisation', status: 'included' },
-      { field: 'name_of_group', status: 'included' },
-      { field: 'placeName_country_organisation', status: 'excluded' },
-      { field: 'placeName_region_organisation', status: 'excluded' },
-      { field: 'placeName_state_organisation', status: 'excluded' },
-      { field: 'type_of_organisation', status: 'default' },
-      { field: 'terms_category_organisation', status: 'default' },
-    ]);
+    ).toEqual({
+      i1: [
+        { field: 'title_of_organisation', status: 'included', visible: true },
+        { field: 'name_of_organisation', status: 'included', visible: true },
+        { field: 'name_of_group', status: 'included', visible: true },
+        {
+          field: 'placeName_country_organisation',
+          status: 'excluded',
+          visible: true,
+        },
+        {
+          field: 'placeName_region_organisation',
+          status: 'excluded',
+          visible: true,
+        },
+        {
+          field: 'placeName_state_organisation',
+          status: 'excluded',
+          visible: true,
+        },
+        { field: 'type_of_organisation', status: 'default', visible: true },
+        {
+          field: 'terms_category_organisation',
+          status: 'default',
+          visible: true,
+        },
+      ],
+      i2: [
+        { field: 'title_of_organisation2', status: 'included', visible: true },
+        { field: 'name_of_organisation2', status: 'included', visible: true },
+        { field: 'name_of_group2', status: 'included', visible: true },
+        {
+          field: 'placeName_country_organisation2',
+          status: 'excluded',
+          visible: true,
+        },
+        {
+          field: 'placeName_region_organisation2',
+          status: 'excluded',
+          visible: true,
+        },
+        {
+          field: 'placeName_state_organisation2',
+          status: 'excluded',
+          visible: true,
+        },
+        { field: 'type_of_organisation2', status: 'default', visible: true },
+        {
+          field: 'terms_category_organisation2',
+          status: 'default',
+          visible: true,
+        },
+      ],
+    });
   });
 });
