@@ -74,8 +74,8 @@ export const requiredFields = {
     { field: 'placeName_country_organisation', type: 'keyword' },
     { field: 'placeName_city_organisation', type: 'keyword' },
     { field: 'id_iso3_country', type: 'keyword' },
-    { field: 'coordinates_of_city', type: 'geo_point' },
-    { field: 'datetime_birth_organisation', type: 'date' },
+    { field: 'coordinate_of_city', type: 'geo_point' },
+    { field: 'date_birth_organisation', type: 'date' },
     { field: 'cost_of_funding', type: 'integer' },
   ],
 };

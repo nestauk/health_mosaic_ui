@@ -1,45 +1,55 @@
 /* eslint-disable indent */
-import { endpointScannerSearch, endpointScanner, size } from '../config';
+import {
+  endpointScannerSearch,
+  endpointScanner,
+  size,
+  requiredFields,
+} from '../config';
 
-export const makeQuery = (querystring, requiredFields) => ({
-  bool: {
-    must: [
-      {
-        query_string: { query: querystring, default_operator: 'AND' },
-      },
-      ...(requiredFields
-        ? requiredFields.reduce((acc, next) => {
-            return acc.concat([
-              {
-                regexp: {
-                  [next]: '.+',
-                },
+import { shallowFlatten } from 'lamb';
+
+// This is the regexp for 'text' fields to disallow empty strings
+// it destroys performance and cannot be used.
+
+// const preventEmptyString = (field, type) =>
+//   type === 'text'
+//     ? {
+//         regexp: {
+//           [field]: '.+',
+//         },
+//       }
+//     : false;
+
+const makeFieldExist = field => ({ exists: { field } });
+
+// this is where the regexp matcher would go
+const makeFieldMatch = ({ field }) => [makeFieldExist(field)].filter(Boolean);
+
+export const makeQuery = querystring => {
+  return {
+    bool: {
+      must: [
+        { query_string: { query: querystring } },
+        {
+          bool: {
+            should: Object.keys(requiredFields).map(index => ({
+              bool: {
+                must: shallowFlatten(requiredFields[index].map(makeFieldMatch)),
               },
-              {
-                exists: {
-                  field: next,
-                },
-              },
-            ]);
-          }, [])
-        : []),
-    ],
-    must_not: [
-      {
-        exists: {
-          field: 'booleanFlag_duplicate_abstract',
+            })),
+          },
         },
-      },
-    ],
-  },
-});
+      ],
+    },
+  };
+};
 
-function generateBody(type, querystring, id = 0, requiredFields) {
+function generateBody(type, querystring, id = 0) {
   const body = {
     single: {
       endpoint: endpointScannerSearch,
       body: {
-        query: makeQuery(querystring, requiredFields),
+        query: makeQuery(querystring),
         size,
       },
     },
