@@ -1,8 +1,6 @@
 /* eslint-disable indent */
 import { endpointScannerSearch, size, requiredFields } from '../config';
 
-import { shallowFlatten } from 'lamb';
-
 // This is the regexp for 'text' fields to disallow empty strings
 // it destroys performance and cannot be used.
 
@@ -18,7 +16,7 @@ import { shallowFlatten } from 'lamb';
 const makeFieldExist = field => ({ exists: { field } });
 
 // this is where the regexp matcher would go
-const makeFieldMatch = ({ field }) => [makeFieldExist(field)].filter(Boolean);
+const makeFieldMatch = ({ field }) => makeFieldExist(field);
 
 export const makeQuery = querystring => {
   return {
@@ -29,7 +27,7 @@ export const makeQuery = querystring => {
           bool: {
             should: Object.keys(requiredFields).map(index => ({
               bool: {
-                must: shallowFlatten(requiredFields[index].map(makeFieldMatch)),
+                must: requiredFields[index].map(makeFieldMatch),
               },
             })),
           },
