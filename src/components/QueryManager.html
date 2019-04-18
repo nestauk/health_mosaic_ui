@@ -27,7 +27,6 @@
   }
 
   function handleSend(rules) {
-    console.log(rules)
     let joinedRules = rules.map(v => ({
       visible: v.visible,
       value: v.value,
@@ -36,13 +35,11 @@
         createFields(subjectFields, v.subject)
       )
     }));
-    console.log(joinedRules)
     joinedRules = joinedRules.reduce((acc, next) => {
       if (!next.visible) return acc;
       return  acc + dslBuilder(next.value, next.fields);
     }, '')
 
-    console.log(joinedRules)
 
    searchMachine.send({ type: 'SEARCH', query: joinedRules, value, searchId: activeTab });
   }

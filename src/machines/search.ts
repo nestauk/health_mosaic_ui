@@ -44,15 +44,10 @@ const searchMachineOptions = {
       ctx.search.update(v => ({
         ...v,
         value: evt.value,
-        pages: v.pages ? v.pages.concat(v.next) : [v.next],
       }));
-      let id;
-      let req = evt.req;
-      if (evt.id) {
-        id = evt.id;
-        req = 'nextScroll';
-      }
-      const q = await query(evt.query, req, id);
+
+      const q = await query(evt.query);
+
       ctx.search.update(v => ({
         ...v,
         data: { ...v.data, [evt.searchId]: q.hits.hits },

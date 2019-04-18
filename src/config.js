@@ -22,6 +22,9 @@ export const endpointScannerSearch = `${endpointScanner}/_search`;
 
 export const size = dev ? 200 : 1000;
 
+export const subjectAliases = ['name', 'location'];
+export const contentAliases = ['title', 'summary', 'body', 'category', 'terms'];
+
 export const subjectFields = {
   NIH: {
     name: ['title_of_organisation'],
@@ -79,23 +82,6 @@ export const requiredFields = {
     { field: 'cost_of_funding', type: 'integer' },
   ],
 };
-
-// export const subjectFields = {
-//   name: ['title_of_organisation'],
-//   location: [
-//     'placeName_country_organisation',
-//     'placeName_state_organisation',
-//     'placeName_city_organisation',
-//   ],
-// };
-
-// export const contentFields = {
-//   title: ['title_of_project'],
-//   summary: ['textBody_abstract_project'],
-//   body: ['textBody_descriptive_project'],
-//   terms: ['terms_mesh_abstract', 'terms_descriptive_project'],
-//   category: ['terms_sdg_project'],
-// };
 
 export const MAPBOXGL_STYLEURL =
   'mapbox://styles/nesta-uk/cjja7cb0s0bcw2rmvflhof4io';

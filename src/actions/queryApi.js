@@ -1,10 +1,5 @@
 /* eslint-disable indent */
-import {
-  endpointScannerSearch,
-  endpointScanner,
-  size,
-  requiredFields,
-} from '../config';
+import { endpointScannerSearch, size, requiredFields } from '../config';
 
 import { shallowFlatten } from 'lamb';
 
@@ -44,33 +39,11 @@ export const makeQuery = querystring => {
   };
 };
 
-function generateBody(type, querystring, id = 0) {
-  const body = {
-    single: {
-      endpoint: endpointScannerSearch,
-      body: {
-        query: makeQuery(querystring),
-        size,
-      },
-    },
-
-    scroll: {
-      endpoint: `${endpointScanner}?scroll=100m`,
-      body: {
-        query: makeQuery(querystring, requiredFields),
-        size,
-      },
-    },
-
-    nextScroll: {
-      endpoint: `${endpointScanner}/scroll`,
-      body: {
-        size,
-        scroll_id: id,
-      },
-    },
+function generateBody(querystring) {
+  return {
+    query: makeQuery(querystring),
+    size,
   };
-  return body[type];
 }
 
 class SearchError extends Error {
@@ -82,21 +55,21 @@ class SearchError extends Error {
   }
 }
 
-export async function query(querystring, type = 'single', id, requiredFields) {
-  const data = generateBody(type, querystring, id, requiredFields);
+export async function query(querystring) {
+  const body = generateBody(querystring);
   const options = {
     method: 'POST',
     mode: 'cors',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify(data.body),
+    body: JSON.stringify(body),
   };
 
   let result;
 
   try {
-    let response = await fetch(`${data.endpoint}`, options);
+    let response = await fetch(`${endpointScannerSearch}`, options);
 
     if (!response.ok)
       throw new SearchError(response.error.type, response.error.reason);

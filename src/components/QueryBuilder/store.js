@@ -1,17 +1,17 @@
 import { writable, derive } from 'svelte/store';
 import { updateIndex, pipe, filterWith, updateAt } from 'lamb';
-import { subjectFields, contentFields } from '../../config';
+import { subjectAliases, contentAliases } from '../../config';
 import { parseQuery } from '../../util/parse.ts';
 
 export const createStore = queries => {
-  const subject = Object.keys(subjectFields.NIH).map(v => ({
+  const subject = subjectAliases.map(v => ({
     field: v,
     status: 'default',
     hovered: false,
     visible: true,
   }));
 
-  const content = Object.keys(contentFields.NIH).map(v => ({
+  const content = contentAliases.map(v => ({
     field: v,
     status: 'default',
     hovered: false,
