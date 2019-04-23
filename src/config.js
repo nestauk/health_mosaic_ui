@@ -68,6 +68,7 @@ export const requiredFields = {
     { field: 'coordinate_of_organisation', type: 'geo_point' },
     { field: 'date_start_project', type: 'date' },
     { field: 'cost_total_project', type: 'integer' },
+    { field: 'currency_total_cost', type: 'keyword' },
   ],
   CB: [
     { field: 'name_of_organisation', type: 'text' },
@@ -80,6 +81,7 @@ export const requiredFields = {
     { field: 'coordinate_of_city', type: 'geo_point' },
     { field: 'date_birth_organisation', type: 'date' },
     { field: 'cost_of_funding', type: 'integer' },
+    { field: 'currency_of_funding', type: 'keyword' },
   ],
 };
 
