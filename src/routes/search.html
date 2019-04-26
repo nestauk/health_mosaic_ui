@@ -16,6 +16,8 @@
     }));
     tab=detail.tab
   }
+
+  $: console.log($searchStore, tab)
 </script>
 
 <svelte:head>
@@ -29,8 +31,8 @@
   {#if $searchStore.data && $searchStore.data[tab] && $searchStore.data[tab].length }
 
     <Results dirty={!!$searchMachine.dirty}>
-      {#each $searchStore.data[tab] as {_source} }
-        <ResultsItem data={_source}></ResultsItem>
+      {#each $searchStore.data[tab] as data }
+        <ResultsItem {data}></ResultsItem>
       {/each}
     </Results>
   {/if}

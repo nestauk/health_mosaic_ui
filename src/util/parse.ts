@@ -1,3 +1,6 @@
+import { union } from 'lamb';
+import { newFieldMappings } from '../config';
+
 export const parseQuery = inputObject => {
   const { value } = inputObject;
   const regexQuery = /^(-*)([^]*)$/;
@@ -16,70 +19,21 @@ export const parseQuery = inputObject => {
   };
 };
 
-export const dslBuilder = (query, fields) => {
-  const q = queryBuilder(query);
+const filterQueryObject = ({ visible, status }) =>
+  status !== 'default' && visible;
 
-  const splitFields = fields.reduce(
-    (acc, next) => {
-      if (!next.visible) return acc;
-      acc[next.status] = acc[next.status].concat(next.field);
-      return acc;
-    },
-    { default: [], included: [], excluded: [] }
-  );
+const transFormFields = (acc, { field, status }) => [
+  ...acc,
+  ...newFieldMappings[field].map(v => ({ title: v, status })),
+];
 
-  if (splitFields.default.length === Object.keys(fields).length) {
-    return q;
-  }
+const createValidFields = fields =>
+  fields.filter(filterQueryObject).reduce(transFormFields, []);
 
-  let queryString = splitFields.included.length
-    ? `${fieldBuilder(splitFields.included, q)}`
-    : q;
+const transformValues = ({ value, status }) => ({ query: value, status });
 
-  if (splitFields.excluded.length) {
-    queryString = `${queryString}${fieldBuilder(
-      splitFields.excluded,
-      q,
-      'exclude'
-    )}`;
-  }
-
-  return queryString
-    .trim()
-    .replace(/^AND/, '')
-    .trim();
-};
-
-const fieldBuilder = (fieldArr, q, type = '') =>
-  fieldArr.reduce((acc, next) => {
-    // if (!next.visible) return acc;
-    return (
-      acc + ' AND ' + (type === 'exclude' ? 'NOT ' : '') + next + `:(${q})`
-    );
-  }, '');
-
-const queryBuilder = query =>
-  query
-    .reduce((acc, next, i, arr) => {
-      return (
-        acc +
-        (next.status === 'not' ? '-' : '') +
-        `"${next.value}"` +
-        (arr[i + 1] ? ' OR ' : '')
-      );
-    }, '')
-    .trim();
-
-export const createFields = (map, fields) => {
-  return fields.reduce((acc, next) => {
-    if (!next.visible) return acc;
-    return acc.concat(fieldMapper(map, next));
-  }, []);
-};
-
-const fieldMapper = (map, field) =>
-  map[field.field].map(v => ({
-    field: v,
-    status: field.status,
-    visible: field.visible,
+export const createQueryObject = queries =>
+  queries.map(({ content, subject, value }) => ({
+    fields: createValidFields(union(content, subject)),
+    values: value.map(transformValues),
   }));

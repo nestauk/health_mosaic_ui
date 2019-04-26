@@ -11,6 +11,8 @@ import typescript from 'rollup-plugin-typescript';
 import copy from 'rollup-plugin-copy-files';
 import pkg from './package.json';
 
+import { graphqlEndpoint } from './src/config';
+
 const mode = process.env.NODE_ENV;
 const dev = mode === 'development';
 const legacy = !!process.env.SAPPER_LEGACY_BUILD;
@@ -67,6 +69,7 @@ export default {
       replace({
         'process.browser': true,
         'process.env.NODE_ENV': JSON.stringify(mode),
+        REPLACE_GRAPHQL_ENDPOINT: graphqlEndpoint,
       }),
       svelte({
         dev,
@@ -123,6 +126,7 @@ export default {
       replace({
         'process.browser': false,
         'process.env.NODE_ENV': JSON.stringify(mode),
+        REPLACE_GRAPHQL_ENDPOINT: graphqlEndpoint,
       }),
       svelte({
         generate: 'ssr',

@@ -2,18 +2,24 @@
   export let data;
 </script>
 
-<li>
-  <h2>{data.title_of_project}</h2>
-  <h3>{data.title_of_organisation}</h3>
+<div>
+  <h2><strong>Name:</strong> {data.name}</h2>
+  <p><strong>Terms:</strong> {data.terms.toString()}</p>
   <p>
-    {data.placeName_city_organisation}, {data.placeName_state_organisation},
-    {data.placeName_country_organisation}
+    <strong>Location:</strong> {data.location.lon}° E - {data.location.lat}° N
   </p>
-</li>
+  <p><strong>Place:</strong> {data.city}, {data.state}, {data.country}</p>
+  <p><strong>type:</strong> {data.type}</p>
+</div>
 
 <style>
   li {
     border-bottom: 1px solid #ccc;
     margin-bottom: 30px;
+  }
+
+  p,
+  h2 {
+    margin: 2rem;
   }
 </style>

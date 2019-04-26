@@ -4,8 +4,8 @@
   "version": "0.0.1",
   "scripts": {
     "dev": "sapper dev",
-    "build": "sapper build --legacy",
-    "export": "sapper export --legacy",
+    "build": "npm run lambda:build && sapper build --legacy",
+    "export": "npm run lambda:build && rollup -c rollup-lambda.config.js && sapper export --legacy",
     "start": "node __sapper__/build",
     "cy:run": "cypress run",
     "cy:open": "cypress open",
@@ -13,13 +13,21 @@
     "cleansrc": "rimraf src/node_modules",
     "cleanall": "rimraf node_modules src/node_modules __sapper__ package-lock.json",
     "reinstall:npm": "npm run cleanall && npm i",
-    "reinstall:yarn": "yarn cleanall && yarn"
+    "reinstall:yarn": "yarn cleanall && yarn",
+    "lambda:test": "NODE_ENV=development rollup -c rollup-lambda.config.js && netlify-lambda serve dist/lambda",
+    "lambda:build": "rollup -c rollup-lambda.config.js && netlify-lambda build dist/lambda"
   },
   "dependencies": {
+    "apollo-boost": "^0.3.1",
+    "apollo-datasource-rest": "^0.3.2",
+    "apollo-server-lambda": "^2.4.8",
     "compression": "^1.7.1",
-    "ionicons": "^4.5.6",
+    "encoding": "^0.1.12",
+    "graphql": "^14.2.1",
+    "ionicons": "^4.5.5",
     "lamb": "^0.57.0",
     "mapbox-gl": "^0.53.1",
+    "netlify-lambda": "^1.4.5",
     "polka": "^0.4.0",
     "sirv": "^0.2.5",
     "xstate": "^4.5.0"

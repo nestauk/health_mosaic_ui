@@ -1,25 +1,83 @@
 const mode = process.env.NODE_ENV;
 const dev = mode === 'development';
 
-export const baseUrl =
-  'https://search-health-scanner-5cs7g52446h7qscocqmiky5dn4.eu-west-2.es.amazonaws.com/rwjf/_search';
-export const size = dev ? 200 : 1000;
+export const endpointNIH_index = 'NIH';
+export const BASE_URL =
+  'https://search-health-scanner-5cs7g52446h7qscocqmiky5dn4.eu-west-2.es.amazonaws.com';
 
+export const endpointRWJF = `${BASE_URL}/rwjf`;
+export const endpointRWJFCount = `${endpointRWJF}/_count`;
+export const endpointRWJFSearch = `${endpointRWJF}/_search`;
+
+export const endpointNIH = `${BASE_URL}/nih_v2`;
+export const endpointNIHCount = `${endpointNIH}/_count`;
+export const endpointNIHSearch = `${endpointNIH}/_search`;
+
+export const endpointCB = `${BASE_URL}/crunchbase`;
+export const endpointCBCount = `${endpointCB}/_count`;
+export const endpointCBSearch = `${endpointCB}/_search`;
+
+export const endpointScanner = `${BASE_URL}/health_scanner`;
+export const endpointScannerCount = `${endpointScanner}/_count`;
+export const endpointScannerSearch = `${endpointScanner}/_search`;
+
+export const size = dev ? 200 : 1000;
+export const graphqlEndpoint = dev
+  ? '"http://localhost:9000/.netlify/functions/graphql"'
+  : '"/.netlify/functions/graphql"';
+
+export const newFieldMappings = {
+  type: ['type'],
+  name: ['name'],
+  body: ['body'],
+  summary: ['summary'],
+  terms: ['terms'],
+  place: ['country', 'state', 'region', 'city', 'continent'],
+  location: ['location'],
+  cost: ['cost_ref'],
+  time: ['start', 'end'],
+  categories: ['sdg_labels'],
+};
+
+export const subjectAliases = ['name', 'place'];
+export const contentAliases = ['body', 'summary', 'terms'];
 export const subjectFields = {
-  name: ['title_of_organisation'],
-  location: [
-    'placeName_country_organisation',
-    'placeName_state_organisation',
-    'placeName_city_organisation',
-  ],
+  name: ['name'],
+  place: ['city', 'country'],
 };
 
 export const contentFields = {
-  title: ['title_of_project'],
-  summary: ['textBody_abstract_project'],
   body: ['textBody_descriptive_project'],
-  terms: ['terms_mesh_abstract', 'terms_descriptive_project'],
-  category: ['terms_sdg_project'],
+  summary: ['summary'],
+  terms: ['terms'],
+};
+
+export const requiredFields = {
+  NIH: [
+    { field: 'title_of_organisation', type: 'text' },
+    { field: 'textBody_abstract_project', type: 'text' },
+    { field: 'terms_mesh_abstract', type: 'text' },
+    { field: 'placeName_country_organisation', type: 'keyword' },
+    { field: 'placeName_city_organisation', type: 'keyword' },
+    { field: 'id_iso2_country', type: 'keyword' },
+    { field: 'coordinate_of_organisation', type: 'geo_point' },
+    { field: 'date_start_project', type: 'date' },
+    { field: 'cost_total_project', type: 'integer' },
+    { field: 'currency_total_cost', type: 'keyword' },
+  ],
+  CB: [
+    { field: 'name_of_organisation', type: 'text' },
+    { field: 'textBody_descriptive_organisation', type: 'text' },
+    { field: 'textBody_summary_organisation', type: 'text' },
+    { field: 'terms_mesh_description', type: 'text' },
+    { field: 'placeName_country_organisation', type: 'keyword' },
+    { field: 'placeName_city_organisation', type: 'keyword' },
+    { field: 'id_iso2_country', type: 'keyword' },
+    { field: 'coordinate_of_city', type: 'geo_point' },
+    { field: 'date_birth_organisation', type: 'date' },
+    { field: 'cost_of_funding', type: 'integer' },
+    { field: 'currency_of_funding', type: 'keyword' },
+  ],
 };
 
 export const MAPBOXGL_STYLEURL =
