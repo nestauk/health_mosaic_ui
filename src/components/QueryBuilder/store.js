@@ -1,4 +1,4 @@
-import { writable, derive } from 'svelte/store';
+import { writable, derived } from 'svelte/store';
 import { updateIndex, pipe, filterWith, updateAt } from 'lamb';
 import { subjectFields, contentFields } from '../../config';
 import { parseQuery } from '../../util/parse.ts';
@@ -40,7 +40,7 @@ export const createStore = queries => {
     }
   );
 
-  const rules = derive(search, search => search.value.map(parseQuery));
+  const rules = derived(search, search => search.value.map(parseQuery));
 
   function updateValue(value) {
     search.update(state => ({
