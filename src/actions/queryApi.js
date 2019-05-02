@@ -7,7 +7,7 @@ export async function query(query) {
         city
         continent
         cost_ref
-        countries_codes
+        countries_ids
         countries_names
         country
         country_id

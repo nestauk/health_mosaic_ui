@@ -96,7 +96,7 @@ const typeDefs = gql`
     city: String
     continent: String
     cost_ref: Float
-    countries_codes: [String]
+    countries_ids: [String]
     countries_names: [String]
     country: String
     country_id: String

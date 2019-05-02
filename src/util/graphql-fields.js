@@ -4,6 +4,8 @@ const makeFieldExist = field => ({ exists: { field } });
 
 // current
 
+// https://github.com/nestauk/nesta/blob/health2/nesta/production/schemas/tier_1/aliases/health_scanner.json
+
 const fieldMaps = {
   body: ['textBody_descriptive_project', 'textBody_descriptive_organisation'],
   city: ['placeName_city_organisation', 'placeName_city_organisation'],
@@ -13,9 +15,9 @@ const fieldMaps = {
   ],
   cost_ref: ['cost_USD2018_project', 'cost_USD2018_org'],
   country: ['placeName_country_organisation', 'placeName_country_organisation'],
-  countries_codes: [
-    'terms_countries_codes_description',
-    'terms_countries_codes_description',
+  countries_ids: [
+    'terms_of_countryTags',
+    'terms_of_countryTags',
   ],
   countries_names: [
     'terms_countries_description',
@@ -27,11 +29,12 @@ const fieldMaps = {
   name: ['title_of_organisation', 'name_of_organisation'],
   novelty: ['rank_rhodonite_abstract', 'rank_rhodonite_abstract'],
   region: ['placeName_region_organisation', 'placeName_region_organisation'],
-  sdg_labels: ['terms_sdg_abstract', 'terms_sdg_summary'],
+  sdg_labels: ['_terms_sdg_abstract', '_terms_sdg_summary'],
   start: ['date_start_project', 'date_birth_organisation'],
   state: ['placeName_state_organisation', 'placeName_state_organisation'],
   summary: ['textBody_abstract_project', 'textBody_summary_organisation'],
-  terms: ['terms_mesh_abstract', 'terms_mesh_description'],
+  terms: ['terms_mesh_abstract', '_terms_mesh_description'],
+  // title: ['title_of_project'], // TODO add title
 };
 
 const makeFieldMatch = ({ field }) => makeFieldExist(field);
