@@ -56,6 +56,9 @@ function transformLess() {
 
 export default {
   client: {
+    treeshake: {
+      moduleSideEffects: id => !/lamb/g.test(id),
+    },
     input: config.client.input(),
     output: config.client.output(),
     onwarn(message, warn) {
@@ -116,6 +119,9 @@ export default {
   },
 
   server: {
+    treeshake: {
+      moduleSideEffects: id => !/lamb/g.test(id),
+    },
     input: config.server.input(),
     output: config.server.output(),
     onwarn(message, warn) {

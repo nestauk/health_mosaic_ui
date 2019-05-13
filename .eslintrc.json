@@ -21,7 +21,8 @@
     "prefer-const": [2, { "destructuring": "all" }],
     "arrow-spacing": 2,
     "no-inner-declarations": 0,
-    "@typescript-eslint/explicit-function-return-type": 0
+    "@typescript-eslint/explicit-function-return-type": 0,
+    "@typescript-eslint/camelcase": 0
   },
   "overrides": [
     {

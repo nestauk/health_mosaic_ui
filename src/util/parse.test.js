@@ -1,6 +1,6 @@
 import { parseQuery, dslBuilder, createFields } from './parse';
 
-describe('parseQuery', () => {
+describe.skip('parseQuery', () => {
   test('parse simple queries', () => {
     expect(parseQuery({ value: 'one, two, three' })).toEqual({
       value: [
@@ -32,7 +32,7 @@ describe('parseQuery', () => {
   });
 });
 
-describe('dslBuilder', () => {
+describe.skip('dslBuilder', () => {
   test('create a valid query string from a query object', () => {
     expect(
       dslBuilder(
@@ -153,7 +153,7 @@ describe('dslBuilder', () => {
   });
 });
 
-describe('createFields', () => {
+describe.skip('createFields', () => {
   const subject = {
     name: ['title_of_organisation', 'name_of_organisation', 'name_of_group'],
     location: [
