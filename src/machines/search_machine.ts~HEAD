@@ -77,7 +77,7 @@ export const searchOptions = {
     sharePending: () => {},
     shareSuccess: () => {},
     shareFail: () => {},
-    MatchingSync: () => {},
+    shareMatching: () => {},
   },
   services: {
     apiRequest: () => Promise.resolve,

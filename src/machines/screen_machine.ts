@@ -282,7 +282,6 @@ export const screen_options = {
       { screenStore },
       { tabId, ruleIndex, section, labelIndex }
     ) => {
-
       const showLabelOption = _.setPath(
         `${tabId}.uiQuery.${ruleIndex}.fields.${section}.${labelIndex}.options`,
         true

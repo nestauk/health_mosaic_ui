@@ -28,7 +28,8 @@
   <ul>
     {#each tabs as {tab}}
     <li>
-      <a on:click|preventDefault="{() => changeTab(tab)}"  class='{tab === activeTab ? "selected" : ""}' href="">Tab {tab + 1}</a>
+      <!-- TODO: Change these to buttons. -->
+      <a on:click|preventDefault="{() => changeTab(tab)}"  class='{tab === activeTab ? "selected" : ""}' href="/bing">Tab {tab + 1}</a>
       {#if tabs.length > 1}
         <span on:click="{() => deleteTab(tab)}" class="remove"><img alt="delete tab" src="{closeIcon}"></span>
       {/if}

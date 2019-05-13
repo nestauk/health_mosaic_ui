@@ -16,10 +16,10 @@
     value = '', activeTab = 0;
 
   function handleChange({queries, values, tab}) {
-    value = queries.filter(v => !!v);
-    savedQueries.update(s => {
-      const newState = [].concat(s);
-      const index = newState.findIndex(v => v.tab === tab)
+    value = queries.filter(value => !!value);
+    savedQueries.update(queries => {
+      const newState = [].concat(queries);
+      const index = newState.findIndex(tabs => tabs.tab === tab)
       newState[index] = { values, queries, tab};
       return newState;
     })
@@ -46,6 +46,7 @@
     close: 'open'
   };
 
+  // TODO: Calculate the required offset dynamically, static values are too inconsistent
   function animateSearch() {
     states.current = states[states.current];
 

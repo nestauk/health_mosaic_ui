@@ -5,22 +5,23 @@ export let properties, hover;
 
 <ul class="tag-container"  >
 {#each properties as prop, s}
-  <li class="tags {prop.status}"
-      on:mouseenter="{(e) => console.log(e)}"
-      on:mouseleave="{(e) => console.log(e)}"
-     >
+  <li
+    class="tags {prop.status}"
+    on:mouseenter="{(e) => console.log(e)}"
+    on:mouseleave="{(e) => console.log(e)}"
+  >
     <span>
       {prop.field}
-      <!-- <span class="icon-wrap"> -->
 
-    {#if prop.hovered}
-      <QueryControls status="{prop.status}" on:mouseover="{() => hover(s)}" />
-
+      {#if prop.hovered}
+        <QueryControls
+          status="{prop.status}"
+          on:mouseover="{() => hover(s)}"
+        />
       {/if}
+
     </span>
-    <!-- </span> -->
   </li>
-<!-- {/if} -->
 
 {/each}
 </ul>

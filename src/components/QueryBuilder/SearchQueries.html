@@ -2,149 +2,111 @@
   import RuleControls from './RuleControls.html';
   import RuleControlsMaster from './RuleControlsMaster.html';
 
-  import QueryControls from './QueryControls.html';
   import Query from './Query.html';
 
-  export let copyRule, ruleselect;
+  import SearchQueriesLabels from './SearchQueriesLabels.html';
+
+  export let copyRule,ruleselect;
 
   export let search;
   export let rules;
 
-  $: filteredRules = rules.map(q => ({
-    value: q.value,
-    subs: q.subject.filter(s => s.status !== 'default'),
-    conts: q.content.filter(s => s.status !== 'default'),
-    visible: q.visible,
+  $: filteredRules = rules.map(query => ({
+    value: query.value,
+    subs: query.subject.filter(s => s.status !== 'default'),
+    conts: query.content.filter(s => s.status !== 'default'),
+    visible: query.visible,
   }));
 
-  function hoverProp(i, s, cat) {
-    const index = rules[i][cat].findIndex(v => v.field === s);
-    rules[i][cat][index].hovered = true;
+  function hoverProp(ruleIndex, fieldName, section) {
+    const index = rules[ruleIndex][section].findIndex(v => v.field === fieldName);
+    rules[ruleIndex][section][index].hovered = true;
   }
 
-  function unHoverProp(i, s, cat) {
-    const index = rules[i][cat].findIndex(v => v.field === s);
+  function unHoverProp(ruleIndex, fieldName, section) {
+    const index = rules[ruleIndex][section].findIndex(v => v.field === fieldName);
 
-    rules[i][cat][index].hovered = false;
+    rules[ruleIndex][section][index].hovered = false;
   }
 
-  function toggleVisibility(i, s, cat) {
-    const index = $search.value[i][cat].findIndex(v => v.field === s);
+  function toggleVisibility(valueIndex, fieldName, section) {
+    const index = $search.value[valueIndex][section].findIndex(v => v.field === fieldName);
 
-    search.updateVisibility(cat, i, index);
+    search.updateVisibility(section, valueIndex, index);
   }
 
-  function removeProperty(i, s, obj) {
-    const index = $search.value[i][obj].findIndex(v => v.field === s);
-    search.updateStatus(obj, i, index, 'default');
+  function removeProperty(valueIndex, fieldName, fieldIndex) {
+    const index = $search.value[valueIndex][fieldIndex].findIndex(v => v.field === fieldName);
+    search.updateStatus(fieldIndex, valueIndex, index, 'default');
   }
 
-  function toggleStatus(i, s, obj) {
-    const index = $search.value[i][obj].findIndex(v => v.field === s);
+  function toggleStatus(valueIndex, fieldName, fieldIndex) {
+    const index = $search.value[valueIndex][fieldIndex].findIndex(v => v.field === fieldName);
     const val =
-      $search.value[i][obj][index].status === 'excluded'
+      $search.value[valueIndex][fieldIndex][index].status === 'excluded'
         ? 'included'
-        : 'excluded';
-    search.updateStatus(obj, i, index, val);
+        :'excluded';
+    search.updateStatus(fieldIndex, valueIndex, index,val);
   }
 </script>
 
 {#if filteredRules.length}
   <ul class="rules-container">
-    <!--  -->
     {#each filteredRules as {value, subs, conts, visible}, i}
-    {#if value && value.length > 0}
-    <li on:click="{() =>  ruleselect(i)}"
-        class:active-query="{i === $search.current}"
-        class="rule"
-        style="{visible ? '' : 'border-color: #ddd;'} transition: 0.3s;">
-
-        <!-- when mainContext bug is fixed!  -->
-      <!-- <Query value={value} index={i} negate="{(j) => negateValueClick(i, j)}"/> -->
-      <ul class="query-container" style="{visible ? '' : 'opacity: 0.5;'} transition: 0.3s;">
-        {#each value as query, j}
-          {#if query.value}
-          <li class="query {query.status}" on:click="{() => search.negateValueClick(i, j)}" >
-            {query.value}
-            <!-- <QueryControls status="{query.status}"/> -->
-          </li>
-          {/if}
-        {/each}
-      </ul>
-      {#if subs.length}
-
-      <ul class="tag-container"  >
-
-        {#each subs as sub}
-            <li class="tags {sub.status}"
-                on:mouseenter="{() => hoverProp(i, sub.field, 'subject')}"
-                on:mouseleave="{() => unHoverProp(i, sub.field, 'subject')}"
-                style="{ visible ? '' : 'opacity: 0.5;'} transition:opacity 0.3s;"
-                >
-              <span style="{sub.visible ? '' : 'opacity: 0.5;'} transition:opacity 0.3s;">
-                {sub.field}
-                <span class="icon-wrap">
-
-              {#if sub.hovered}
-                <QueryControls status="{sub.status}"
-                               visible={sub.visible}
-                               on:delete="{() => removeProperty(i, sub.field, 'subject')}"
-                               on:change="{() => toggleStatus(i, sub.field, 'subject')}"
-                               on:toggle="{() => toggleVisibility(i, sub.field, 'subject')}"/>
-
-                {/if}
-              </span>
-              </span>
-            </li>
-          <!-- {/if} -->
-
-        {/each}
-      </ul>
-      {/if}
-
-      {#if conts.length}
-      <ul class="tag-container">
-        {#each conts as cont, c}
-        <!-- {#if cont.length} -->
-
-        <li class="tags {cont.status}"
-            on:mouseenter="{() => hoverProp(i, cont.field, 'content')}"
-            on:mouseleave="{() => unHoverProp(i, cont.field, 'content')}"
-            style="{ visible ? '' : 'opacity: 0.5'}"
+      {#if value && value.length > 0}
+        <li
+          on:click="{() =>  ruleselect(i)}"
+          class:active-query="{i === $search.current}"
+          class="rule"
+          style="{visible ? '' : 'border-color: #ddd;'} transition: 0.3s;"
         >
-        <span style="{cont.visible ? '' : 'opacity: 0.5;'} transition: opacity 0.3s;">
-            {cont.field}
 
-          <span class="icon-wrap">
-              {#if cont.hovered}
-              <QueryControls status="{cont.status}"
-                             visible={cont.visible}
-                             on:delete="{() => removeProperty(i, cont.field, 'content')}"
-                             on:change="{() => toggleStatus(i, cont.field, 'content')}"
-                             on:toggle="{() => toggleVisibility(i, cont.field, 'content')}"/>
+          <Query
+            value={value}
+            index={i}
+            negate="{(j) => search.negateValueClick(i, j)}"
+          />
 
-              {/if}
-          </span>
-        </span>
+
+          {#if subs.length}
+
+            <SearchQueriesLabels
+              labels="{subs}"
+              {visible}
+              on:hover="{({detail}) => hoverProp(i, detail, 'subject')}"
+              on:unhover="{({detail}) => unHoverProp(i, detail, 'subject')}"
+              on:delete="{({detail}) => removeProperty(i, detail, 'subject')}"
+              on:change="{({detail}) => toggleStatus(i, detail, 'subject')}"
+              on:toggle="{({detail}) => toggleVisibility(i, detail, 'subject')}"
+            />
+          {/if}
+
+          {#if conts.length}
+            <SearchQueriesLabels
+              labels="{conts}"
+              {visible}
+              on:hover="{({detail}) => hoverProp(i, detail, 'subject')}"
+              on:unhover="{({detail}) => unHoverProp(i, detail, 'subject')}"
+              on:delete="{({detail}) => removeProperty(i, detail, 'subject')}"
+              on:change="{({detail}) => toggleStatus(i, detail, 'subject')}"
+              on:toggle="{({detail}) => toggleVisibility(i, detail, 'subject')}"
+            />
+          {/if}
+
+            <RuleControlsMaster selected={$search.current === i}>
+
+              <RuleControls
+                on:visibility="{() => search.setRuleVisibility(i)}"
+                {visible}
+                on:copy="{() => copyRule(i)}"
+                on:delete="{() => search.removeRule(i)}"
+              />
+
+            </RuleControlsMaster>
+
         </li>
-
-        <!-- {/if} -->
-        {/each}
-
-      </ul>
       {/if}
-      <RuleControlsMaster selected={$search.current === i}>
-        <RuleControls on:visibility="{() => search.setRuleVisibility(i)}" {visible}
-                      on:copy="{() => copyRule(i)}"
-                      on:delete="{() => search.removeRule(i)}" />
-      </RuleControlsMaster>
-      <!-- <span class="remove-rule" on:click="{() => removeRule(i)}"></span> -->
-      <!--  -->
-    </li>
-    {/if}
-      {/each}
-
-    <!--  -->
+    {/each}
   </ul>
 {/if}
 
@@ -156,53 +118,11 @@
     transition: 0.2s 0.2s;
     transform-origin: 0 100%;
   }
-  .excluded {
-    color: red;
-  }
-  .included {
-    color: limegreen;
-  }
-  .default {
-    color: #ccc;
-  }
+
   ul {
     list-style: none;
   }
-  .tag-container {
-    display: flex;
-    margin: 10px 15px;
-    padding: 0px 0px;
-    border: none;
-    position: relative;
-    font-size: 15px;
-    height: 2rem;
-    border-bottom: 1px solid #ccc;
-    border-radius: 1rem;
-    color: #333;
-  }
 
-  .tags {
-    cursor: pointer;
-    margin: 0;
-    font-weight: 400;
-    line-height: 1;
-    position: relative;
-    min-width: 5.7rem;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-  }
-
-  .tags span {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    height: 100%;
-    width: 100%;
-    position: absolute;
-    transform: translateY(0.5px);
-  }
   .rule {
     font-size: 18px;
     position: relative;
@@ -215,53 +135,4 @@
     transition: 0.2s;
   }
 
-  /* .rule.active-query {
-        border-color: #333;
-
-      }
-       */
-
-  .query-container {
-    display: flex;
-    margin: 10px 15px 0 0;
-    padding: 5px;
-    border: none;
-    border: 1px solid #aaa;
-    border-radius: 1rem;
-    font-size: 18px;
-    height: 2rem;
-    color: #333;
-  }
-
-  .query {
-    margin: 0 5px;
-    color: #333;
-    display: flex;
-    color: limegreen;
-    line-height: 1;
-    cursor: pointer;
-  }
-
-  .query.not {
-    color: red;
-  }
-
-  .query.and {
-    border-color: limegreen;
-  }
-
-  .active-query {
-    background: #fff;
-    border: 1px solid #999;
-  }
-
-  .query-placeholder span {
-    padding: 5px;
-    margin: 5px;
-    /* border: 2px solid #999; */
-    color: #333;
-    display: block;
-    width: 80px;
-    font-weight: bold;
-  }
 </style>
