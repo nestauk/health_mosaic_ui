@@ -8,6 +8,10 @@
     dispatch('enter');
   }
 
+  export function focus(){
+    input.focus();
+  }
+
   export let current;
   let inputValue = '', input;
 

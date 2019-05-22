@@ -6,3 +6,8 @@ export { default as Edit } from './Edit.html';
 export { default as Pin } from './Pin.html';
 export { default as Save } from './Save.html';
 export { default as Undo } from './Undo.html';
+export { default as Selector } from './Selector.html';
+export { default as Dots } from './Dots.html';
+export { default as Copy } from './Copy.html';
+export { default as Trash } from './Trash.html';
+export { default as Toggle } from './Toggle.html';

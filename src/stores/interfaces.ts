@@ -59,6 +59,7 @@ export interface Tab {
   searchMachine: any;
   name: string;
   results: Results;
+  visible: boolean;
 }
 
 // The whole shebang

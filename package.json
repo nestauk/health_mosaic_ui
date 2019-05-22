@@ -18,7 +18,7 @@
     "lambda:build": "rollup -c rollup-lambda.config.js && netlify-lambda build dist/lambda"
   },
   "dependencies": {
-    "apollo-boost": "^0.3.1",
+    "apollo-boost": "^0.4.1",
     "apollo-datasource-rest": "^0.3.2",
     "apollo-server-lambda": "^2.4.8",
     "compression": "^1.7.1",

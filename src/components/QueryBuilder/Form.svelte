@@ -1,11 +1,15 @@
 <script>
   import { createEventDispatcher } from 'svelte';
 
+  export let formHeight = 0, isQueries;
   const dispatch = createEventDispatcher();
   let tooltip;
+
+  $:console.log(formHeight)
 </script>
 
-<form on:submit|preventDefault>
+<form on:submit|preventDefault style="position: static;">
+<span bind:offsetHeight="{formHeight}">
   <div class="button">
     <button
       on:mouseenter={() => (tooltip = true)}
@@ -17,13 +21,14 @@
     </button>
 
     {#if tooltip}
-      <span>Add new query (return)</span>
+      <span>Add new query</span>
     {/if}
   </div>
+</span>
   <slot />
-
-  <button class="search-button" on:click="{() => dispatch('search')}">Search</button>
-
+  {#if isQueries}
+    <button class="search-button" on:click="{() => dispatch('search')}">Search</button>
+  {/if}
 </form>
 
 <style>
@@ -36,11 +41,13 @@
   :global(body) {
     padding: 0;
   }
+
   form {
-    padding: 0;
+    padding: 10px 0 0 0;
     margin: 0;
     display: flex;
     flex-wrap: wrap;
+    position: static;
     margin-bottom: 30px;
   }
 
@@ -71,11 +78,20 @@
     position: absolute;
     font-size: 12px;
     font-weight: 300;
-    width: 9.3rem;
+    width: 6.5rem;
     top: -1rem;
     color: #eee;
     padding: 4px 8px;
     border-radius: 2px;
     z-index: 99;
+    background: #333;
   }
+
+  .search-button {
+	position: absolute;
+	cursor: pointer;
+	right: 80px;
+  bottom: 20px;
+	transition: 0.2s;
+}
 </style>

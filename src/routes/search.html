@@ -6,9 +6,9 @@
   import * as _ from 'lamb';
 
 
-  import Nav from '../components/Nav.html';
+  import Nav from '../components/Nav.svelte';
   import { Form, FormInput, FormLabels } from '../components/QueryBuilder/Form';
-  import { Rules, Ruleset,RulesetQueries, RulesetLabels } from '../components/QueryBuilder/Rules';
+  import { Rules, Ruleset, RulesetQueries, RulesetLabels } from '../components/QueryBuilder/Rules';
   import { Results, ResultsItem } from '../components/Results';
 
   import { subjectAliases, contentAliases } from '../config';
@@ -41,7 +41,7 @@
     screenService.stop();
   })
 
-  let search;
+  let formHeight, input;
 
   $: searchMachine = $screenStore[$currentTab].searchMachine;
   $: uiQuery = $screenStore[$currentTab]&& $screenStore[$currentTab].uiQuery;
@@ -56,20 +56,11 @@
     Content: ruleset.fields.content
   };
   $: data = $screenStore[$currentTab].results.data
-
-  // TODO
-  // Do something with this
-  function animateSearch() {
-    states.current = states[states.current];
-
-    if (search && states.current === 'close') {
-      search.style.transform = `translateY(-7rem)`;
-      search.children[0].children[1].style.transform = `scale(0.8)`;
-    } else if (search) {
-      search.style.transform = 'translateY(0)';
-      search.children[0].children[1].style.transform = `scale(1)`;
-    }
-  }
+  $: open = $screenStore[$currentTab].visible;
+  $: isLoading = searchMachine.state.matches('Search.NotEmpty.Dirty.Pending');
+  $: isError = searchMachine.state.matches('Search.NotEmpty.Dirty.Error');
+  $: tabs = Object.entries($screenStore);
+  $: isQueries = uiQuery[0] && uiQuery[0].terms[0].term;
 
   const stripEmpties = _.filterWith(_.allOf([
     _.getPath('values.length'),
@@ -79,8 +70,11 @@
   const newTab = () =>  screenMachine.send({type: 'TAB_CREATED', id: $idStore });
 
   const sendTab = (type, id) =>  screenMachine.send({type, id: parseInt(id, 10) });
+  const sendTabEdit = ({detail: { value, id }}) => 
+    screenMachine.send({type: 'TAB_RENAMED', labelText: value , id: parseInt(id, 10)});
 
   const handleChange = ({ detail }) => {
+
     screenMachine.send({
       type: 'TEXT_CHANGED',
       tabId: $currentTab,
@@ -110,12 +104,14 @@
 
   const handleSend = (rules) => searchMachine.send({ type:'SEARCHED', tab: $currentTab });
 
-  const newRuleset = () =>
+  const newRuleset = () => {
+    input.focus();
     screenMachine.send({
       type: 'RULESET_CREATED',
       tabId: $currentTab,
       targetIndex: uiQuery.length
     })
+  }
 
   const toggleTermStatus = (ruleIndex, termIndex) =>
     screenMachine.send({
@@ -163,29 +159,37 @@
 </svelte:head>
 
 <Nav
-  tabs={$screenStore}
+  {isLoading}
+  {isError}
+  {tabs}
   activeTab="{$currentTab}"
   on:newtab="{newTab}"
   on:changetab="{({detail}) => sendTab('TAB_SELECTED', detail)}"
   on:deletetab="{({detail}) => sendTab('TAB_DELETED', detail)}"
+  on:textchange={sendTabEdit}
 />
 
-<div class="search" bind:this="{search}">
+<div 
+  class="search" 
+  style="{open ? '' : `transform: translateY(-${formHeight + 50}px)`}" 
+>
   <Form
+    {isQueries}
+    bind:formHeight
     on:submit|preventDefault="{handleSend}"
     on:newrule="{newRuleset}"
     on:search="{handleSend}"
   >
     <FormInput
+      bind:this={input}
       on:change="{handleChange}"
       on:enter="{newRuleset}"
       current={ruleset.terms}
     />
     <FormLabels
       on:select="{({ detail }) => sendRuleLabel('LABEL_CLICKED', detail)}"
-      labels="{labels}"
+      {labels}
     />
-  </Form>
 
 
   {#if uiQuery.length}
@@ -205,7 +209,7 @@
       >
         <RulesetQueries
           {disabled}
-          terms={terms}
+          {terms}
           on:toggle="{({detail}) => toggleTermStatus(i, detail)}"
         />
         <RulesetLabels
@@ -221,11 +225,20 @@
     {/each}
   </Rules>
   {/if}
-
+</Form>
+  {#if isQueries}
+      <div 
+        class="close-label" 
+        on:click="{() => sendTab('TAB_VISIBILITY_TOGGLED', $currentTab)}" 
+        style="{open ? 'transform: rotate(180deg) ' : ''}"
+      >
+        <img alt="close search" src="arrow.svg"/>
+      </div>
+    {/if}
 </div>
 
 <div class="content">
-    <Results dirty={false}>
+    <Results dirty="{searchMachine.state.matches('Search.NotEmpty.Dirty')}">
       {#each data as data }
         <ResultsItem {data}></ResultsItem>
       {/each}

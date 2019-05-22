@@ -1,6 +1,5 @@
 <script>
   import { createEventDispatcher } from 'svelte';
-
   const dispatch = createEventDispatcher();
   export let terms, disabled;
 </script>
@@ -29,7 +28,6 @@
     height: 2rem;
     color: #333;
   }
-
   .query {
     margin: 0 5px;
     color: #333;
@@ -37,11 +35,9 @@
     color: limegreen;
     line-height: 1;
   }
-
   .query.not {
     color: red;
   }
-
   .query.and {
     border-color: limegreen;
   }

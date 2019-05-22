@@ -2,8 +2,8 @@ import { Machine, interpret } from 'xstate';
 import { createSearchConfig, searchOptions } from './search_machine';
 import { contentAliases, subjectAliases } from '../config';
 import { Tab, UIField, UITerm } from '../stores/interfaces';
-import { get } from 'svelte/store';
-import { toggle, add1, removeLast } from '../util/transform';
+import { get, writable } from 'svelte/store';
+import { toggleBoolean, add1, removeLast } from '../util/transform';
 
 import * as _ from 'lamb';
 
@@ -27,6 +27,9 @@ const screen_config = {
         },
         TAB_RENAMED: {
           target: 'Form.Idle',
+        },
+        TAB_VISIBILITY_TOGGLED: {
+          actions: ['toggleTabVisibility'],
         },
         LABEL_CLICKED: {
           actions: ['toggleLabelTernary'],
@@ -183,6 +186,7 @@ const newTab = (machine, id): Tab => ({
   uiQuery: [newRuleset()],
   searchMachine: machine,
   name: 'Tab' + id,
+  visible: true,
   results: {
     data: [],
     queryObj: [],
@@ -258,7 +262,7 @@ export const screen_options = {
         ).withContext({ screenStore, queryObj, currentTab })
       );
 
-      //screenMachine.onTransition(e => console.log(e));
+      screenMachine.onTransition(e => screenStore.update(s => s));
 
       screenMachine.start();
 
@@ -311,7 +315,7 @@ export const screen_options = {
     ) => {
       const disableLabelStatus = _.updatePath(
         `${tabId}.uiQuery.${ruleIndex}.fields.${section}.${labelIndex}.disabled`,
-        toggle
+        toggleBoolean
       );
 
       screenStore.update(disableLabelStatus);
@@ -377,7 +381,7 @@ export const screen_options = {
     disableRule: ({ screenStore }, { tabId, ruleIndex }) => {
       const toggleRule = _.updatePath(
         `${tabId}.uiQuery.${ruleIndex}.disabled`,
-        toggle
+        toggleBoolean
       );
       screenStore.update(toggleRule);
     },
@@ -441,6 +445,9 @@ export const screen_options = {
       const newRule = _.updatePath(`${tabId}.uiQuery`, updater);
 
       screenStore.update(newRule);
+    },
+    toggleTabVisibility: ({ screenStore }, { id }) => {
+      screenStore.update(_.updatePath(`${id}.visible`, toggleBoolean));
     },
   },
 };

@@ -9,6 +9,8 @@
     flex-wrap: wrap;
     transition: 0.2s 0.2s;
     transform-origin: 0 100%;
+    transform: translateY(30px);
+    flex-basis: 100%;
   }
 
   ul {
