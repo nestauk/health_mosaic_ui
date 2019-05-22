@@ -1,4 +1,4 @@
-import { screen_options, newField, screenMachineBase } from './screen_machine';
+import { newField, screen_machine_base, screen_options } from './screen_machine';
 import { subjectAliases, contentAliases } from '../config';
 import { Machine } from 'xstate';
 import { createSearchConfig, searchOptions } from './search_machine';
@@ -49,7 +49,7 @@ const createExpected = id => ({
         selected: false,
       },
     ],
-    machine: Machine(createSearchConfig(screenMachineBase), searchOptions),
+    searchMachine: Machine(createSearchConfig(screen_machine_base), searchOptions),
     name: `Tab${id}`,
   },
 });
@@ -95,7 +95,7 @@ const createExpectedBigger = id => ({
         selected: false,
       },
     ],
-    machine: Machine(createSearchConfig(screenMachineBase), searchOptions),
+    searchMachine: Machine(createSearchConfig(screen_machine_base), searchOptions),
     name: `Tab${id}`,
   },
 });

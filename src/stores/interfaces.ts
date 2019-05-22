@@ -48,11 +48,17 @@ export interface QueryObject {
   size: number;
 }
 
+interface Results {
+  data: any[];
+  queryObj: any[];
+}
+
 // An individual tab
 export interface Tab {
   uiQuery: UIQuery[];
-  machine: any;
+  searchMachine: any;
   name: string;
+  results: Results;
 }
 
 // The whole shebang

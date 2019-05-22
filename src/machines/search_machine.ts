@@ -1,3 +1,8 @@
+import { get } from 'svelte/store';
+import { query } from '../actions/queryApi';
+import * as _ from 'lamb';
+import { send } from 'xstate';
+
 export const createSearchConfig = childMachine => ({
   id: 'search',
   type: 'parallel',
@@ -31,31 +36,37 @@ export const createSearchConfig = childMachine => ({
           states: {
             Matching: {
               id: 'Matching',
-              entry: 'shareMatching',
+              onEntry: 'shareMatching',
             },
             Dirty: {
               id: 'Dirty',
               initial: 'Idle',
+              onEntry: 'shareDirty',
               on: {
                 SEARCHED: {
-                  target: '#Pending',
+                  target: 'Dirty.Pending',
                 },
               },
               states: {
                 Idle: {},
                 Pending: {
+                  onEntry: 'sharePending',
                   invoke: {
                     id: 'Pending',
                     src: 'apiRequest',
-                  },
-                  entry: 'sharePending',
-                  onDone: {
-                    target: '#Matching',
-                    actions: 'shareSuccess',
+
+                    onDone: {
+                      target: '#Matching',
+                      actions: ['updateData', 'shareSuccess'],
+                    },
+                    onError: {
+                      target: '#Error',
+                    },
                   },
                 },
-                Fail: {
-                  entry: 'shareFail',
+                Error: {
+                  id: 'Error',
+                  onEntry: 'shareError',
                 },
               },
             },
@@ -74,12 +85,29 @@ export const createSearchConfig = childMachine => ({
 
 export const searchOptions = {
   actions: {
-    sharePending: () => {},
-    shareSuccess: () => {},
-    shareFail: () => {},
-    MatchingSync: () => {},
+    sharePending: send('PENDING', { to: 'Link' }),
+    shareSuccess: send('SUCCESS', { to: 'Link' }),
+    shareError: send('ERROR', { to: 'Link' }),
+    shareMatching: send('MATCHING', { to: 'Link' }),
+    shareDirty: send('DIRTY', { to: 'Link' }),
+    updateData: ({ screenStore, queryObj, currentTab }, evt) => {
+      const tab = get(currentTab);
+      const currentQuery = get(queryObj)[tab];
+      screenStore.update(tabs => ({
+        ...tabs,
+        [tab]: {
+          ...tabs[tab],
+          results: { data: evt.data.data.All, queryObj: currentQuery },
+        },
+      }));
+    },
   },
   services: {
-    apiRequest: () => Promise.resolve,
+    apiRequest: ({ queryObj, currentTab }) => {
+      const tab = get(currentTab);
+      const currentQuery = get(queryObj)[tab];
+
+      return query(currentQuery);
+    },
   },
 };

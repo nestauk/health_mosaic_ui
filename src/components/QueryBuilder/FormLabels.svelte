@@ -1,31 +1,34 @@
 <script>
+  import * as _ from 'lamb';
   import { createEventDispatcher } from 'svelte';
-  export let labels, changed;
 
   const dispatch = createEventDispatcher();
+  const allDefault = _.every(({status}) => status === 'default');
+
+  export let labels;
 </script>
 
-<div>
-  <fieldset>
-    {#each labels as {field, status}, i}
-    <label
-      class="{status}"
-      on:click="{() => dispatch('select', i)}"
-      for="subject-{field}"
-    >
-      {field}
-    </label>
-    <select class="sr-only" id="subject-{field}">
-      <!-- <select bind:value={subject[i].status} class="sr-only" id="subject-{field}"> -->
-
-      <option value="default">Default</option>
-      <option value="include">Include</option>
-      <option value="exclude">Exclude</option>
-    </select>
-    {/each}
-  </fieldset>
-  <span class="label {changed ? 'changed' : 'default'}">Subject</span>
-</div>
+{#each Object.entries(labels) as [type, label]}
+  <div>
+    <fieldset>
+      {#each label as { field, status }, i}
+      <label
+        class="{status}"
+        on:click="{() => dispatch('select', { section: type, index: i })}"
+        for="subject-{field}"
+      >
+        {field}
+      </label>
+      <select class="sr-only" id="subject-{field}">
+        <option value="default">Default</option>
+        <option value="include">Include</option>
+        <option value="exclude">Exclude</option>
+      </select>
+      {/each}
+    </fieldset>
+    <span class="label {allDefault(label) ? 'default' : 'changed'}">{type}</span>
+  </div>
+{/each}
 
 <style>
   .label {

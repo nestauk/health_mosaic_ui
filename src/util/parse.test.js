@@ -1,4 +1,4 @@
-import { parseQuery, dslBuilder, createFields } from './parse';
+import { parseQuery, dslBuilder, createFields } from './parse.ts';
 
 describe.skip('parseQuery', () => {
   test('parse simple queries', () => {

@@ -70,7 +70,7 @@ class HealthScanner extends RESTDataSource {
 
   async getAll(queryObject) {
     const queryString = mappedQueryBuilder(queryMapper(queryObject));
-    console.log(queryString);
+
     return this.post(`/health_scanner/_search`, {
       query: {
         bool: {

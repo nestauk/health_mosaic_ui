@@ -10,7 +10,9 @@ export const parseQuery = inputObject => {
     value: value
       .split(',')
       .reduce((acc, next) => {
-        const isQuery = next.trim().match(regexQuery);
+        const isQuery = next.length
+          ? next.trim().match(regexQuery)
+          : next.match(regexQuery);
         return acc.concat([
           { status: isQuery[1] === '-' ? 'not' : 'and', value: isQuery[2] },
         ]);

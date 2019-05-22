@@ -1,4 +1,4 @@
-import { Machine } from 'xstate';
+import { Machine, interpret } from 'xstate';
 import { createSearchConfig, searchOptions } from './search_machine';
 import { contentAliases, subjectAliases } from '../config';
 import { Tab, UIField, UITerm } from '../stores/interfaces';
@@ -10,6 +10,7 @@ import * as _ from 'lamb';
 const screen_config = {
   id: 'screen',
   type: 'parallel',
+  onEntry: ['createTab', 'setCurrentTab', 'pushHistory'],
   states: {
     Form: {
       id: 'Form',
@@ -30,12 +31,18 @@ const screen_config = {
         LABEL_CLICKED: {
           actions: ['toggleLabelTernary'],
         },
+        TERM_CLICKED: {
+          actions: ['toggleTermStatus'],
+        },
       },
       states: {
         Idle: {
           on: {
             TEXT_CHANGED: {
               actions: ['updateCurrentRuleText'],
+            },
+            RULESET_CREATED: {
+              actions: ['createRuleset', 'selectRule'],
             },
             RULE_SELECTED: {
               actions: ['selectRule'],
@@ -49,7 +56,7 @@ const screen_config = {
           },
         },
         LabelOptionsShowing: {
-          entry: ['showLabelOptions'],
+          onEntry: ['showLabelOptions'],
           on: {
             LABEL_DISABLED: {
               actions: ['disableLabel'],
@@ -66,27 +73,27 @@ const screen_config = {
             },
           },
 
-          exit: ['hideLabelOptions'],
+          onExit: ['hideLabelOptions'],
         },
         RuleOptionsShowing: {
-          entry: ['showRuleOptions'],
+          onEntry: ['showRuleOptions'],
           on: {
             RULE_DISABLED: {
               actions: ['disableRule'],
             },
             RULE_COPIED: {
-              actions: ['copyRule'],
+              actions: ['copyRule', 'selectRule'],
             },
             RULE_DELETED: {
               actions: ['deleteRule'],
               target: 'Idle',
             },
-            RULE_OPTIONS_HIDDEN: {
+            RULE_OPTIONS_DISMISSED: {
               target: 'Idle',
             },
           },
 
-          exit: ['hideRuleOptions'],
+          onExit: ['hideRuleOptions'],
         },
       },
     },
@@ -97,10 +104,10 @@ const screen_config = {
         Idle: {
           on: {
             TAB_DELETED: {
-              actions: ['setCurrentTab', 'deleteTab', 'popHistory'],
+              actions: ['deleteTab', 'popHistory'],
             },
             TAB_CREATED: {
-              actions: ['createTab', 'setCurrentTab'],
+              actions: ['createTab', 'setCurrentTab', 'pushHistory'],
             },
             TAB_SELECTED: {
               actions: ['setCurrentTab', 'pushHistory'],
@@ -118,11 +125,21 @@ const screen_config = {
       on: {
         PENDING: {
           target: '#Disabled',
+          actions: () => console.log('PENDING'),
         },
         SUCCESS: {
           target: '#Interactive',
+          actions: () => console.log('SUCCESS'),
         },
-        FAIL: {},
+        ERROR: {
+          actions: () => console.log('ERROR'),
+        },
+        MATCHING: {
+          actions: () => console.log('MATCHING'),
+        },
+        DIRTY: {
+          actions: () => console.log('DIRTY'),
+        },
       },
       states: {
         Interactive: {
@@ -136,7 +153,7 @@ const screen_config = {
   },
 };
 
-export const screenMachineBase = Machine(screen_config);
+export const screen_machine_base = Machine(screen_config);
 
 const newTerm = (term: string = '', status: 'and' | 'not' = 'and'): UITerm => ({
   term,
@@ -151,21 +168,25 @@ export const newField = (fields: string[]): UIField[] =>
     disabled: false,
   }));
 
+const newRuleset = () => ({
+  terms: [newTerm()],
+  fields: {
+    subject: newField(subjectAliases),
+    content: newField(contentAliases),
+  },
+  options: false,
+  disabled: false,
+  selected: true,
+});
+
 const newTab = (machine, id): Tab => ({
-  uiQuery: [
-    {
-      terms: [newTerm()],
-      fields: {
-        subject: newField(subjectAliases),
-        content: newField(contentAliases),
-      },
-      options: false,
-      disabled: false,
-      selected: false,
-    },
-  ],
-  machine,
+  uiQuery: [newRuleset()],
+  searchMachine: machine,
   name: 'Tab' + id,
+  results: {
+    data: [],
+    queryObj: [],
+  },
 });
 
 const toggleLabelBinaryUpdater = labelStatus =>
@@ -194,13 +215,16 @@ const labelOptionsDisabler = fields => ({
 
 const deselectRule = _.setPath('selected', false);
 
-const regexQuery = /^(-*)([^]*)$/;
+const regexQuery = /^([ -]*)([^]*)$/;
 
-const termBuilder = (acc, next) => {
-  const isQuery = next.trim().match(regexQuery);
+const termBuilder = (acc, next, i, arr) => {
+  const isQuery =
+    i === arr.length - 1
+      ? next.replace(/\s{1}/g, ' ').match(regexQuery)
+      : next.trim().match(regexQuery);
   return acc.concat([
     {
-      status: isQuery[1] === '-' ? 'not' : 'and',
+      status: isQuery[1].trim() === '-' ? 'not' : 'and',
       term: isQuery[2],
     },
   ]);
@@ -209,7 +233,7 @@ const termBuilder = (acc, next) => {
 const parseQuery = _.pipe([
   s => s.split(','),
   _.reduceWith(termBuilder, []),
-  _.filterWith(a => a.term.length),
+  _.filterWith((a, i, arr) => (i === arr.length - 1 ? true : a.term.length)),
 ]);
 
 const ruleOptionsDeselect = _.setPath('options', false);
@@ -220,24 +244,38 @@ const hideTabLabelOptions = tabId =>
 const hideTabRuleOptions = tabId =>
   _.updatePath(`${tabId}.uiQuery`, _.mapWith(ruleOptionsDeselect));
 
+const toggleTerm = status => (status === 'and' ? 'not' : 'and');
+
 export const screen_options = {
   actions: {
-    createTab: ({ screenStore, idStore }) => {
-      screenStore.update(
-        _.setKey(
-          `tab${get(idStore)}`,
-          newTab(
-            Machine(createSearchConfig(screenMachineBase), searchOptions),
-            get(idStore)
-          )
-        )
+    createTab: ({ screenStore, idStore, queryObj, currentTab }) => {
+      // xstate 4.6 -- spawn?
+      const id = get(idStore);
+      const screenMachine = interpret(
+        Machine(
+          createSearchConfig(screen_machine_base),
+          searchOptions
+        ).withContext({ screenStore, queryObj, currentTab })
       );
+
+      //screenMachine.onTransition(e => console.log(e));
+
+      screenMachine.start();
+
+      screenStore.update(_.setKey(id, newTab(screenMachine, id)));
       idStore.update(add1);
     },
-    deleteTab: ({ screenStore }, id) => {
+    deleteTab: ({ screenStore, historyStore, currentTab }, { id }) => {
+      // xstate 4.6 -- spawn?
+      get(screenStore)[id].searchMachine.stop();
       screenStore.update(_.skipKeys([id]));
+
+      const history = get(historyStore);
+      const prev = history[history.length - 2];
+
+      currentTab.set(prev);
     },
-    setCurrentTab: ({ currentTab }, id) => {
+    setCurrentTab: ({ currentTab }, { id = 0 }) => {
       currentTab.set(id);
     },
     setTabLabel: ({ screenStore }, { labelText, id }) => {
@@ -246,7 +284,7 @@ export const screen_options = {
     popHistory: ({ historyStore }) => {
       historyStore.update(removeLast);
     },
-    pushHistory: ({ historyStore }, id) => {
+    pushHistory: ({ historyStore }, { id = 0 }) => {
       historyStore.update(_.append(id));
     },
     toggleLabelBinary: (
@@ -271,9 +309,9 @@ export const screen_options = {
       { screenStore },
       { tabId, ruleIndex, section, labelIndex }
     ) => {
-      const disableLabelStatus = _.setPath(
-        `${tabId}.uiQuery.${ruleIndex}.fields.${section}.${labelIndex}.status`,
-        'default'
+      const disableLabelStatus = _.updatePath(
+        `${tabId}.uiQuery.${ruleIndex}.fields.${section}.${labelIndex}.disabled`,
+        toggle
       );
 
       screenStore.update(disableLabelStatus);
@@ -304,14 +342,14 @@ export const screen_options = {
 
       screenStore.update(updateLabelStatus);
     },
-    selectRule: ({ screenStore }, { tabId, ruleIndex }) => {
+    selectRule: ({ screenStore }, { tabId, targetIndex }) => {
       const hideOptions = _.updatePath(
         `${tabId}.uiQuery`,
         _.mapWith(deselectRule)
       );
 
       const selectRule = _.setPath(
-        `${tabId}.uiQuery.${ruleIndex}.selected`,
+        `${tabId}.uiQuery.${targetIndex}.selected`,
         true
       );
 
@@ -344,20 +382,67 @@ export const screen_options = {
       screenStore.update(toggleRule);
     },
     copyRule: ({ screenStore }, { tabId, ruleIndex }) => {
-      const updater = rules => _.append(_.getIndex(rules, ruleIndex));
+      const updater = rules => _.appendTo(rules, _.getIndex(rules, ruleIndex));
       const copyRule = _.updatePath(`${tabId}.uiQuery`, updater);
 
       screenStore.update(copyRule);
     },
     deleteRule: ({ screenStore }, { tabId, ruleIndex }) => {
-      const deleteRule = _.updatePath(
-        `${tabId}.uiQuery`,
-        _.filterWith((_, i) => i !== ruleIndex)
-      );
+      const uiQuery = get(screenStore)[tabId].uiQuery;
+      const currentSelection = uiQuery.findIndex(({ selected }) => selected);
 
-      screenStore.update(deleteRule);
+      if (uiQuery.length > 1) {
+        const deleteRule = _.updatePath(
+          `${tabId}.uiQuery`,
+          _.filterWith((_, i) => i !== ruleIndex)
+        );
+
+        const newIndex =
+          currentSelection === ruleIndex
+            ? 0
+            : currentSelection > ruleIndex
+            ? currentSelection - 1
+            : currentSelection;
+
+        const hideOptions = _.updatePath(
+          `${tabId}.uiQuery`,
+          _.mapWith(deselectRule)
+        );
+
+        const updateSelected = _.setPath(
+          `${tabId}.uiQuery.${newIndex}.selected`,
+          true
+        );
+
+        screenStore.update(_.pipe([deleteRule, hideOptions, updateSelected]));
+      } else {
+        const blankRule = _.setPath(`${tabId}.uiQuery.0`, {
+          terms: [newTerm()],
+          fields: {
+            subject: newField(subjectAliases),
+            content: newField(contentAliases),
+          },
+          options: false,
+          disabled: false,
+          selected: true,
+        });
+        screenStore.update(blankRule);
+      }
+    },
+    toggleTermStatus: ({ screenStore }, { tabId, ruleIndex, termIndex }) => {
+      const toggleTermStatus = _.updatePath(
+        `${tabId}.uiQuery.${ruleIndex}.terms.${termIndex}.status`,
+        toggleTerm
+      );
+      screenStore.update(toggleTermStatus);
+    },
+    createRuleset: ({ screenStore }, { tabId }) => {
+      const updater = rules => _.appendTo(rules, newRuleset());
+      const newRule = _.updatePath(`${tabId}.uiQuery`, updater);
+
+      screenStore.update(newRule);
     },
   },
 };
 // @ts-ignore
-export const screen_machine = screenMachineBase.withConfig(screen_options);
+export const screen_machine = screen_machine_base.withConfig(screen_options);
