@@ -1,8 +1,8 @@
-import { Machine } from 'xstate';
+import { Machine, interpret } from 'xstate';
 import { createSearchConfig, searchOptions } from './search_machine';
 import { contentAliases, subjectAliases } from '../config';
 import { Tab, UIField, UITerm } from '../stores/interfaces';
-import { get } from 'svelte/store';
+import { get, writable } from 'svelte/store';
 import { toggle, add1, removeLast } from '../util/transform';
 
 import * as _ from 'lamb';
@@ -10,6 +10,7 @@ import * as _ from 'lamb';
 const screen_config = {
   id: 'screen',
   type: 'parallel',
+  entry: ['createTab', 'setCurrentTab'],
   states: {
     Form: {
       id: 'Form',
@@ -100,7 +101,7 @@ const screen_config = {
               actions: ['setCurrentTab', 'deleteTab', 'popHistory'],
             },
             TAB_CREATED: {
-              actions: ['createTab', 'setCurrentTab'],
+              actions: ['setCurrentTab', 'createTab'],
             },
             TAB_SELECTED: {
               actions: ['setCurrentTab', 'pushHistory'],
@@ -161,7 +162,7 @@ const newTab = (machine, id): Tab => ({
       },
       options: false,
       disabled: false,
-      selected: false,
+      selected: true,
     },
   ],
   machine,
@@ -223,21 +224,27 @@ const hideTabRuleOptions = tabId =>
 export const screen_options = {
   actions: {
     createTab: ({ screenStore, idStore }) => {
-      screenStore.update(
-        _.setKey(
-          `tab${get(idStore)}`,
-          newTab(
-            Machine(createSearchConfig(screenMachineBase), searchOptions),
-            get(idStore)
-          )
-        )
+      // xstate 4.6 -- spawn?
+      const id = get(idStore);
+      const machine = interpret(
+        Machine(createSearchConfig(screenMachineBase), searchOptions)
       );
+
+      machine.onTransition(newState =>
+        screenStore.update(_.setPath(`tab${id}.machine`, newState))
+      );
+
+      machine.start();
+
+      screenStore.update(_.setKey(`tab${id}`, newTab(machine, get(idStore))));
       idStore.update(add1);
     },
-    deleteTab: ({ screenStore }, id) => {
+    deleteTab: ({ screenStore }, { id }) => {
+      // xstate 4.6 -- spawn?
+      screenStore[id].machine.stop();
       screenStore.update(_.skipKeys([id]));
     },
-    setCurrentTab: ({ currentTab }, id) => {
+    setCurrentTab: ({ currentTab }, { id = 'tab0' }) => {
       currentTab.set(id);
     },
     setTabLabel: ({ screenStore }, { labelText, id }) => {
@@ -246,7 +253,7 @@ export const screen_options = {
     popHistory: ({ historyStore }) => {
       historyStore.update(removeLast);
     },
-    pushHistory: ({ historyStore }, id) => {
+    pushHistory: ({ historyStore }, { id }) => {
       historyStore.update(_.append(id));
     },
     toggleLabelBinary: (
@@ -361,3 +368,23 @@ export const screen_options = {
 };
 // @ts-ignore
 export const screen_machine = screenMachineBase.withConfig(screen_options);
+
+import {
+  screenStore,
+  idStore,
+  historyStore,
+  currentTab,
+} from '../stores/search';
+
+// console.log(screen_machine);
+
+export const service = interpret(
+  screen_machine.withContext({ screenStore, idStore, historyStore, currentTab })
+);
+const { set, subscribe } = writable();
+export const machine = { subscribe, send: service.send };
+service.onTransition(state => {
+  set(state);
+  //console.log(state);
+});
+service.start();

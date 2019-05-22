@@ -1,44 +1,38 @@
 <script>
-  import Nav from './Nav.html';
-  import QueryBuilder from '../components/QueryBuilder';
-  import { searchMachine, searchStore } from '../machines/search';
+  import { Form, FormInput, FormLabels } from './QueryBuilder/Form';
+  import { Rules, Ruleset, RulesetLabels } from './QueryBuilder/Rules';
+  import { screenStore, idStore, historyStore, currentTab } from '../stores/search';
+  import { machine } from '../machines/screen_machine.ts';
+  import * as _ from 'lamb';
 
-  import { subjectFields, contentFields } from '../config';
-  import {  createQueryObject } from '../util/parse.ts';
+  $: console.log($screenStore);
+  $: current = $screenStore[$currentTab].uiQuery
+  $: currentQuery = current.find(( { selected } ) => selected)
+  $: currentQueryIndex = current.findIndex(( { selected } ) => selected)
+
+
+  import Nav from './Nav.html';
+  //import QueryBuilder from '../components/QueryBuilder';
+
+
+  import { subjectAliases, contentAliases } from '../config';
+
 
   import { createEventDispatcher } from 'svelte';
-  import { writable } from 'svelte/store';
-
   const dispatch = createEventDispatcher();
-  const savedQueries = writable([{queries:[], values:[], tab:0}]);
+
+  const typeMap = type => label => ({ type, label });
+
+  // let formLabels = _.union(
+  //   _.mapWith(subjectFields, typeMap('subject')),
+  //   _.mapWith(contentFields, typeMap('content'))
+  // );
   let currentData,
     search,
-    value = '', activeTab = 0;
+    value = '',
+    activeTab = 0;
 
-  function handleChange({queries, values, tab}) {
-    value = queries.filter(value => !!value);
-    savedQueries.update(queries => {
-      const newState = [].concat(queries);
-      const index = newState.findIndex(tabs => tabs.tab === tab)
-      newState[index] = { values, queries, tab};
-      return newState;
-    })
-    checkDirty();
-  }
 
-  function handleSend(rules) {
-    console.log(createQueryObject(rules));
-    searchMachine.send({
-      type: 'SEARCH',
-      query: createQueryObject(rules),
-      value,
-      searchId: activeTab
-    });
-  }
-
-  function checkDirty() {
-   searchMachine.send('CHANGED');
-  }
 
   const states = {
     current: 'open',
@@ -59,64 +53,66 @@
     }
   }
 
-  function newTab() {
-    savedQueries.update(state => {
-      activeTab = state[state.length-1].tab + 1;
-      return state.concat({queries:[], values:[], tab: state[state.length - 1].tab + 1})
-    })
-
-    dispatch('tab', activeTab)
-  }
-
-  function changeTab(e) {
-    activeTab = e.detail
-    dispatch('tab', activeTab)
-  }
-
-  function deleteTab(e) {
-    savedQueries.update(state => {
-      if (state.length === 1) return state;
-
-      const index = $searchStore.value.findIndex(v => v.tab === e.detail)
-      const newState = [].concat(state);
-      newState.splice(index, 1);
-
-      activeTab = activeTab > newState[newState.length-1].tab ? newState[newState.length-1].tab :
-        (activeTab < newState[0].tab ? newState[0].tab : activeTab);
-
-      return newState;
-    });
-
-    dispatch('deletetab', {tab: activeTab, removed: e.detail})
-  }
-
+  const newTab = () =>  machine.send({type: 'TAB_CREATED', id: $idStore });
+  const changeTab = ({ detail: { id }}) =>  machine.send({type: 'TAB_SELECTED', id });
+  const deleteTab = ({ detail: { id }}) => machine.send({type: 'TAB_DELETED', id });
+$: console.log(current)
+  const handleChange = ({ detail }) =>
+    machine.send({type: 'TEXT_CHANGED', tabId: $currentTab, ruleIndex: currentQueryIndex, text: detail})
+  const handleSend = (rules) => console.log('SEARCH PRESSED');
+  const newRuleset = () => {};
 </script>
-<Nav tabs={$savedQueries}
-     {activeTab}
-     on:newtab="{newTab}"
-     on:changetab="{changeTab}"
-     on:deletetab="{deleteTab}"/>
+
+<Nav
+  tabs={$screenStore}
+  activeTab="{$currentTab}"
+  on:newtab="{newTab}"
+  on:changetab="{changeTab}"
+  on:deletetab="{deleteTab}"
+/>
 
 <div class="search" bind:this="{search}">
-  {#each $savedQueries as {values, queries, tab}}
-    {#if tab === activeTab}
-      <QueryBuilder
-        savedQueries={values}
-        key={tab}
-        {subjectFields}
-        {contentFields}
-        status="{$searchMachine.dirty ? 'dirty' : 'clean'}"
-        on:change="{({detail}) => handleChange({...detail, tab}) }"
-        send="{ handleSend }" />
+  <Form
+    on:submit="{handleSend}"
+  >
+    <FormInput
+      on:change="{handleChange}"
+      on:enter="{newRuleset}"
+    />
+    <FormLabels
+      on:select="{() => {}}"
+      labels="{{ Subject: currentQuery.fields.subject, Content: currentQuery.fields.content }}"
+    />
+  </Form>
+
+  <!-- <Rules>
+    <Ruleset
+      on:hover
+      optionsShow="{true}"
+      on:select
+      on:copy
+      on:delete
+      on:disable
+    >
+      <RulesetLabels
+        labels="{[]}"
+        on:hover
+
+        on:disable
+        on:delete
+        on:exclude
+      />
+    </Ruleset>
+  </Rules> -->
 
 
-    {#if queries[0] && queries[0].length}
+    <!-- {#if queries[0] && queries[0].length}
       <div class="close-label" on:click="{animateSearch}" style="{states.current === 'open' ? 'transform: rotate(180deg)' : ''}">
           <img alt="close search" src="arrow.svg"/>
       </div>
-    {/if}
-    {/if}
-  {/each}
+    {/if} -->
+    <!-- {/if}
+  {/each} -->
 </div>
 
 

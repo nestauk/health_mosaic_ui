@@ -8,31 +8,33 @@
 
   export let tabs = 1,
     send,
-    status, savedQueries, key;
+    status,
+    savedQueries,
+    key,
+    subjectFields,
+    contentFields, rules;
 
 
-  let input;
+  let input, inputValue;
 
-  const { search, rules } = createStore(savedQueries.value && savedQueries.value.length ? savedQueries : undefined);
+  //const { search, rules } = createStore(savedQueries.value && savedQueries.value.length ? savedQueries : undefined);
 
   const dispatch = createEventDispatcher();
 
-  $: dispatch('change', {
-    values: $search,
-    queries: $search.value.map(value => value.value)
-  });
-  $: subjectDefault = $search.value[$search.current].subject.every(value => value.status === 'default');
-  $: contentDefault = $search.value[$search.current].content.every(value => value.status === 'default');
+  $: dispatch('change', { text: inputValue, ruleIndex: selectedRule });
+  $: selectedRule = rules.findIndex(rule => rule.selected)
+  $: subjectDefault = rules[selectedRule].every(value => value.status === 'default');
+  $: contentDefault = rules[selectedRule].every(value => value.status === 'default');
 
   function sendSearch() {
-    send($rules.filter(v => v.value.length > 0));
+    //send($rules.filter(v => v.value.length > 0));
   }
 
   function handleEnter(event, isWindow = false) {
-    if (event.key !== 'Enter') return;
-    if (event.metaKey) return sendSearch();
-    if (isWindow) return;
-    handleNewQuery();
+    // if (event.key !== 'Enter') return;
+    // if (event.metaKey) return sendSearch();
+    // if (isWindow) return;
+    // handleNewQuery();
   }
 
   function handleNewQuery() {
@@ -89,8 +91,9 @@
       <input
         autocomplete="off"
         id="search-builder"
+        bind:value="{inputValue}"
         bind:this="{input}"
-        value="{$search.value[$search.current].value}"
+  
         on:keydown="{handleEnter}"
         on:input="{(e) => search.updateValue(e.target.value)}"
         placeholder="example: cancer, -breast"

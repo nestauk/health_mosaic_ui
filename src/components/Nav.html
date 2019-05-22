@@ -9,6 +9,8 @@
 
   export let tabs, activeTab;
 
+  $: tabs = Object.entries(tabs);
+
   const dispatch = createEventDispatcher();
 
   function createTab() {
@@ -26,18 +28,18 @@
 
 <nav>
   <ul>
-    {#each tabs as {tab}}
+    {#each tabs as [id, tab]}
     <li>
       <!-- TODO: Change these to buttons. -->
-      <a on:click|preventDefault="{() => changeTab(tab)}"  class='{tab === activeTab ? "selected" : ""}' href="/bing">Tab {tab + 1}</a>
+      <a on:click|preventDefault="{() => changeTab(id)}"  class='{id === activeTab ? "selected" : ""}' href="/bing">{tab.name}</a>
       {#if tabs.length > 1}
-        <span on:click="{() => deleteTab(tab)}" class="remove"><img alt="delete tab" src="{closeIcon}"></span>
+        <span on:click="{() => deleteTab(id)}" class="remove"><img alt="delete tab" src="{closeIcon}"></span>
       {/if}
 
     </li>
     {/each}
     <li class="close-container">
-        <span on:click="{createTab}" class="newtab remove"><img alt="creat tab" src="{addIcon}"></span>
+        <span on:click="{createTab}" class="newtab remove"><img alt="create tab" src="{addIcon}"></span>
     </li>
   </ul>
   {#if $searchMachine.matches('dirty.pending') }
