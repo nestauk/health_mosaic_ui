@@ -31,6 +31,9 @@ const screen_config = {
         LABEL_CLICKED: {
           actions: ['toggleLabelTernary'],
         },
+        QUERY_CLICKED: {
+          actions: ['toggleTermStatus'],
+        },
       },
       states: {
         Idle: {
@@ -82,7 +85,7 @@ const screen_config = {
               actions: ['deleteRule'],
               target: 'Idle',
             },
-            RULE_OPTIONS_HIDDEN: {
+            RULE_OPTIONS_DISMISSED: {
               target: 'Idle',
             },
           },
@@ -221,6 +224,8 @@ const hideTabLabelOptions = tabId =>
 const hideTabRuleOptions = tabId =>
   _.updatePath(`${tabId}.uiQuery`, _.mapWith(ruleOptionsDeselect));
 
+const toggleTerm = status => (status === 'and' ? 'not' : 'and');
+
 export const screen_options = {
   actions: {
     createTab: ({ screenStore, idStore }) => {
@@ -278,9 +283,9 @@ export const screen_options = {
       { screenStore },
       { tabId, ruleIndex, section, labelIndex }
     ) => {
-      const disableLabelStatus = _.setPath(
-        `${tabId}.uiQuery.${ruleIndex}.fields.${section}.${labelIndex}.status`,
-        'default'
+      const disableLabelStatus = _.updatePath(
+        `${tabId}.uiQuery.${ruleIndex}.fields.${section}.${labelIndex}.disabled`,
+        toggle
       );
 
       screenStore.update(disableLabelStatus);
@@ -351,18 +356,39 @@ export const screen_options = {
       screenStore.update(toggleRule);
     },
     copyRule: ({ screenStore }, { tabId, ruleIndex }) => {
-      const updater = rules => _.append(_.getIndex(rules, ruleIndex));
+      const updater = rules => _.appendTo(rules, _.getIndex(rules, ruleIndex));
       const copyRule = _.updatePath(`${tabId}.uiQuery`, updater);
 
       screenStore.update(copyRule);
     },
     deleteRule: ({ screenStore }, { tabId, ruleIndex }) => {
-      const deleteRule = _.updatePath(
-        `${tabId}.uiQuery`,
-        _.filterWith((_, i) => i !== ruleIndex)
-      );
+      if (get(screenStore)[tabId].uiQuery.length > 1) {
+        const deleteRule = _.updatePath(
+          `${tabId}.uiQuery`,
+          _.filterWith((_, i) => i !== ruleIndex)
+        );
 
-      screenStore.update(deleteRule);
+        screenStore.update(deleteRule);
+      } else {
+        const blankRule = _.setPath(`${tabId}.uiQuery.0`, {
+          terms: [newTerm()],
+          fields: {
+            subject: newField(subjectAliases),
+            content: newField(contentAliases),
+          },
+          options: false,
+          disabled: false,
+          selected: true,
+        });
+        screenStore.update(blankRule);
+      }
+    },
+    toggleTermStatus: ({ screenStore }, { tabId, ruleIndex, termIndex }) => {
+      const toggleTermStatus = _.updatePath(
+        `${tabId}.uiQuery.${ruleIndex}.terms.${termIndex}.status`,
+        toggleTerm
+      );
+      screenStore.update(toggleTermStatus);
     },
   },
 };
@@ -385,6 +411,6 @@ const { set, subscribe } = writable();
 export const machine = { subscribe, send: service.send };
 service.onTransition(state => {
   set(state);
-  //console.log(state);
+  // console.log(state);
 });
 service.start();

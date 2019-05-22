@@ -5,9 +5,6 @@
 
   function handleEnter(event, isWindow = false) {
     if (event.key !== 'Enter') return;
-    // if (event.metaKey) return sendSearch();
-    // if (isWindow) return;
-    // handleNewQuery();
     dispatch('enter');
   }
 

@@ -1,12 +1,16 @@
 <script>
-  export let open = false,
-    selected;
+  import { createEventDispatcher } from 'svelte';
+
+  export let selected, options;
+
+  const dispatch = createEventDispatcher();
+
 </script>
 
 <div
   class="container"
   class:selected="{selected}"
-  on:mouseleave|stopPropagation="{() => open = false}"
+  on:mouseleave|stopPropagation="{() => dispatch('close')}"
 >
   <div class="master">
     <span class="selector">
@@ -21,7 +25,7 @@
         />
       </svg>
     </span>
-    <span class="dots" on:mouseenter|stopPropagation="{() => open = true}">
+    <span class="dots" on:mouseenter|stopPropagation="{() => dispatch('open')}">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
         <path
           fill="#555"
@@ -30,8 +34,8 @@
       </svg>
     </span>
   </div>
-  {#if open}
-  <div class="context" on:mouseleave|stopPropagation="{() => open = false}">
+  {#if options}
+  <div class="context" on:mouseleave|stopPropagation="{() => dispatch('close')}">
     <slot></slot>
   </div>
   {/if}

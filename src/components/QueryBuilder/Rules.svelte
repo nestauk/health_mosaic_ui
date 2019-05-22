@@ -1,47 +1,20 @@
 <script>
-  export let value, isActive, ruleSelect;
 </script>
 
-<li class:active-query="{isActive}" class="rule" on:click="{ruleSelect}">
+<ul class="rules-container">
   <slot></slot>
-</li>
+</ul>
+
 
 <style>
-  .rule {
-    /* border-bottom: 1px solid #ccc; */
-    /* padding: 10px; */
-    font-size: 18px;
-    position: relative;
+  .rules-container {
     display: flex;
-    height: 3.4rem;
-    border: 1px solid #ccc;
-    margin: 10px;
-    border-radius: 1.7rem;
-    padding-left: 3.4rem;
-    transition: 0.2s;
+    flex-wrap: wrap;
+    transition: 0.2s 0.2s;
+    transform-origin: 0 100%;
   }
 
-  .rule::before {
-    position: absolute;
-    content: '';
-    height: 3.4rem;
-    width: 2.5rem;
-    top: -1px;
-    left: -1px;
-    background: #ccc;
-    border-top-left-radius: 1.7rem;
-    border-bottom-left-radius: 1.7rem;
-    transition: 0.2s;
-
-    /* border: 1px solid #333; */
-    /* border-radius: 1.7rem; */
-  }
-
-  .rule.active-query {
-    border-color: #333;
-  }
-  .rule.active-query::before {
-    background: #333;
-    border-color: #333;
+  ul {
+    list-style: none;
   }
 </style>

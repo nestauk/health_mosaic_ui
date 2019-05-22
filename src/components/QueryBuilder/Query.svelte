@@ -1,0 +1,45 @@
+<script>
+  import QueryControls from './QueryControls.html';
+
+  export let value, index, negate;
+</script>
+
+<ul class="query-container">
+  {#each value as query, j}
+    {#if query.value}
+      <li class="query {query.status}" on:click="{() => negate(j)}">
+        {query.value}
+      </li>
+    {/if}
+  {/each}
+</ul>
+
+<style>
+  .query-container {
+    display: flex;
+    margin: 10px 15px 0 0;
+    padding: 5px;
+    border: none;
+    border: 1px solid #ccc;
+    border-radius: 1rem;
+    font-size: 18px;
+    height: 2rem;
+    color: #333;
+  }
+
+  .query {
+    margin: 0 5px;
+    color: #333;
+    display: flex;
+    color: limegreen;
+    line-height: 1;
+  }
+
+  .query.not {
+    color: red;
+  }
+
+  .query.and {
+    border-color: limegreen;
+  }
+</style>

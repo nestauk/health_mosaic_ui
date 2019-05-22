@@ -1,12 +1,11 @@
 <script>
   import * as _ from 'lamb';
   import { createEventDispatcher } from 'svelte';
-  export let labels, changed;
-  console.log(labels)
 
   const dispatch = createEventDispatcher();
   const allDefault = _.every(({status}) => status === 'default');
-  // $: changed =
+
+  export let labels;
 </script>
 
 {#each Object.entries(labels) as [type, label]}

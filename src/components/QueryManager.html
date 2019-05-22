@@ -1,15 +1,15 @@
 <script>
   import { Form, FormInput, FormLabels } from './QueryBuilder/Form';
-  import { Rules, Ruleset, RulesetLabels } from './QueryBuilder/Rules';
+  import { Rules, Ruleset,RulesetQueries, RulesetLabels } from './QueryBuilder/Rules';
   import { screenStore, idStore, historyStore, currentTab } from '../stores/search';
   import { machine } from '../machines/screen_machine.ts';
   import * as _ from 'lamb';
 
   $: console.log($screenStore);
-  $: current = $screenStore[$currentTab].uiQuery
-  $: currentQuery = current.find(( { selected } ) => selected)
-  $: currentQueryIndex = current.findIndex(( { selected } ) => selected)
-
+  $: current = $screenStore[$currentTab] && $screenStore[$currentTab].uiQuery;
+  $: currentQuery = current ? current.find(( { selected } ) => selected) : false;
+  $: currentQueryIndex = current ? current.findIndex(( { selected } ) => selected) : false;
+  $: currentLabels = currentQuery && { Subject: currentQuery.fields.subject, Content: currentQuery.fields.content };
 
   import Nav from './Nav.html';
   //import QueryBuilder from '../components/QueryBuilder';
@@ -27,18 +27,8 @@
   //   _.mapWith(subjectFields, typeMap('subject')),
   //   _.mapWith(contentFields, typeMap('content'))
   // );
-  let currentData,
-    search,
-    value = '',
-    activeTab = 0;
+  let search;
 
-
-
-  const states = {
-    current: 'open',
-    open: 'close',
-    close: 'open'
-  };
 
   // TODO: Calculate the required offset dynamically, static values are too inconsistent
   function animateSearch() {
@@ -54,13 +44,115 @@
   }
 
   const newTab = () =>  machine.send({type: 'TAB_CREATED', id: $idStore });
+
   const changeTab = ({ detail: { id }}) =>  machine.send({type: 'TAB_SELECTED', id });
+
   const deleteTab = ({ detail: { id }}) => machine.send({type: 'TAB_DELETED', id });
-$: console.log(current)
+
   const handleChange = ({ detail }) =>
     machine.send({type: 'TEXT_CHANGED', tabId: $currentTab, ruleIndex: currentQueryIndex, text: detail})
+
   const handleSend = (rules) => console.log('SEARCH PRESSED');
+
   const newRuleset = () => {};
+
+  const handleSelect = ({ detail: { type, i: labelIndex } }) => machine.send({
+    type: 'LABEL_CLICKED',
+    tabId: $currentTab,
+    ruleIndex: currentQueryIndex,
+    section: type.toLowerCase(),
+    labelIndex
+  });
+
+  const toggleTermStatus = ({ detail: termIndex }) =>
+    machine.send({
+      type: 'QUERY_CLICKED',
+      tabId: $currentTab,
+      ruleIndex: currentQueryIndex,
+      termIndex
+    })
+
+  const showRuleOptions = (ruleIndex) =>
+    machine.send({
+      type: 'RULE_OPTIONS_SELECTED',
+      tabId: $currentTab,
+      ruleIndex
+    })
+
+  const hideRuleOptions = (ruleIndex) =>
+    machine.send({
+      type: 'RULE_OPTIONS_DISMISSED',
+      tabId: $currentTab,
+      ruleIndex
+    })
+
+  const selectRuleset = () => {}
+
+  const copyRuleset = (ruleIndex) =>
+    machine.send({
+      type: 'RULE_COPIED',
+      tabId: $currentTab,
+      ruleIndex
+    })
+
+  const deleteRuleset = (ruleIndex) =>
+    machine.send({
+      type: 'RULE_DELETED',
+      tabId: $currentTab,
+      ruleIndex
+    })
+
+  const disableRuleset = (ruleIndex) =>
+    machine.send({
+      type: 'RULE_DISABLED',
+      tabId: $currentTab,
+      ruleIndex
+    })
+
+  const showLabelOptions = ({ detail: { section, index } }) =>
+    machine.send({
+      type: 'LABEL_OPTIONS_SELECTED',
+      tabId: $currentTab,
+      ruleIndex: currentQueryIndex,
+      section,
+      labelIndex: index
+    });
+
+  const hideLabelOptions = ({ detail: { section, index } }) =>
+    machine.send({
+      type: 'LABEL_OPTIONS_DISMISSED',
+      tabId: $currentTab,
+      ruleIndex: currentQueryIndex,
+      section,
+      labelIndex: index
+    });
+
+  const disableLabel = ({ detail: { section, index } }) =>
+    machine.send({
+      type: 'LABEL_DISABLED',
+      tabId: $currentTab,
+      ruleIndex: currentQueryIndex,
+      section,
+      labelIndex: index
+    })
+
+  const deleteLabel = ({ detail: { section, index } }) =>
+    machine.send({
+      type: 'LABEL_DELETED',
+      tabId: $currentTab,
+      ruleIndex: currentQueryIndex,
+      section,
+      labelIndex: index
+    })
+
+  const toggleLabel = ({ detail: { section, index } }) =>
+    machine.send({
+      type: 'LABEL_TOGGLED',
+      tabId: $currentTab,
+      ruleIndex: currentQueryIndex,
+      section,
+      labelIndex: index
+    })
 </script>
 
 <Nav
@@ -73,46 +165,51 @@ $: console.log(current)
 
 <div class="search" bind:this="{search}">
   <Form
-    on:submit="{handleSend}"
+    on:submit|preventDefault="{handleSend}"
   >
     <FormInput
       on:change="{handleChange}"
       on:enter="{newRuleset}"
     />
     <FormLabels
-      on:select="{() => {}}"
-      labels="{{ Subject: currentQuery.fields.subject, Content: currentQuery.fields.content }}"
+      on:select="{handleSelect}"
+      labels="{currentLabels}"
     />
   </Form>
 
-  <!-- <Rules>
-    <Ruleset
-      on:hover
-      optionsShow="{true}"
-      on:select
-      on:copy
-      on:delete
-      on:disable
-    >
-      <RulesetLabels
-        labels="{[]}"
-        on:hover
 
-        on:disable
-        on:delete
-        on:exclude
-      />
-    </Ruleset>
-  </Rules> -->
+  {#if current.length}
+  <Rules>
+    {#each current as { options, disabled, selected, terms, fields }, i}
+      <Ruleset
+        {terms}
+        {selected}
+        {disabled}
+        {options}
+        on:open="{() => showRuleOptions(i)}"
+        on:close="{() => hideRuleOptions(i)}"
+        on:select="{() => selectRuleset(i)}"
+        on:copy="{() => copyRuleset(i)}"
+        on:delete="{() => deleteRuleset(i)}"
+        on:disable="{() => disableRuleset(i)}"
+      >
+        <RulesetQueries
+          terms={currentQuery.terms}
+          on:toggle={toggleTermStatus}
+        />
+        <RulesetLabels
+          labels="{{ subject: fields.subject, content: fields.content }}"
+          on:hover={showLabelOptions}
+          on:unhover={hideLabelOptions}
+          on:disable={disableLabel}
+          on:delete={deleteLabel}
+          on:toggle={toggleLabel}
+        />
+      </Ruleset>
+    {/each}
+  </Rules>
+  {/if}
 
-
-    <!-- {#if queries[0] && queries[0].length}
-      <div class="close-label" on:click="{animateSearch}" style="{states.current === 'open' ? 'transform: rotate(180deg)' : ''}">
-          <img alt="close search" src="arrow.svg"/>
-      </div>
-    {/if} -->
-    <!-- {/if}
-  {/each} -->
 </div>
 
 

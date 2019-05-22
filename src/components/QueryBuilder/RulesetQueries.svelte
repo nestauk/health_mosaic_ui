@@ -1,17 +1,18 @@
 <script>
-  import QueryControls from './QueryControls.html';
+  import { createEventDispatcher } from 'svelte';
 
-  export let value, index, negate;
+  const dispatch = createEventDispatcher();
+  export let terms;
 </script>
 
 <ul class="query-container">
-  {#each value as query, j} {#if query.value}
-  <li class="query {query.status}" on:click="{() => negate(j)}">
-    {query.value}
-    <!-- <QueryControls status="{query.status}"/> -->
-  </li>
-  {/if} {/each}
+  {#each terms as {term, status}, j}
+      <li class="query {status}" on:click="{() => dispatch('toggle', j)}">
+        {term}
+      </li>
+  {/each}
 </ul>
+
 
 <style>
   .query-container {

@@ -2,7 +2,7 @@
   let tooltip;
 </script>
 
-<form on:submit>
+<form on:submit|preventDefault>
   <div class="button">
     <button
       on:mouseenter={() => (tooltip = true)}

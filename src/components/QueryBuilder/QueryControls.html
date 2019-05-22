@@ -1,13 +1,13 @@
 <script>
-  export let status, visible;
+  export let status, disabled;
   import { createEventDispatcher } from 'svelte';
   const dispatch = createEventDispatcher();
 </script>
 
 <div class="rule-controls">
-  <span on:click|stopPropagation="{() => dispatch('toggle')}">
+  <span on:click|stopPropagation="{() => dispatch('disable')}">
     <svg
-      class="{visible ? 'on' : 'off'}"
+      class="{disabled ? 'off' : 'on'}"
       width="100%"
       height="100%"
       viewBox="0 0 448 256"
@@ -32,7 +32,7 @@
     </svg>
   </span>
   {#if status === 'included'}
-  <span on:click|stopPropagation="{() => dispatch('change')}">
+  <span on:click|stopPropagation="{() => dispatch('toggle')}">
     <svg
       version="1.1"
       id="Layer_1"
@@ -59,7 +59,7 @@
     </svg>
   </span>
   {:else}
-  <span on:click|stopPropagation="{() => dispatch('change')}">
+  <span on:click|stopPropagation="{() => dispatch('toggle')}">
     <svg
       version="1.1"
       id="Layer_1"

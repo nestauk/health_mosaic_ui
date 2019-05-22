@@ -1,5 +1,5 @@
 <script>
-  export let visible;
+  export let disabled;
   import { createEventDispatcher } from 'svelte';
   const dispatch = createEventDispatcher();
 </script>
@@ -65,9 +65,9 @@
       </g>
     </svg>
   </span>
-  <span on:click|stopPropagation="{() => dispatch('visibility')}">
+  <span on:click|stopPropagation="{() => dispatch('disable')}">
     <svg
-      class="{visible ? 'on' : 'off'}"
+      class="{disabled ? 'off' : 'on'}"
       width="100%"
       height="100%"
       viewBox="0 0 448 256"
