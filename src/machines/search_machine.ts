@@ -1,3 +1,7 @@
+import { get } from 'svelte/store';
+import { query } from '../actions/queryApi';
+import * as _ from 'lamb';
+
 export const createSearchConfig = childMachine => ({
   id: 'search',
   type: 'parallel',
@@ -80,6 +84,24 @@ export const searchOptions = {
     MatchingSync: () => {},
   },
   services: {
-    apiRequest: () => Promise.resolve,
+    apiRequest: async ({ screenStore, queryObj, currentTab }) => {
+      // ctx.search.update(v => ({
+      //   ...v,
+      //   value: evt.value,
+      //   pages: v.pages ? v.pages.concat(v.next) : [v.next],
+      // }));
+
+      const currentQuery = get(queryObj)[currentTab];
+      const q = await query(currentQuery);
+
+      console.log(q);
+
+      screenStore.update(tabs => ({
+        ...tabs,
+        results: { ...tabs.results, [currentTab]: q.data.All },
+      }));
+
+      return true;
+    },
   },
 };

@@ -2,7 +2,7 @@ import { Machine, interpret } from 'xstate';
 import { createSearchConfig, searchOptions } from './search_machine';
 import { contentAliases, subjectAliases } from '../config';
 import { Tab, UIField, UITerm } from '../stores/interfaces';
-import { get, writable } from 'svelte/store';
+import { derived, get, writable } from 'svelte/store';
 import { toggle, add1, removeLast } from '../util/transform';
 
 import * as _ from 'lamb';
@@ -173,6 +173,10 @@ const newTab = (machine, id): Tab => ({
   uiQuery: [newRuleset()],
   machine,
   name: 'Tab' + id,
+  results: {
+    data: [],
+    queryObj: [],
+  },
 });
 
 const toggleLabelBinaryUpdater = labelStatus =>
@@ -249,13 +253,12 @@ export const screen_options = {
     },
     deleteTab: ({ screenStore, historyStore }, { id }) => {
       // xstate 4.6 -- spawn?
-      console.log('id:', id);
       get(screenStore)[id].machine.stop();
       screenStore.update(_.skipKeys([id]));
+
       const history = get(historyStore);
-      console.log(history);
       const prev = history[history.length - 2];
-      console.log(prev);
+
       currentTab.set(prev);
     },
     setCurrentTab: ({ currentTab }, { id = 0 }) => {
@@ -420,9 +423,21 @@ import {
 
 // console.log(screen_machine);
 
+const queryObj = derived(screenStore, $screenStore => {
+  console.log('derived', $screenStore);
+  return $screenStore;
+});
+
 export const service = interpret(
-  screen_machine.withContext({ screenStore, idStore, historyStore, currentTab })
+  screen_machine.withContext({
+    screenStore,
+    idStore,
+    historyStore,
+    currentTab,
+    queryObj,
+  })
 );
+
 const { set, subscribe } = writable();
 export const machine = { subscribe, send: service.send };
 service.onTransition(set);

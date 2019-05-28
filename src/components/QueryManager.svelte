@@ -1,20 +1,24 @@
 <script>
+  import { onMount } from 'svelte';
+  import compare from 'just-compare';
+
   import Nav from './Nav.html';
   import { Form, FormInput, FormLabels } from './QueryBuilder/Form';
   import { Rules, Ruleset,RulesetQueries, RulesetLabels } from './QueryBuilder/Rules';
   
   import { subjectAliases, contentAliases } from '../config';
-  import { screenStore, idStore, historyStore, currentTab } from '../stores/search';
+  import { screenStore, idStore, historyStore, currentTab, queryObj } from '../stores/search';
   import { machine } from '../machines/screen_machine.ts';
 
   let search;
 
   $: console.log(current, $currentTab, $screenStore);
+  $: currentMachine = $screenStore[$currentTab].machine;
   $: current = $screenStore[$currentTab] && $screenStore[$currentTab].uiQuery;
   $: currentQuery = current !== undefined ? current.find(( { selected } ) => selected) : false;
   $: currentQueryIndex = current!== undefined ? current.findIndex(( { selected } ) => selected) : false;
   $: currentLabels = currentQuery && { Subject: currentQuery.fields.subject, Content: currentQuery.fields.content };
-
+  $: console.log(currentMachine.values)
 
   function animateSearch() {
     states.current = states[states.current];
@@ -28,6 +32,28 @@
     }
   }
 
+  onMount(() => {
+    const unsubscribe = queryObj.subscribe((query) => {
+      // console.log('asdasdas', queryObj)
+      // if (!currentMachine) return;
+      // if (query.length === 1 && query[0][0].length < 1 && 1 && query[0][0].query.length === 0) {
+      //   console.log('hi')
+      //   //currentMachine.send('QUERY_ENTERED')
+      // } else {
+      //   currentMachine.send('QUERY_CLEARED')
+      // }
+
+      // if (compare($screenStore[$currentTab].results.queryObj, queryObj[$currentTab])) {
+      //   currentMachine.send('QUERY_MATCHED')
+      // } else {
+      //   currentMachine.send('QUERY_CHANGED')
+      // }
+    }) 
+
+    return unsubscribe;
+  })
+  
+
   const newTab = () =>  machine.send({type: 'TAB_CREATED', id: $idStore });
 
   const tabSend = (type, id) =>  machine.send({type, id: parseInt(id, 10) });
@@ -35,7 +61,7 @@
   const handleChange = ({ detail }) =>
     machine.send({type: 'TEXT_CHANGED', tabId: $currentTab, ruleIndex: currentQueryIndex, text: detail})
 
-  const handleSend = (rules) => console.log('SEARCH PRESSED');
+  const handleSend = (rules) => currentMachine.send({ type:'SEARCHED', tab: $currentTab });
 
   const newRuleset = () => 
     machine.send({
