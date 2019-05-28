@@ -2,8 +2,7 @@
   import QueryControls from './QueryControls.html';
   import { createEventDispatcher } from 'svelte';
 
-  export let labels;
-
+  export let labels, rulesetDisabled;
   const dispatch = createEventDispatcher();
 </script>
 
@@ -15,7 +14,7 @@
           class="tags {status}"
           on:mouseenter="{() => dispatch('hover', { section, index })}"
           on:mouseleave="{() => dispatch('unhover', { section, index })}"
-          style="{ disabled ? 'opacity: 0.5;': ''} transition:opacity 0.3s;"
+          style="{ rulesetDisabled ? 'opacity: 0.5;': ''} transition:opacity 0.3s;"
         >
           <span
             style="{disabled ? 'opacity: 0.5;' : ''} transition:opacity 0.3s;"

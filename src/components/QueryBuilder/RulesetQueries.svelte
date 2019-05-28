@@ -2,12 +2,15 @@
   import { createEventDispatcher } from 'svelte';
 
   const dispatch = createEventDispatcher();
-  export let terms;
+  export let terms, disabled;
 </script>
 
-<ul class="query-container">
+<ul 
+  class="query-container" 
+  style="{disabled ? 'opacity: 0.5;' : ''} transition: all 0.3s ease 0s;"
+>
   {#each terms as {term, status}, j}
-      <li class="query {status}" on:click="{() => dispatch('toggle', j)}">
+      <li class="query {status}" on:click|stopPropagation="{() => dispatch('toggle', j)}">
         {term}
       </li>
   {/each}

@@ -4,6 +4,7 @@
   const dispatch = createEventDispatcher()
 
   function handleEnter(event, isWindow = false) {
+    console.log('boo')
     if (event.key !== 'Enter') return;
     dispatch('enter');
   }

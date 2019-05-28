@@ -10,7 +10,7 @@ import * as _ from 'lamb';
 const screen_config = {
   id: 'screen',
   type: 'parallel',
-  entry: ['createTab', 'setCurrentTab'],
+  entry: ['createTab', 'setCurrentTab', 'pushHistory'],
   states: {
     Form: {
       id: 'Form',
@@ -40,6 +40,9 @@ const screen_config = {
           on: {
             TEXT_CHANGED: {
               actions: ['updateCurrentRuleText'],
+            },
+            RULESET_CREATED: {
+              actions: ['createRuleset', 'selectRule'],
             },
             RULE_SELECTED: {
               actions: ['selectRule'],
@@ -79,7 +82,7 @@ const screen_config = {
               actions: ['disableRule'],
             },
             RULE_COPIED: {
-              actions: ['copyRule'],
+              actions: ['copyRule', 'selectRule'],
             },
             RULE_DELETED: {
               actions: ['deleteRule'],
@@ -101,10 +104,10 @@ const screen_config = {
         Idle: {
           on: {
             TAB_DELETED: {
-              actions: ['setCurrentTab', 'deleteTab', 'popHistory'],
+              actions: ['deleteTab', 'popHistory'],
             },
             TAB_CREATED: {
-              actions: ['setCurrentTab', 'createTab'],
+              actions: ['createTab', 'setCurrentTab', 'pushHistory'],
             },
             TAB_SELECTED: {
               actions: ['setCurrentTab', 'pushHistory'],
@@ -155,19 +158,19 @@ export const newField = (fields: string[]): UIField[] =>
     disabled: false,
   }));
 
+const newRuleset = () => ({
+  terms: [newTerm()],
+  fields: {
+    subject: newField(subjectAliases),
+    content: newField(contentAliases),
+  },
+  options: false,
+  disabled: false,
+  selected: true,
+});
+
 const newTab = (machine, id): Tab => ({
-  uiQuery: [
-    {
-      terms: [newTerm()],
-      fields: {
-        subject: newField(subjectAliases),
-        content: newField(contentAliases),
-      },
-      options: false,
-      disabled: false,
-      selected: true,
-    },
-  ],
+  uiQuery: [newRuleset()],
   machine,
   name: 'Tab' + id,
 });
@@ -236,20 +239,26 @@ export const screen_options = {
       );
 
       machine.onTransition(newState =>
-        screenStore.update(_.setPath(`tab${id}.machine`, newState))
+        screenStore.update(_.setPath(`${id}.machine`, newState))
       );
 
       machine.start();
 
-      screenStore.update(_.setKey(`tab${id}`, newTab(machine, get(idStore))));
+      screenStore.update(_.setKey(id, newTab(machine, get(idStore))));
       idStore.update(add1);
     },
-    deleteTab: ({ screenStore }, { id }) => {
+    deleteTab: ({ screenStore, historyStore }, { id }) => {
       // xstate 4.6 -- spawn?
-      screenStore[id].machine.stop();
+      console.log('id:', id);
+      get(screenStore)[id].machine.stop();
       screenStore.update(_.skipKeys([id]));
+      const history = get(historyStore);
+      console.log(history);
+      const prev = history[history.length - 2];
+      console.log(prev);
+      currentTab.set(prev);
     },
-    setCurrentTab: ({ currentTab }, { id = 'tab0' }) => {
+    setCurrentTab: ({ currentTab }, { id = 0 }) => {
       currentTab.set(id);
     },
     setTabLabel: ({ screenStore }, { labelText, id }) => {
@@ -258,8 +267,9 @@ export const screen_options = {
     popHistory: ({ historyStore }) => {
       historyStore.update(removeLast);
     },
-    pushHistory: ({ historyStore }, { id }) => {
+    pushHistory: ({ historyStore }, { id = 0 }) => {
       historyStore.update(_.append(id));
+      console.log('push history', get(historyStore));
     },
     toggleLabelBinary: (
       { screenStore },
@@ -316,14 +326,14 @@ export const screen_options = {
 
       screenStore.update(updateLabelStatus);
     },
-    selectRule: ({ screenStore }, { tabId, ruleIndex }) => {
+    selectRule: ({ screenStore }, { tabId, targetIndex }) => {
       const hideOptions = _.updatePath(
         `${tabId}.uiQuery`,
         _.mapWith(deselectRule)
       );
 
       const selectRule = _.setPath(
-        `${tabId}.uiQuery.${ruleIndex}.selected`,
+        `${tabId}.uiQuery.${targetIndex}.selected`,
         true
       );
 
@@ -390,6 +400,12 @@ export const screen_options = {
       );
       screenStore.update(toggleTermStatus);
     },
+    createRuleset: ({ screenStore }, { tabId }) => {
+      const updater = rules => _.appendTo(rules, newRuleset());
+      const newRule = _.updatePath(`${tabId}.uiQuery`, updater);
+
+      screenStore.update(newRule);
+    },
   },
 };
 // @ts-ignore
@@ -409,8 +425,5 @@ export const service = interpret(
 );
 const { set, subscribe } = writable();
 export const machine = { subscribe, send: service.send };
-service.onTransition(state => {
-  set(state);
-  // console.log(state);
-});
+service.onTransition(set);
 service.start();

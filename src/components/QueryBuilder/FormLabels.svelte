@@ -14,7 +14,7 @@
       {#each label as { field, status }, i}
       <label
         class="{status}"
-        on:click="{() => dispatch('select', { type, i })}"
+        on:click="{() => dispatch('select', { section: type, index: i })}"
         for="subject-{field}"
       >
         {field}
