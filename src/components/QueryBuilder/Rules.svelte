@@ -1,5 +1,4 @@
-<script>
-</script>
+
 
 <ul class="rules-container">
   <slot></slot>

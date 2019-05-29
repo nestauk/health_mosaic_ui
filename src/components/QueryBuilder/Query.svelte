@@ -2,7 +2,6 @@
   import QueryControls from './QueryControls.html';
 
   export let value, index, negate;
-  $:console.log('v', value)
 </script>
 
 <ul class="query-container">

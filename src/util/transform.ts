@@ -23,5 +23,5 @@ const transformValues = ({ term, status }) => ({ query: term, status });
 export const createQueryObject = queries =>
   queries.map(({ terms, fields: { subject, content } }) => ({
     fields: createValidFields(_.union(content, subject)),
-    value: terms.map(transformValues),
+    values: terms.map(transformValues),
   }));

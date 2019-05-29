@@ -12,16 +12,24 @@ export const idStore = writable(0);
 export const currentTab = writable();
 export const queryObj = derived(screenStore, $screenStore => {
   const object = {};
-  console.log($screenStore);
+
   for (const key in $screenStore) {
     if ($screenStore[key].uiQuery) {
-      console.log('query', $screenStore[key].uiQuery);
-      object[key] = createQueryObject($screenStore[key].uiQuery);
+      let q = $screenStore[key].uiQuery;
+      console.log('TERMS', q[0].terms);
+      if (
+        q[0].terms.length === 0 ||
+        (q[0].terms.length === 1 && q[0].terms[0].term.length === 0)
+      ) {
+        object[key] = false;
+      } else {
+        object[key] = createQueryObject($screenStore[key].uiQuery);
+      }
     }
   }
 
   return object;
 });
 queryObj.subscribe(v => {
-  console.log('derived: ', v);
+  // console.log('derived: ', v);
 });

@@ -4,7 +4,6 @@
   export let selected, options;
 
   const dispatch = createEventDispatcher();
-
 </script>
 
 <div

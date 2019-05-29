@@ -3,8 +3,10 @@
   import QueryManager from '../components/QueryManager.svelte';
 
   import { searchStore, searchMachine } from '../machines/search.ts';
-
+  import { screenStore, currentTab } from '../stores/search.ts'
   let tab = 0;
+
+  $: data = $screenStore[$currentTab].results.data
 
   function deleteResults({detail}) {
     searchStore.update(s => ({
@@ -17,7 +19,7 @@
     tab=detail.tab
   }
 
-  $: console.log($searchStore, tab)
+
 </script>
 
 <svelte:head>
@@ -28,13 +30,13 @@
               on:deletetab="{deleteResults}" />
 
 <div class="content">
-  {#if $searchStore.data && $searchStore.data[tab] && $searchStore.data[tab].length }
+  <!-- {#if data && $searchStore.data[tab] && $searchStore.data[tab].length } -->
 
     <Results dirty={!!$searchMachine.dirty}>
-      {#each $searchStore.data[tab] as data }
+      {#each data as data }
         <ResultsItem {data}></ResultsItem>
       {/each}
     </Results>
-  {/if}
+  <!-- {/if} -->
 </div>
 

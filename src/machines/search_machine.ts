@@ -42,7 +42,7 @@ export const createSearchConfig = childMachine => ({
               initial: 'Idle',
               on: {
                 SEARCHED: {
-                  target: '#Pending',
+                  target: 'Dirty.Pending',
                 },
               },
               states: {
@@ -57,8 +57,12 @@ export const createSearchConfig = childMachine => ({
                     target: '#Matching',
                     actions: 'shareSuccess',
                   },
+                  onError: {
+                    target: 'Fail',
+                  },
                 },
                 Fail: {
+                  id: 'Fail',
                   entry: 'shareFail',
                 },
               },
@@ -81,27 +85,26 @@ export const searchOptions = {
     sharePending: () => {},
     shareSuccess: () => {},
     shareFail: () => {},
-    MatchingSync: () => {},
+    shareMatching: () => {},
   },
   services: {
     apiRequest: async ({ screenStore, queryObj, currentTab }) => {
-      // ctx.search.update(v => ({
-      //   ...v,
-      //   value: evt.value,
-      //   pages: v.pages ? v.pages.concat(v.next) : [v.next],
-      // }));
+      const tab = get(currentTab);
+      const currentQuery = get(queryObj)[tab];
 
-      const currentQuery = get(queryObj)[currentTab];
-      const q = await query(currentQuery);
+      try {
+        const q = await query(currentQuery);
 
-      console.log(q);
-
-      screenStore.update(tabs => ({
-        ...tabs,
-        results: { ...tabs.results, [currentTab]: q.data.All },
-      }));
-
-      return true;
+        screenStore.update(tabs => ({
+          ...tabs,
+          [tab]: {
+            ...tabs[tab],
+            results: { data: q.data.All, queryObj: currentQuery },
+          },
+        }));
+      } catch (e) {
+        throw new Error(e);
+      }
     },
   },
 };

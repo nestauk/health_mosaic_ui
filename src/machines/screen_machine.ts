@@ -235,15 +235,14 @@ const toggleTerm = status => (status === 'and' ? 'not' : 'and');
 
 export const screen_options = {
   actions: {
-    createTab: ({ screenStore, idStore }) => {
+    createTab: ({ screenStore, idStore, queryObj, currentTab }) => {
       // xstate 4.6 -- spawn?
       const id = get(idStore);
       const machine = interpret(
-        Machine(createSearchConfig(screenMachineBase), searchOptions)
-      );
-
-      machine.onTransition(newState =>
-        screenStore.update(_.setPath(`${id}.machine`, newState))
+        Machine(
+          createSearchConfig(screenMachineBase),
+          searchOptions
+        ).withContext({ screenStore, queryObj, currentTab })
       );
 
       machine.start();
@@ -419,14 +418,8 @@ import {
   idStore,
   historyStore,
   currentTab,
+  queryObj,
 } from '../stores/search';
-
-// console.log(screen_machine);
-
-const queryObj = derived(screenStore, $screenStore => {
-  console.log('derived', $screenStore);
-  return $screenStore;
-});
 
 export const service = interpret(
   screen_machine.withContext({

@@ -12,13 +12,12 @@
 
   let search;
 
-  $: console.log(current, $currentTab, $screenStore);
   $: currentMachine = $screenStore[$currentTab].machine;
   $: current = $screenStore[$currentTab] && $screenStore[$currentTab].uiQuery;
   $: currentQuery = current !== undefined ? current.find(( { selected } ) => selected) : false;
   $: currentQueryIndex = current!== undefined ? current.findIndex(( { selected } ) => selected) : false;
   $: currentLabels = currentQuery && { Subject: currentQuery.fields.subject, Content: currentQuery.fields.content };
-  $: console.log(currentMachine.values)
+  $: console.log(currentMachine.state.value)
 
   function animateSearch() {
     states.current = states[states.current];
@@ -32,34 +31,35 @@
     }
   }
 
-  onMount(() => {
-    const unsubscribe = queryObj.subscribe((query) => {
-      // console.log('asdasdas', queryObj)
-      // if (!currentMachine) return;
-      // if (query.length === 1 && query[0][0].length < 1 && 1 && query[0][0].query.length === 0) {
-      //   console.log('hi')
-      //   //currentMachine.send('QUERY_ENTERED')
-      // } else {
-      //   currentMachine.send('QUERY_CLEARED')
-      // }
-
-      // if (compare($screenStore[$currentTab].results.queryObj, queryObj[$currentTab])) {
-      //   currentMachine.send('QUERY_MATCHED')
-      // } else {
-      //   currentMachine.send('QUERY_CHANGED')
-      // }
-    }) 
-
-    return unsubscribe;
-  })
-  
-
   const newTab = () =>  machine.send({type: 'TAB_CREATED', id: $idStore });
 
   const tabSend = (type, id) =>  machine.send({type, id: parseInt(id, 10) });
 
-  const handleChange = ({ detail }) =>
+  const handleChange = ({ detail }) => {
     machine.send({type: 'TEXT_CHANGED', tabId: $currentTab, ruleIndex: currentQueryIndex, text: detail})
+    
+    if ($queryObj[$currentTab]) {
+        currentMachine.send('QUERY_ENTERED')
+        console.log('q-entered')
+    } else {
+        currentMachine.send('QUERY_CLEARED')
+        console.log('q-cleared')
+    }
+
+    const stripEmpties = (arr) => arr.filter(v => v.values.length && v.values[0].query.length);
+
+    const cachedQuery = $queryObj[$currentTab] && stripEmpties($screenStore[$currentTab].results.queryObj);
+    const newQuery = $queryObj[$currentTab] && stripEmpties($queryObj[$currentTab]);
+
+    console.log(cachedQuery, newQuery)
+    if ($queryObj[$currentTab] && compare(cachedQuery, newQuery)) {
+        currentMachine.send('QUERY_MATCHED')
+        console.log('q-matched')
+      } else {
+        currentMachine.send('QUERY_CHANGED')
+        console.log('q-changed')
+      }
+  }
 
   const handleSend = (rules) => currentMachine.send({ type:'SEARCHED', tab: $currentTab });
 

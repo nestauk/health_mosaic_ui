@@ -14,7 +14,7 @@
     "cleanall": "rimraf node_modules src/node_modules __sapper__ package-lock.json",
     "reinstall:npm": "npm run cleanall && npm i",
     "reinstall:yarn": "yarn cleanall && yarn",
-    "lambda:test": "NODE_ENV=development rollup -c rollup-lambda.config.js && netlify-lambda serve dist/lambda",
+    "lambda:test": "NODE_ENV=development netlify-lambda serve dist/lambda",
     "lambda:build": "rollup -c rollup-lambda.config.js && netlify-lambda build dist/lambda"
   },
   "dependencies": {
