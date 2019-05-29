@@ -1,6 +1,6 @@
 <script>
   import { createEventDispatcher } from 'svelte';
-
+  import { queryToString } from '../../util/transform.ts';
   const dispatch = createEventDispatcher()
 
   function handleEnter(event, isWindow = false) {
@@ -8,7 +8,10 @@
     dispatch('enter');
   }
 
+  export let current;
   let inputValue = '', input;
+
+  $: inputValue = queryToString(current);
 </script>
 
 <div class="input-wrap">

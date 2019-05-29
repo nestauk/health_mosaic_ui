@@ -17,7 +17,7 @@
   $: currentQuery = current !== undefined ? current.find(( { selected } ) => selected) : false;
   $: currentQueryIndex = current!== undefined ? current.findIndex(( { selected } ) => selected) : false;
   $: currentLabels = currentQuery && { Subject: currentQuery.fields.subject, Content: currentQuery.fields.content };
-  $: console.log(currentMachine.state.value)
+  // $: console.log(currentMachine.state.value)
 
   function animateSearch() {
     states.current = states[states.current];
@@ -40,10 +40,8 @@
     
     if ($queryObj[$currentTab]) {
         currentMachine.send('QUERY_ENTERED')
-        console.log('q-entered')
     } else {
         currentMachine.send('QUERY_CLEARED')
-        console.log('q-cleared')
     }
 
     const stripEmpties = (arr) => arr.filter(v => v.values.length && v.values[0].query.length);
@@ -51,13 +49,10 @@
     const cachedQuery = $queryObj[$currentTab] && stripEmpties($screenStore[$currentTab].results.queryObj);
     const newQuery = $queryObj[$currentTab] && stripEmpties($queryObj[$currentTab]);
 
-    console.log(cachedQuery, newQuery)
     if ($queryObj[$currentTab] && compare(cachedQuery, newQuery)) {
         currentMachine.send('QUERY_MATCHED')
-        console.log('q-matched')
       } else {
         currentMachine.send('QUERY_CHANGED')
-        console.log('q-changed')
       }
   }
 
@@ -125,6 +120,7 @@
     <FormInput
       on:change="{handleChange}"
       on:enter="{newRuleset}"
+      current={currentQuery.terms}
     />
     <FormLabels
       on:select="{({ detail }) => sendRuleLabel('LABEL_CLICKED', detail)}"

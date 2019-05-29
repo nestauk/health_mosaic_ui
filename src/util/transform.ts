@@ -6,7 +6,6 @@ export const add1 = _.add(1);
 export const removeLast = _.sliceAt(0, -1);
 
 const filterQueryObject = ({ disabled, status }) => {
-  console.log(disabled, status);
   return status !== 'default' && !disabled;
 };
 
@@ -25,3 +24,8 @@ export const createQueryObject = queries =>
     fields: createValidFields(_.union(content, subject)),
     values: terms.map(transformValues),
   }));
+
+export const queryToString = query =>
+  Object.values(query)
+    .map(({ status, term }) => (status === 'not' ? '-' : '') + term, '')
+    .join(', ');

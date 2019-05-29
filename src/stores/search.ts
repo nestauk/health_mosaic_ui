@@ -16,7 +16,6 @@ export const queryObj = derived(screenStore, $screenStore => {
   for (const key in $screenStore) {
     if ($screenStore[key].uiQuery) {
       let q = $screenStore[key].uiQuery;
-      console.log('TERMS', q[0].terms);
       if (
         q[0].terms.length === 0 ||
         (q[0].terms.length === 1 && q[0].terms[0].term.length === 0)
@@ -30,6 +29,4 @@ export const queryObj = derived(screenStore, $screenStore => {
 
   return object;
 });
-queryObj.subscribe(v => {
-  // console.log('derived: ', v);
-});
+queryObj.subscribe(v => {});

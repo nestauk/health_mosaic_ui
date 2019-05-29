@@ -1,6 +1,4 @@
 <script>
-  import QueryControls from './QueryControls.html';
-
   export let value, index, negate;
 </script>
 

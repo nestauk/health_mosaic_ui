@@ -220,7 +220,7 @@ const termBuilder = (acc, next) => {
 const parseQuery = _.pipe([
   s => s.split(','),
   _.reduceWith(termBuilder, []),
-  _.filterWith(a => a.term.length),
+  _.filterWith((a, i, arr) => (i === arr.length - 1 ? true : a.term.length)),
 ]);
 
 const ruleOptionsDeselect = _.setPath('options', false);
@@ -271,7 +271,6 @@ export const screen_options = {
     },
     pushHistory: ({ historyStore }, { id = 0 }) => {
       historyStore.update(_.append(id));
-      console.log('push history', get(historyStore));
     },
     toggleLabelBinary: (
       { screenStore },
