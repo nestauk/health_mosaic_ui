@@ -29,4 +29,6 @@ export const queryObj = derived(screenStore, $screenStore => {
 
   return object;
 });
+
+// hmmm...
 queryObj.subscribe(v => {});

@@ -2,7 +2,6 @@
   import { Results, ResultsItem } from '../components/Results';
   import QueryManager from '../components/QueryManager.svelte';
 
-  import { searchStore, searchMachine } from '../machines/search.ts';
   import { screenStore, currentTab } from '../stores/search.ts'
   let tab = 0;
 
@@ -26,13 +25,12 @@
   <title>Search</title>
 </svelte:head>
 
-<QueryManager on:tab="{(e) => tab = e.detail}"
-              on:deletetab="{deleteResults}" />
+<QueryManager />
 
 <div class="content">
   <!-- {#if data && $searchStore.data[tab] && $searchStore.data[tab].length } -->
 
-    <Results dirty={!!$searchMachine.dirty}>
+    <Results dirty={false}>
       {#each data as data }
         <ResultsItem {data}></ResultsItem>
       {/each}

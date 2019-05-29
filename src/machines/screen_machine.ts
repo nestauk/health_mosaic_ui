@@ -205,13 +205,18 @@ const labelOptionsDisabler = fields => ({
 
 const deselectRule = _.setPath('selected', false);
 
-const regexQuery = /^(-*)([^]*)$/;
+const regexQuery = /^([ -]*)([^]*)$/;
 
-const termBuilder = (acc, next) => {
-  const isQuery = next.trim().match(regexQuery);
+const termBuilder = (acc, next, i, arr) => {
+  console.log(next.length);
+  const isQuery =
+    i === arr.length - 1
+      ? next.replace(/\s{1}/g, ' ').match(regexQuery)
+      : next.trim().match(regexQuery);
+  console.log(isQuery);
   return acc.concat([
     {
-      status: isQuery[1] === '-' ? 'not' : 'and',
+      status: isQuery[1].trim() === '-' ? 'not' : 'and',
       term: isQuery[2],
     },
   ]);

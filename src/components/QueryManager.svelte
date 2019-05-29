@@ -19,6 +19,9 @@
   $: currentLabels = currentQuery && { Subject: currentQuery.fields.subject, Content: currentQuery.fields.content };
   // $: console.log(currentMachine.state.value)
 
+
+  // TODO
+  // Do something with this
   function animateSearch() {
     states.current = states[states.current];
 

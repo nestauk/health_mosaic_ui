@@ -1,5 +1,5 @@
 <script>
-  import QueryControls from './QueryControls.html';
+  import QueryControls from './QueryControls.svelte';
   import { createEventDispatcher } from 'svelte';
 
   export let labels, rulesetDisabled;
