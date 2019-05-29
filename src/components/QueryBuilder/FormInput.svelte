@@ -12,6 +12,7 @@
   let inputValue = '', input;
 
   $: inputValue = queryToString(current);
+  $: console.log(current, inputValue)
 </script>
 
 <div class="input-wrap">

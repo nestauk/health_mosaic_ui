@@ -51,14 +51,14 @@ export const createSearchConfig = childMachine => ({
                   invoke: {
                     id: 'Pending',
                     src: 'apiRequest',
-                  },
-                  entry: 'sharePending',
-                  onDone: {
-                    target: '#Matching',
-                    actions: 'shareSuccess',
-                  },
-                  onError: {
-                    target: 'Fail',
+                    entry: 'sharePending',
+                    onDone: {
+                      target: '#Matching',
+                      actions: ['updateData'],
+                    },
+                    onError: {
+                      target: '#Fail',
+                    },
                   },
                 },
                 Fail: {
@@ -71,12 +71,6 @@ export const createSearchConfig = childMachine => ({
         },
       },
     },
-    Link: {
-      invoke: {
-        id: 'Link',
-        src: childMachine,
-      },
-    },
   },
 });
 
@@ -86,25 +80,24 @@ export const searchOptions = {
     shareSuccess: () => {},
     shareFail: () => {},
     shareMatching: () => {},
+    updateData: ({ screenStore, queryObj, currentTab }, evt) => {
+      const tab = get(currentTab);
+      const currentQuery = get(queryObj)[tab];
+      screenStore.update(tabs => ({
+        ...tabs,
+        [tab]: {
+          ...tabs[tab],
+          results: { data: evt.data.data.All, queryObj: currentQuery },
+        },
+      }));
+    },
   },
   services: {
-    apiRequest: async ({ screenStore, queryObj, currentTab }) => {
+    apiRequest: ({ queryObj, currentTab }) => {
       const tab = get(currentTab);
       const currentQuery = get(queryObj)[tab];
 
-      try {
-        const q = await query(currentQuery);
-
-        screenStore.update(tabs => ({
-          ...tabs,
-          [tab]: {
-            ...tabs[tab],
-            results: { data: q.data.All, queryObj: currentQuery },
-          },
-        }));
-      } catch (e) {
-        throw new Error(e);
-      }
+      return query(currentQuery);
     },
   },
 };

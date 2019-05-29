@@ -1,4 +1,7 @@
 <script>
+  import { createEventDispatcher } from 'svelte';
+
+  const dispatch = createEventDispatcher();
   let tooltip;
 </script>
 
@@ -8,7 +11,7 @@
       on:mouseenter={() => (tooltip = true)}
       on:mouseleave={() => (tooltip = false)}
       type="button"
-      on:click>
+      on:click="{() => dispatch('newrule')}">
       +
     </button>
 
@@ -18,7 +21,7 @@
   </div>
   <slot />
 
-  <button class="search-button" on:click>Search</button>
+  <button class="search-button" on:click="{() => dispatch('search')}">Search</button>
 
 </form>
 

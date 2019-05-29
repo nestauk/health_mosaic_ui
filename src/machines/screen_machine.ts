@@ -208,12 +208,10 @@ const deselectRule = _.setPath('selected', false);
 const regexQuery = /^([ -]*)([^]*)$/;
 
 const termBuilder = (acc, next, i, arr) => {
-  console.log(next.length);
   const isQuery =
     i === arr.length - 1
       ? next.replace(/\s{1}/g, ' ').match(regexQuery)
       : next.trim().match(regexQuery);
-  console.log(isQuery);
   return acc.concat([
     {
       status: isQuery[1].trim() === '-' ? 'not' : 'and',
@@ -249,6 +247,8 @@ export const screen_options = {
           searchOptions
         ).withContext({ screenStore, queryObj, currentTab })
       );
+
+      machine.onTransition(e => console.log(e));
 
       machine.start();
 

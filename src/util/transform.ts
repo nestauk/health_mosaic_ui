@@ -35,7 +35,11 @@ export const queryToString = query => {
   return Object.values(query)
     .map(({ status, term }) => (status === 'not' ? '-' : '') + term, '')
     .reduce(
-      (acc, next, i, arr) => acc + next + (arr.length - 1 === i ? '' : ', '),
+      (acc, next, i, arr) =>
+        acc +
+        (i === 0 || next.length < 1 ? '' : ' ') +
+        next +
+        (arr.length - 1 === i ? '' : ','),
       ''
     );
 };

@@ -119,6 +119,8 @@
 <div class="search" bind:this="{search}">
   <Form
     on:submit|preventDefault="{handleSend}"
+    on:newrule="{newRuleset}"
+    on:search="{handleSend}"
   >
     <FormInput
       on:change="{handleChange}"
