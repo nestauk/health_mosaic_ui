@@ -38,6 +38,8 @@
 
   const tabSend = (type, id) =>  machine.send({type, id: parseInt(id, 10) });
 
+  const sendRenameTab = ({ detail: {id, value} }) => machine.send({type: 'TAB_RENAMED', id: parseInt(id, 10), labelText: value });
+
   const handleChange = ({ detail }) => {
     machine.send({type: 'TEXT_CHANGED', tabId: $currentTab, ruleIndex: currentQueryIndex, text: detail})
     
@@ -114,6 +116,7 @@
   on:newtab="{newTab}"
   on:changetab="{({detail}) => tabSend('TAB_SELECTED', detail)}"
   on:deletetab="{({detail}) => tabSend('TAB_DELETED', detail)}"
+  on:textchange="{sendRenameTab}"
 />
 
 <div class="search" bind:this="{search}">
