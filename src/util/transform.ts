@@ -25,14 +25,8 @@ export const createQueryObject = queries =>
     values: terms.map(transformValues),
   }));
 
-export const queryToString = query => {
-  console.log(
-    Object.values(query).map(
-      ({ status, term }) => (status === 'not' ? '-' : '') + term,
-      ''
-    )
-  );
-  return Object.values(query)
+export const queryToString = query =>
+  Object.values(query)
     .map(({ status, term }) => (status === 'not' ? '-' : '') + term, '')
     .reduce(
       (acc, next, i, arr) =>
@@ -42,4 +36,3 @@ export const queryToString = query => {
         (arr.length - 1 === i ? '' : ','),
       ''
     );
-};

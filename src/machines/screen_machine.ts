@@ -125,11 +125,21 @@ const screen_config = {
       on: {
         PENDING: {
           target: '#Disabled',
+          actions: () => console.log('PENDING'),
         },
         SUCCESS: {
           target: '#Interactive',
+          actions: () => console.log('SUCCESS'),
         },
-        FAIL: {},
+        ERROR: {
+          actions: () => console.log('ERROR'),
+        },
+        MATCHING: {
+          actions: () => console.log('MATCHING'),
+        },
+        DIRTY: {
+          actions: () => console.log('DIRTY'),
+        },
       },
       states: {
         Interactive: {
@@ -248,7 +258,7 @@ export const screen_options = {
         ).withContext({ screenStore, queryObj, currentTab })
       );
 
-      machine.onTransition(e => console.log(e));
+      //machine.onTransition(e => console.log(e));
 
       machine.start();
 

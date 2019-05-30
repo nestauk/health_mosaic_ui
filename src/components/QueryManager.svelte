@@ -17,7 +17,7 @@
   $: currentQuery = current !== undefined ? current.find(( { selected } ) => selected) : false;
   $: currentQueryIndex = current!== undefined ? current.findIndex(( { selected } ) => selected) : false;
   $: currentLabels = currentQuery && { Subject: currentQuery.fields.subject, Content: currentQuery.fields.content };
-  // $: console.log(currentMachine.state.value)
+  // $: console.log($machine)
 
 
   // TODO
