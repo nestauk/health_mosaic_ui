@@ -17,30 +17,12 @@
   $: currentQuery = current !== undefined ? current.find(( { selected } ) => selected) : false;
   $: currentQueryIndex = current!== undefined ? current.findIndex(( { selected } ) => selected) : false;
   $: currentLabels = currentQuery && { Subject: currentQuery.fields.subject, Content: currentQuery.fields.content };
-  // $: console.log($machine)
-  $: console.log(current)
-
   $:  open = $screenStore[$currentTab].visible;
-  $: console.log(open)
-  // TODO
-  // Do something with this
-  function animateSearch() {
-    states.current = states[states.current];
-
-    if (search && states.current === 'close') {
-      search.style.transform = `translateY(-7rem)`;
-      search.children[0].children[1].style.transform = `scale(0.8)`;
-    } else if (search) {
-      search.style.transform = 'translateY(0)';
-      search.children[0].children[1].style.transform = `scale(1)`;
-    }
-  }
 
   const newTab = () =>  {
     open = true; 
     machine.send({type: 'TAB_CREATED', id: $idStore });
   };
-
 
   const tabSend = (type, id) =>  machine.send({ type, id: parseInt(id, 10) });
 
@@ -115,7 +97,6 @@
       targetIndex
     })
 
-    $: console.log(search, formHeight)
 </script>
 
 <Nav

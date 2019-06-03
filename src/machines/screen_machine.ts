@@ -427,7 +427,6 @@ export const screen_options = {
       screenStore.update(newRule);
     },
     toggleTabVisibility: ({ screenStore }, { id }) => {
-      console.log(get(screenStore), id);
       screenStore.update(_.updatePath(`${id}.visible`, toggle));
     },
   },
