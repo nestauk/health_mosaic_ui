@@ -2,7 +2,7 @@ import { Machine, interpret } from 'xstate';
 import { createSearchConfig, searchOptions } from './search_machine';
 import { contentAliases, subjectAliases } from '../config';
 import { Tab, UIField, UITerm } from '../stores/interfaces';
-import { derived, get, writable } from 'svelte/store';
+import { get, writable } from 'svelte/store';
 import { toggle, add1, removeLast } from '../util/transform';
 
 import * as _ from 'lamb';
@@ -27,6 +27,9 @@ const screen_config = {
         },
         TAB_RENAMED: {
           target: 'Form.Idle',
+        },
+        TAB_VISIBILITY_TOGGLED: {
+          actions: ['toggleTabVisibility'],
         },
         LABEL_CLICKED: {
           actions: ['toggleLabelTernary'],
@@ -183,6 +186,7 @@ const newTab = (machine, id): Tab => ({
   uiQuery: [newRuleset()],
   machine,
   name: 'Tab' + id,
+  visible: true,
   results: {
     data: [],
     queryObj: [],
@@ -421,6 +425,10 @@ export const screen_options = {
       const newRule = _.updatePath(`${tabId}.uiQuery`, updater);
 
       screenStore.update(newRule);
+    },
+    toggleTabVisibility: ({ screenStore }, { id }) => {
+      console.log(get(screenStore), id);
+      screenStore.update(_.updatePath(`${id}.visible`, toggle));
     },
   },
 };

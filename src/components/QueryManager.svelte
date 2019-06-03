@@ -10,7 +10,7 @@
   import { screenStore, idStore, historyStore, currentTab, queryObj } from '../stores/search';
   import { machine } from '../machines/screen_machine.ts';
 
-  let search;
+  let search,formHeight;
 
   $: currentMachine = $screenStore[$currentTab].machine;
   $: current = $screenStore[$currentTab] && $screenStore[$currentTab].uiQuery;
@@ -18,8 +18,10 @@
   $: currentQueryIndex = current!== undefined ? current.findIndex(( { selected } ) => selected) : false;
   $: currentLabels = currentQuery && { Subject: currentQuery.fields.subject, Content: currentQuery.fields.content };
   // $: console.log($machine)
+  $: console.log(current)
 
-
+  $:  open = $screenStore[$currentTab].visible;
+  $: console.log(open)
   // TODO
   // Do something with this
   function animateSearch() {
@@ -34,9 +36,13 @@
     }
   }
 
-  const newTab = () =>  machine.send({type: 'TAB_CREATED', id: $idStore });
+  const newTab = () =>  {
+    open = true; 
+    machine.send({type: 'TAB_CREATED', id: $idStore });
+  };
 
-  const tabSend = (type, id) =>  machine.send({type, id: parseInt(id, 10) });
+
+  const tabSend = (type, id) =>  machine.send({ type, id: parseInt(id, 10) });
 
   const sendRenameTab = ({ detail: {id, value} }) => machine.send({type: 'TAB_RENAMED', id: parseInt(id, 10), labelText: value });
 
@@ -108,6 +114,8 @@
       tabId: $currentTab,
       targetIndex
     })
+
+    $: console.log(search, formHeight)
 </script>
 
 <Nav
@@ -119,8 +127,9 @@
   on:textchange="{sendRenameTab}"
 />
 
-<div class="search" bind:this="{search}">
+<div class="search" bind:offsetHeight="{search}" style="{open ? '' : `transform: translateY(-${formHeight + 40}px)`}">
   <Form
+    bind:formHeight
     on:submit|preventDefault="{handleSend}"
     on:newrule="{newRuleset}"
     on:search="{handleSend}"
@@ -170,7 +179,15 @@
     {/each}
   </Rules>
   {/if}
-
+  {#if current[0] && current[0].terms[0].term}
+      <div 
+        class="close-label" 
+        on:click="{() => tabSend('TAB_VISIBILITY_TOGGLED', $currentTab)}" 
+        style="{open ? 'transform: rotate(180deg) ' : ''}"
+      >
+        <img alt="close search" src="arrow.svg"/>
+      </div>
+    {/if}
 </div>
 
 

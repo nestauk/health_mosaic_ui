@@ -1,11 +1,12 @@
 <script>
   import { createEventDispatcher } from 'svelte';
 
+  export let formHeight = 0;
   const dispatch = createEventDispatcher();
   let tooltip;
 </script>
 
-<form on:submit|preventDefault>
+<form on:submit|preventDefault bind:offsetHeight="{formHeight}">
   <div class="button">
     <button
       on:mouseenter={() => (tooltip = true)}

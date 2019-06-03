@@ -1,3 +1,5 @@
+<script context="module"></script>
+
 <script>
   import { createEventDispatcher } from 'svelte';
   import Spinner from './Spinner.html';
@@ -6,7 +8,9 @@
   import closeIcon from 'ionicons/dist/ionicons/svg/ios-close-circle-outline.svg';
   import addIcon from 'ionicons/dist/ionicons/svg/ios-add-circle-outline.svg';
 
-  export let tabs, activeTab;
+  export let tabs,
+    activeTab,
+    tabHeight = 0;
 
   $: tabs = Object.entries(tabs);
 
@@ -47,9 +51,9 @@
   };
 </script>
 
-<svelte:window on:click|preventDefault|stopPropagatino="{stopEdit}" />
+<svelte:window on:click|preventDefault|stopPropagation="{stopEdit}" />
 
-<nav>
+<nav bind:offsetHeight="{tabHeight}">
   <ul>
     {#each tabs as [id, tab]}
     <li>
@@ -59,7 +63,7 @@
         on:dblclick="{handleDoubleClick}"
         on:keydown="{stopEdit}"
         on:input="{({ target }) => dispatch('textchange', { value: target.innerText, id })}"
-        class='{parseInt(id, 10) === activeTab ? "selected" : ""}'
+        class:selected="{parseInt(id, 10) === activeTab}"
         href="/bing"
         >{tab.name}</a
       >
