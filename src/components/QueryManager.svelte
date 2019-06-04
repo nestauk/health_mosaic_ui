@@ -18,6 +18,7 @@
   $: currentQueryIndex = current!== undefined ? current.findIndex(( { selected } ) => selected) : false;
   $: currentLabels = currentQuery && { Subject: currentQuery.fields.subject, Content: currentQuery.fields.content };
   $:  open = $screenStore[$currentTab].visible;
+  $: console.log($queryObj)
 
   const newTab = () =>  {
     open = true; 
