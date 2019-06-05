@@ -1,5 +1,6 @@
 <script>
   import { onMount } from 'svelte';
+  import { stores } from '@sapper/app';
   import compare from 'just-compare';
 
   import Nav from './Nav.html';
@@ -18,7 +19,11 @@
   $: currentQueryIndex = current!== undefined ? current.findIndex(( { selected } ) => selected) : false;
   $: currentLabels = currentQuery && { Subject: currentQuery.fields.subject, Content: currentQuery.fields.content };
   $:  open = $screenStore[$currentTab].visible;
-  $: console.log($queryObj)
+
+  const { page } = stores();
+  
+
+  machine.send({type: 'TAB_CREATED', id: $idStore, savedQuery: $page.query.q ? $page.query.q : false })
 
   const newTab = () =>  {
     open = true; 

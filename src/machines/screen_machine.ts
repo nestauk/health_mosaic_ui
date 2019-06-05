@@ -1,8 +1,11 @@
+import { get, writable } from 'svelte/store';
+import { goto } from '@sapper/app';
+
 import { Machine, interpret } from 'xstate';
+
 import { createSearchConfig, searchOptions } from './search_machine';
 import { contentAliases, subjectAliases } from '../config';
 import { Tab, UIField, UITerm } from '../stores/interfaces';
-import { get, writable } from 'svelte/store';
 import { toggle, add1, removeLast } from '../util/transform';
 
 import * as _ from 'lamb';
@@ -10,7 +13,7 @@ import * as _ from 'lamb';
 const screen_config = {
   id: 'screen',
   type: 'parallel',
-  entry: ['createTab', 'setCurrentTab', 'pushHistory'],
+  //entry: ['createTab', 'setCurrentTab', 'pushHistory'],
   states: {
     Form: {
       id: 'Form',
@@ -143,6 +146,10 @@ const screen_config = {
         DIRTY: {
           actions: () => console.log('DIRTY'),
         },
+        ROUTE_CHANGED: {
+          target: '#Disabled',
+          actions: ['changeRoute'],
+        },
       },
       states: {
         Interactive: {
@@ -150,6 +157,11 @@ const screen_config = {
         },
         Disabled: {
           id: 'Disabled',
+          on: {
+            ROUTE_CHANGE_COMPLETED: {
+              target: '#Interactive',
+            },
+          },
         },
       },
     },
@@ -182,8 +194,8 @@ const newRuleset = () => ({
   selected: true,
 });
 
-const newTab = (machine, id): Tab => ({
-  uiQuery: [newRuleset()],
+const newTab = (machine, id, sharedQuery): Tab => ({
+  uiQuery: sharedQuery || [newRuleset()],
   machine,
   name: 'Tab' + id,
   visible: true,
@@ -252,21 +264,26 @@ const toggleTerm = status => (status === 'and' ? 'not' : 'and');
 
 export const screen_options = {
   actions: {
-    createTab: ({ screenStore, idStore, queryObj, currentTab }) => {
+    createTab: (
+      { screenStore, idStore, queryObj, currentTab },
+      { sharedQuery = false }
+    ) => {
       // xstate 4.6 -- spawn?
       const id = get(idStore);
       const machine = interpret(
         Machine(
           createSearchConfig(screenMachineBase),
           searchOptions
-        ).withContext({ screenStore, queryObj, currentTab })
+        ).withContext({ screenStore, queryObj, currentTab, path: '' })
       );
 
       //machine.onTransition(e => console.log(e));
 
       machine.start();
 
-      screenStore.update(_.setKey(id, newTab(machine, get(idStore))));
+      screenStore.update(
+        _.setKey(id, newTab(machine, get(idStore), sharedQuery))
+      );
       idStore.update(add1);
     },
     deleteTab: ({ screenStore, historyStore }, { id }) => {
@@ -428,6 +445,9 @@ export const screen_options = {
     },
     toggleTabVisibility: ({ screenStore }, { id }) => {
       screenStore.update(_.updatePath(`${id}.visible`, toggle));
+    },
+    changeRoute: (_, { path }) => {
+      goto(path);
     },
   },
 };

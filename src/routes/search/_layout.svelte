@@ -1,5 +1,9 @@
 <script>
   import QueryManager from '../../components/QueryManager.svelte';
+  import { machine } from '../../machines/screen_machine.ts';
+
+  $: console.log($machine.value);
+
 </script>
 
 <svelte:head>
@@ -14,9 +18,9 @@
 </div>
 
 <ul>
-  <li><a href="/search/facet1">facet1</a></li>
-  <li><a href="/search/facet2">facet2</a></li>
-  <li><a href="/search/facet3">facet3</a></li>
+  <li><a href="/search/facet1" on:click={() => machine.send({type: 'ROUTE_CHANGED', path: '/search/facet1'})}>facet1</a></li>
+  <li><a href="/search/facet2" on:click={() => machine.send({type: 'ROUTE_CHANGED', path: '/search/facet2'})}>facet2</a></li>
+  <li><a href="/search/facet3" on:click={() => machine.send({type: 'ROUTE_CHANGED', path: '/search/facet3'})}>facet3</a></li>
 </ul>
 
 <style>

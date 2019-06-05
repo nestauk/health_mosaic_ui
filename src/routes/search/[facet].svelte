@@ -1,16 +1,18 @@
 <script>
   import { stores } from '@sapper/app';
-  const { page } = stores();
+  import { onMount, tick } from 'svelte';
+  import { machine } from '../../machines/screen_machine.ts';
 
-  $: console.log($page)
+  const { page } = stores();
+    
+  $: $page && machine.send({type: 'ROUTE_CHANGE_COMPLETED'})
 
 </script>
 
 
 <div class="content">
-  <!-- {#if data && $searchStore.data[tab] && $searchStore.data[tab].length } -->
 
    <h1>{$page.params.facet}</h1>
-  <!-- {/if} -->
+
 </div>
 
