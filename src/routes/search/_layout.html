@@ -1,26 +1,31 @@
+<script context="module">
+  export const SEARCH = {};
+</script>
+
 <script>
   import { writable } from 'svelte/store';
-  import { onDestroy,  } from 'svelte';
+  import { onDestroy, setContext } from 'svelte';
   import { interpret } from 'xstate';
   import compare from 'just-compare';
   import * as _ from 'lamb';
 
 
-  import Nav from '../components/Nav.svelte';
-  import { Form, FormInput, FormLabels } from '../components/QueryBuilder/Form';
-  import { Rules, Ruleset, RulesetQueries, RulesetLabels } from '../components/QueryBuilder/Rules';
-  import { Results, ResultsItem } from '../components/Results';
+  import Nav from '../../components/Nav.svelte';
+  import { Form, FormInput, FormLabels } from '../../components/QueryBuilder/Form';
+  import { Rules, Ruleset, RulesetQueries, RulesetLabels } from '../../components/QueryBuilder/Rules';
+  import { Results, ResultsItem } from '../../components/Results';
 
-  import { subjectAliases, contentAliases } from '../config';
-  import { screen_machine } from '../machines/screen_machine.ts';
+  import { subjectAliases, contentAliases } from '../../config';
+  import { screen_machine } from '../../machines/screen_machine.ts';
   import {
     screenStore,
     idStore,
     historyStore,
     currentTab,
     queryObj
-  } from '../stores/search.ts'
+  } from '../../stores/search.ts'
 
+  
 
   export const screenService = interpret(
     screen_machine.withContext({
@@ -37,9 +42,17 @@
   screenService.onTransition(set);
   screenService.start();
 
+  setContext(SEARCH, {
+    transitionComplete: () => screenMachine.send({ type: 'ROUTE_CHANGE_COMPLETED' }),
+    data: screenStore,
+    checkDirty: () => searchMachine.state.matches('Search.NotEmpty.Dirty')
+  });
+
   onDestroy(() => {
     screenService.stop();
   })
+
+
 
   let formHeight, input;
 
@@ -102,7 +115,10 @@
     }
   }
 
-  const handleSend = (rules) => searchMachine.send({ type:'SEARCHED', tab: $currentTab });
+  const handleSend = (event) => {
+    event.preventDefault();
+    searchMachine.send({ type:'SEARCHED', tab: $currentTab });
+  };
 
   const newRuleset = () => {
     input.focus();
@@ -176,7 +192,7 @@
   <Form
     {isQueries}
     bind:formHeight
-    on:submit|preventDefault="{handleSend}"
+    on:submit="{handleSend}"
     on:newrule="{newRuleset}"
     on:search="{handleSend}"
   >
@@ -237,12 +253,43 @@
     {/if}
 </div>
 
+<ul class="facets">
+  <li>
+    <a 
+      href="/search" 
+      on:click={() => searchMachine.send({type: 'ROUTE_CHANGED', path: '/search'})}
+    >
+      search index
+    </a>
+  </li>
+  <li>
+    <a 
+      href="/search/facet1" 
+      on:click={() => searchMachine.send({type: 'ROUTE_CHANGED', path: '/search/facet1'})}
+    >
+      facet1
+    </a>
+  </li>
+  <li>
+    <a 
+      href="/search/facet2" 
+      on:click={() => searchMachine.send({type: 'ROUTE_CHANGED', path: '/search/facet2'})}
+    >
+      facet2
+    </a>
+  </li>
+  <li>
+    <a 
+      href="/search/facet3" 
+      on:click={() => searchMachine.send({type: 'ROUTE_CHANGED', path: '/search/facet3'})}
+    >
+      facet3
+    </a>
+  </li>
+</ul>
+
 <div class="content">
-    <Results dirty="{searchMachine.state.matches('Search.NotEmpty.Dirty')}">
-      {#each data as data }
-        <ResultsItem {data}></ResultsItem>
-      {/each}
-    </Results>
+  <slot></slot>
 </div>
 
 <style>
@@ -270,5 +317,13 @@
 
   img {
     margin-top: -5px;
+  }
+
+  ul.facets {
+    padding-top: 500px;
+  }
+  
+  .content {
+    padding-top: 200px;
   }
 </style>

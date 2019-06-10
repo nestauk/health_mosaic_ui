@@ -1,11 +1,12 @@
 import { Machine, interpret } from 'xstate';
+import { get } from 'svelte/store';
+import { goto } from '@sapper/app';
+import * as _ from 'lamb';
+
 import { createSearchConfig, searchOptions } from './search_machine';
 import { contentAliases, subjectAliases } from '../config';
 import { Tab, UIField, UITerm } from '../stores/interfaces';
-import { get, writable } from 'svelte/store';
 import { toggleBoolean, add1, removeLast } from '../util/transform';
-
-import * as _ from 'lamb';
 
 const screen_config = {
   id: 'screen',
@@ -143,6 +144,10 @@ const screen_config = {
         DIRTY: {
           actions: () => console.log('DIRTY'),
         },
+        ROUTE_CHANGED: {
+          target: '#Disabled',
+          actions: ['changeRoute'],
+        },
       },
       states: {
         Interactive: {
@@ -150,6 +155,11 @@ const screen_config = {
         },
         Disabled: {
           id: 'Disabled',
+          on: {
+            ROUTE_CHANGE_COMPLETED: {
+              target: '#Interactive',
+            },
+          },
         },
       },
     },
@@ -259,7 +269,7 @@ export const screen_options = {
         Machine(
           createSearchConfig(screen_machine_base),
           searchOptions
-        ).withContext({ screenStore, queryObj, currentTab })
+        ).withContext({ screenStore, queryObj, currentTab, path: '' })
       );
 
       screenMachine.onTransition(e => screenStore.update(s => s));
@@ -448,6 +458,9 @@ export const screen_options = {
     },
     toggleTabVisibility: ({ screenStore }, { id }) => {
       screenStore.update(_.updatePath(`${id}.visible`, toggleBoolean));
+    },
+    changeRoute: (_, { path }) => {
+      goto(path);
     },
   },
 };
