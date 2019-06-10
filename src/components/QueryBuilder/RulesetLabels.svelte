@@ -4,42 +4,47 @@
 
   export let labels, rulesetDisabled;
   const dispatch = createEventDispatcher();
+  const isntStatusDefault = object => object.status !== 'default';
+
+  $: labelArray = Object.entries(labels);
+  $: hasLabels = labelArray.some(array => array[1].some(isntStatusDefault));
 </script>
 
-{#each Object.entries(labels) as [section, labelCollection]}
-  <ul class="tag-container">
-    {#each labelCollection as { field, status, disabled, options }, index}
-      {#if status !== 'default'}
-        <li
-          class="tags {status}"
-          on:mouseenter="{() => dispatch('hover', { section, index })}"
-          on:mouseleave="{() => dispatch('unhover', { section, index })}"
-          style="{ rulesetDisabled ? 'opacity: 0.5;': ''} transition:opacity 0.3s;"
-        >
-          <span
-            style="{disabled ? 'opacity: 0.5;' : ''} transition:opacity 0.3s;"
+{#if hasLabels}
+  {#each labelArray as [section, labelCollection]}
+    <ul class="tag-container">
+      {#each labelCollection as { field, status, disabled, options }, index}
+        {#if status !== 'default'}
+          <li
+            class="tags {status}"
+            on:mouseenter="{() => dispatch('hover', { section, index })}"
+            on:mouseleave="{() => dispatch('unhover', { section, index })}"
+            style="{ rulesetDisabled ? 'opacity: 0.5;': ''} transition:opacity 0.3s;"
           >
-            {field}
-            <span class="icon-wrap">
+            <span
+              style="{disabled ? 'opacity: 0.5;' : ''} transition:opacity 0.3s;"
+            >
+              {field}
+              <span class="icon-wrap">
 
-              {#if options}
-                <QueryControls
-                  status="{status}"
-                  disabled={disabled}
-                  on:delete="{() => dispatch('delete', { section, index } )}"
-                  on:disable="{() => dispatch('disable', { section, index } )}"
-                  on:toggle="{() => dispatch('toggle', { section, index } )}"
-                />
-              {/if}
+                {#if options}
+                  <QueryControls
+                    status="{status}"
+                    disabled={disabled}
+                    on:delete="{() => dispatch('delete', { section, index } )}"
+                    on:disable="{() => dispatch('disable', { section, index } )}"
+                    on:toggle="{() => dispatch('toggle', { section, index } )}"
+                  />
+                {/if}
 
+              </span>
             </span>
-          </span>
-        </li>
-      {/if}
-    {/each}
-  </ul>
-{/each}
-
+          </li>
+        {/if}
+      {/each}
+    </ul>
+  {/each}
+{/if}
 
 <style>
 .tag-container {

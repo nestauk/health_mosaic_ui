@@ -93,13 +93,16 @@ export const searchOptions = {
     updateData: ({ screenStore, queryObj, currentTab }, evt) => {
       const tab = get(currentTab);
       const currentQuery = get(queryObj)[tab];
-      screenStore.update(tabs => ({
-        ...tabs,
-        [tab]: {
-          ...tabs[tab],
-          results: { data: evt.data.data.All, queryObj: currentQuery },
-        },
-      }));
+      console.log(currentQuery);
+      screenStore.update(tabs => {
+        return {
+          ...tabs,
+          [tab]: {
+            ...tabs[tab],
+            results: { data: evt.data.data.All, queryObj: currentQuery },
+          },
+        };
+      });
     },
   },
   services: {
