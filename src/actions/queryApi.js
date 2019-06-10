@@ -5,13 +5,12 @@ export async function query(query) {
     query All($query: [QueryObject]) {
       All(query: $query) {
         city
-        continent
+        continent_id
         cost_ref
-        countries_codes
-        countries_names
-        country
+        countries_ids
         country_id
         end
+        funders
         is_health_related
         location {
           lon
@@ -21,17 +20,19 @@ export async function query(query) {
         novelty
         region
         sdg_labels
-        state
+        state_id
         start
         terms
         type
       }
     }
   `;
+
   const client = new ApolloClient({
     /* eslint-disable-next-line no-undef */
     uri: REPLACE_GRAPHQL_ENDPOINT,
   });
+
   const results = await client.query({
     query: QUERY_ALL,
     variables: {

@@ -1,5 +1,5 @@
 import { union } from 'lamb';
-import { newFieldMappings } from '../config';
+import { fieldGroups } from '../config';
 
 export const parseQuery = inputObject => {
   const { value } = inputObject;
@@ -26,7 +26,7 @@ const filterQueryObject = ({ visible, status }) =>
 
 const transFormFields = (acc, { field, status }) => [
   ...acc,
-  ...newFieldMappings[field].map(v => ({ title: v, status })),
+  ...fieldGroups[field].map(v => ({ title: v, status })),
 ];
 
 const createValidFields = fields =>

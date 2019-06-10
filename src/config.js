@@ -1,23 +1,26 @@
 const mode = process.env.NODE_ENV;
 const dev = mode === 'development';
 
-export const endpointNIH_index = 'NIH';
 export const BASE_URL =
   'https://search-health-scanner-5cs7g52446h7qscocqmiky5dn4.eu-west-2.es.amazonaws.com';
 
-export const endpointRWJF = `${BASE_URL}/rwjf`;
-export const endpointRWJFCount = `${endpointRWJF}/_count`;
-export const endpointRWJFSearch = `${endpointRWJF}/_search`;
-
-export const endpointNIH = `${BASE_URL}/nih_v2`;
+export const NIH_index = 'nih_v4';
+export const endpointNIH = `${BASE_URL}/${NIH_index}`;
 export const endpointNIHCount = `${endpointNIH}/_count`;
 export const endpointNIHSearch = `${endpointNIH}/_search`;
 
-export const endpointCB = `${BASE_URL}/crunchbase`;
+export const CB_index = 'companies_v2';
+export const endpointCB = `${BASE_URL}/${CB_index}`;
 export const endpointCBCount = `${endpointCB}/_count`;
 export const endpointCBSearch = `${endpointCB}/_search`;
 
-export const endpointScanner = `${BASE_URL}/health_scanner`;
+export const MU_index = 'meetup_v1';
+export const endpointMU = `${BASE_URL}/${MU_index}`;
+export const endpointMU_Count = `${endpointMU}/_count`;
+export const endpointMU_Search = `${endpointMU}/_search`;
+
+export const HS_index = 'health_scanner';
+export const endpointScanner = `${BASE_URL}/${HS_index}`;
 export const endpointScannerCount = `${endpointScanner}/_count`;
 export const endpointScannerSearch = `${endpointScanner}/_search`;
 
@@ -26,51 +29,31 @@ export const graphqlEndpoint = dev
   ? '"http://localhost:9000/.netlify/functions/graphql"'
   : '"/.netlify/functions/graphql"';
 
-export const newFieldMappings = {
-  type: ['type'],
+export const fieldGroups = {
+  // subject
   name: ['name'],
+  place: ['continent', 'country', 'state', 'region', 'city'],
+
+  // content
   body: ['body'],
+  categories: ['sdg_labels'],
+  cost: ['cost_ref'],
+  location: ['location'],
   summary: ['summary'],
   terms: ['terms'],
-  place: ['country', 'state', 'region', 'city', 'continent'],
-  location: ['location'],
-  cost: ['cost_ref'],
   time: ['start', 'end'],
-  categories: ['sdg_labels'],
+  type: ['type'],
 };
 
 export const subjectAliases = ['name', 'place'];
 export const contentAliases = ['body', 'summary', 'terms'];
-export const subjectFields = {
-  name: ['name'],
-  place: ['city', 'country'],
-};
-
-export const contentFields = {
-  body: ['textBody_descriptive_project'],
-  summary: ['summary'],
-  terms: ['terms'],
-};
 
 export const requiredFields = {
-  NIH: [
-    { field: 'title_of_organisation', type: 'text' },
-    { field: 'textBody_abstract_project', type: 'text' },
-    { field: 'terms_mesh_abstract', type: 'text' },
-    { field: 'placeName_country_organisation', type: 'keyword' },
-    { field: 'placeName_city_organisation', type: 'keyword' },
-    { field: 'id_iso2_country', type: 'keyword' },
-    { field: 'coordinate_of_organisation', type: 'geo_point' },
-    { field: 'date_start_project', type: 'date' },
-    { field: 'cost_total_project', type: 'integer' },
-    { field: 'currency_total_cost', type: 'keyword' },
-  ],
   CB: [
     { field: 'name_of_organisation', type: 'text' },
     { field: 'textBody_descriptive_organisation', type: 'text' },
     { field: 'textBody_summary_organisation', type: 'text' },
     { field: 'terms_mesh_description', type: 'text' },
-    { field: 'placeName_country_organisation', type: 'keyword' },
     { field: 'placeName_city_organisation', type: 'keyword' },
     { field: 'id_iso2_country', type: 'keyword' },
     { field: 'coordinate_of_city', type: 'geo_point' },
@@ -78,7 +61,29 @@ export const requiredFields = {
     { field: 'cost_of_funding', type: 'integer' },
     { field: 'currency_of_funding', type: 'keyword' },
   ],
+  MU: [
+    { field: 'coordinate_of_group', type: 'geo_point' },
+    { field: 'datetime_start_group', type: 'date' },
+    { field: 'id_iso2_country', type: 'keyword' },
+    { field: 'name_of_group', type: 'text' },
+    { field: 'placeName_city_group', type: 'keyword' },
+    { field: 'terms_topics_group', type: 'text' },
+    { field: 'textBody_descriptive_group', type: 'text' },
+  ],
+  NIH: [
+    { field: 'title_of_organisation', type: 'text' },
+    { field: 'textBody_abstract_project', type: 'text' },
+    { field: 'terms_mesh_abstract', type: 'text' },
+    { field: 'placeName_city_organisation', type: 'keyword' },
+    { field: 'id_iso2_country', type: 'keyword' },
+    { field: 'coordinate_of_organisation', type: 'geo_point' },
+    { field: 'date_start_project', type: 'date' },
+    { field: 'cost_total_project', type: 'integer' },
+    { field: 'currency_total_cost', type: 'keyword' },
+  ],
 };
+
+/* mapbox */
 
 export const MAPBOXGL_STYLEURL =
   'mapbox://styles/nesta-uk/cjja7cb0s0bcw2rmvflhof4io';

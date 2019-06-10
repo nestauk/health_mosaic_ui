@@ -1,5 +1,5 @@
 import * as _ from 'lamb';
-import { newFieldMappings } from '../config';
+import { fieldGroups } from '../config';
 
 export const toggleBoolean = (x: boolean): boolean => !x;
 export const add1 = _.add(1);
@@ -11,7 +11,7 @@ const filterQueryObject = ({ disabled, status }) => {
 
 const transFormFields = (acc, { field, status }) => [
   ...acc,
-  ...newFieldMappings[field].map(v => ({ title: v, status })),
+  ...fieldGroups[field].map(v => ({ title: v, status })),
 ];
 
 const createValidFields = fields =>
