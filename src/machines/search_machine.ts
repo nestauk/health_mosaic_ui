@@ -1,7 +1,11 @@
 import { get } from 'svelte/store';
-import { query } from '../actions/queryApi';
+import { goto } from '@sapper/app';
 import * as _ from 'lamb';
 import { send } from 'xstate';
+
+import { uiQueryToUrlString } from '../util/urlBuilder';
+import { makeRouteUrl } from '../util/transform';
+import { query } from '../actions/queryApi';
 
 export const createSearchConfig = childMachine => ({
   id: 'search',
@@ -92,14 +96,17 @@ export const searchOptions = {
     shareDirty: send('DIRTY', { to: 'Link' }),
     updateData: ({ screenStore, queryObj, currentTab }, evt) => {
       const tab = get(currentTab);
-      const currentQuery = get(queryObj)[tab];
-      console.log(currentQuery);
+      const currentQueryObject = get(queryObj)[tab];
+      const currentQuery = get(screenStore)[tab];
+
+      const urlQuery = uiQueryToUrlString(currentQuery.uiQuery);
+      goto(makeRouteUrl('search', { q: urlQuery }));
       screenStore.update(tabs => {
         return {
           ...tabs,
           [tab]: {
             ...tabs[tab],
-            results: { data: evt.data.data.All, queryObj: currentQuery },
+            results: { data: evt.data.data.All, queryObj: currentQueryObject },
           },
         };
       });

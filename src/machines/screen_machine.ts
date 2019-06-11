@@ -1,17 +1,27 @@
-import { Machine, interpret } from 'xstate';
 import { get } from 'svelte/store';
 import { goto } from '@sapper/app';
+import { Machine, interpret } from 'xstate';
 import * as _ from 'lamb';
 
 import { createSearchConfig, searchOptions } from './search_machine';
 import { contentAliases, subjectAliases } from '../config';
-import { Tab, UIField, UITerm } from '../stores/interfaces';
-import { toggleBoolean, add1, removeLast } from '../util/transform';
+import { Tab } from '../stores/interfaces';
+import { parseQueryUrl } from '../util/urlParser';
+import { uiQueryToUrlString } from '../util/urlBuilder';
+
+import { newRuleset, newField, newTerm } from '../util/query';
+import {
+  add1,
+  isNot,
+  makeRouteUrl,
+  toggleBoolean,
+  removeLast,
+} from '../util/transform';
 
 const screen_config = {
   id: 'screen',
   type: 'parallel',
-  onEntry: ['createTab', 'setCurrentTab', 'pushHistory'],
+  //onEntry: ['createTab', 'setCurrentTab', 'pushHistory'],
   states: {
     Form: {
       id: 'Form',
@@ -108,13 +118,18 @@ const screen_config = {
         Idle: {
           on: {
             TAB_DELETED: {
-              actions: ['deleteTab', 'popHistory'],
+              actions: ['deleteTab', 'popHistory', 'setUrlQuery'],
             },
             TAB_CREATED: {
-              actions: ['createTab', 'setCurrentTab', 'pushHistory'],
+              actions: [
+                'createTab',
+                'setCurrentTab',
+                'pushHistory',
+                'setUrlQuery',
+              ],
             },
             TAB_SELECTED: {
-              actions: ['setCurrentTab', 'pushHistory'],
+              actions: ['setCurrentTab', 'pushHistory', 'setUrlQuery'],
             },
             TAB_RENAMED: {
               actions: ['setTabLabel'],
@@ -168,32 +183,8 @@ const screen_config = {
 
 export const screen_machine_base = Machine(screen_config);
 
-const newTerm = (term: string = '', status: 'and' | 'not' = 'and'): UITerm => ({
-  term,
-  status,
-});
-
-export const newField = (fields: string[]): UIField[] =>
-  fields.map(field => ({
-    field,
-    status: 'default',
-    options: false,
-    disabled: false,
-  }));
-
-const newRuleset = () => ({
-  terms: [newTerm()],
-  fields: {
-    subject: newField(subjectAliases),
-    content: newField(contentAliases),
-  },
-  options: false,
-  disabled: false,
-  selected: true,
-});
-
-const newTab = (machine, id): Tab => ({
-  uiQuery: [newRuleset()],
+const newTab = (machine, id, uiQuery): Tab => ({
+  uiQuery,
   searchMachine: machine,
   name: 'Tab' + id,
   visible: true,
@@ -260,9 +251,11 @@ const hideTabRuleOptions = tabId =>
 
 const toggleTerm = status => (status === 'and' ? 'not' : 'and');
 
+const removeHistoryEntries = removedTab => _.filterWith(isNot(removedTab));
+
 export const screen_options = {
   actions: {
-    createTab: ({ screenStore, idStore, queryObj, currentTab }) => {
+    createTab: ({ screenStore, idStore, queryObj, currentTab }, { params }) => {
       // xstate 4.6 -- spawn?
       const id = get(idStore);
       const screenMachine = interpret(
@@ -275,19 +268,35 @@ export const screen_options = {
       screenMachine.onTransition(e => screenStore.update(s => s));
 
       screenMachine.start();
-
-      screenStore.update(_.setKey(id, newTab(screenMachine, id)));
+      screenStore.update(
+        _.setKey(
+          id,
+          newTab(
+            screenMachine,
+            id,
+            params ? parseQueryUrl(params) : [newRuleset(true)],
+            true
+          )
+        )
+      );
       idStore.update(add1);
     },
     deleteTab: ({ screenStore, historyStore, currentTab }, { id }) => {
       // xstate 4.6 -- spawn?
-      get(screenStore)[id].searchMachine.stop();
+      let store = get(screenStore);
+
+      store[id].searchMachine.stop();
       screenStore.update(_.skipKeys([id]));
+
+      store = get(screenStore);
+      const tabs = Object.keys(store);
+
+      historyStore.update(removeHistoryEntries(id));
 
       const history = get(historyStore);
       const prev = history[history.length - 2];
 
-      currentTab.set(prev);
+      currentTab.set(prev ? prev : tabs[0]);
     },
     setCurrentTab: ({ currentTab }, { id = 0 }) => {
       currentTab.set(id);
@@ -356,7 +365,7 @@ export const screen_options = {
 
       screenStore.update(updateLabelStatus);
     },
-    selectRule: ({ screenStore }, { tabId, targetIndex }) => {
+    selectRule: ({ screenStore }, { tabId, targetIndex = 0 }) => {
       const hideOptions = _.updatePath(
         `${tabId}.uiQuery`,
         _.mapWith(deselectRule)
@@ -461,6 +470,14 @@ export const screen_options = {
     },
     changeRoute: (_, { path }) => {
       goto(path);
+    },
+    setUrlQuery: ({ screenStore, queryObj, currentTab }) => {
+      const tab = get(currentTab);
+      const currentQuery = get(screenStore)[tab];
+
+      const urlQuery = uiQueryToUrlString(currentQuery.uiQuery);
+      goto(makeRouteUrl('search', urlQuery ? { q: urlQuery } : false));
+      // goto(`/search${urlQuery ? '?q=' : ''}${urlQuery}`);
     },
   },
 };

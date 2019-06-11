@@ -3,12 +3,12 @@
 </script>
 
 <script>
+  import { stores } from '@sapper/app';
   import { writable } from 'svelte/store';
-  import { onDestroy, setContext } from 'svelte';
+  import { onMount, onDestroy, setContext } from 'svelte';
   import { interpret } from 'xstate';
   import compare from 'just-compare';
   import * as _ from 'lamb';
-
 
   import Nav from '../../components/Nav.svelte';
   import { Form, FormInput, FormLabels } from '../../components/QueryBuilder/Form';
@@ -26,7 +26,7 @@
   } from '../../stores/search.ts'
 
   
-
+  const { page } = stores();
   export const screenService = interpret(
     screen_machine.withContext({
       screenStore,
@@ -42,17 +42,21 @@
   screenService.onTransition(set);
   screenService.start();
 
+  onDestroy(() => {
+    screenService.stop();
+  })
+
+  screenMachine.send({
+    type: 'TAB_CREATED', 
+    id: $idStore, 
+    params: $page.query && $page.query.q 
+  });
+
   setContext(SEARCH, {
     transitionComplete: () => screenMachine.send({ type: 'ROUTE_CHANGE_COMPLETED' }),
     data: screenStore,
     checkDirty: () => searchMachine.state.matches('Search.NotEmpty.Dirty')
   });
-
-  onDestroy(() => {
-    screenService.stop();
-  })
-
-
 
   let formHeight, input;
 
@@ -75,32 +79,19 @@
   $: tabs = Object.entries($screenStore);
   $: isQueries = uiQuery[0] && uiQuery[0].terms[0].term;
 
+  onMount(() => {
+    if($page.query && $page.query.q) {
+      searchMachine.send('QUERY_ENTERED')
+      searchMachine.send({ type:'SEARCHED', tab: $currentTab });
+    }
+  })
+
   const stripEmpties = _.filterWith(_.allOf([
     _.getPath('values.length'),
     _.getPath('values.0.query.length')
   ]));
 
-  const newTab = () =>  screenMachine.send({type: 'TAB_CREATED', id: $idStore });
-
-  const sendTab = (type, id) =>  screenMachine.send({type, id: parseInt(id, 10) });
-  const sendTabEdit = ({detail: { value, id }}) => 
-    screenMachine.send({type: 'TAB_RENAMED', labelText: value , id: parseInt(id, 10)});
-
-  const handleChange = ({ detail }) => {
-
-    screenMachine.send({
-      type: 'TEXT_CHANGED',
-      tabId: $currentTab,
-      ruleIndex: rulesetIndex,
-      text: detail
-    });
-
-    if ($queryObj[$currentTab]) {
-      searchMachine.send('QUERY_ENTERED')
-    } else {
-      searchMachine.send('QUERY_CLEARED')
-    }
-
+  function checkDirty() {
     const cachedQuery =
       $queryObj[$currentTab]
       && stripEmpties($screenStore[$currentTab].results.queryObj);
@@ -113,6 +104,28 @@
     } else {
       searchMachine.send('QUERY_CHANGED')
     }
+  }
+
+  const newTab = () =>  screenMachine.send({type: 'TAB_CREATED', id: $idStore });
+
+  const sendTab = (type, id) =>  screenMachine.send({type, id: parseInt(id, 10) });
+  const sendTabEdit = ({detail: { value, id }}) => 
+    screenMachine.send({type: 'TAB_RENAMED', labelText: value , id: parseInt(id, 10)});
+
+  const handleChange = ({ detail }) => {
+    screenMachine.send({
+      type: 'TEXT_CHANGED',
+      tabId: $currentTab,
+      ruleIndex: rulesetIndex,
+      text: detail
+    });
+
+    if ($queryObj[$currentTab]) {
+      searchMachine.send('QUERY_ENTERED')
+    } else {
+      searchMachine.send('QUERY_CLEARED')
+    }
+    checkDirty()
   }
 
   const handleSend = (event) => {
@@ -129,37 +142,44 @@
     })
   }
 
-  const toggleTermStatus = (ruleIndex, termIndex) =>
+  const toggleTermStatus = (ruleIndex, termIndex) => {
     screenMachine.send({
       type: 'TERM_CLICKED',
       tabId: $currentTab,
       ruleIndex,
       termIndex
     })
-
-  const sendRule = (type, ruleIndex) =>
+    checkDirty();
+  }
+  const sendRule = (type, ruleIndex) => {
     screenMachine.send({
       type,
       tabId: $currentTab,
       ruleIndex
     });
+    checkDirty();
+  }
 
-  const sendRuleLabel = (type, { section, index: labelIndex } ) =>
+  const sendRuleLabel = (type, { section, index: labelIndex }, ruleIndex = rulesetIndex ) =>{
     screenMachine.send({
       type,
       tabId: $currentTab,
-      ruleIndex: rulesetIndex,
+      ruleIndex,
       section: section.toLowerCase(),
       labelIndex
     });
+    checkDirty();
+  }
 
-  const copyRuleset = (ruleIndex) =>
+  const copyRuleset = (ruleIndex) => {
     screenMachine.send({
       type: 'RULE_COPIED',
       tabId: $currentTab,
       ruleIndex,
       targetIndex: uiQuery.length
     })
+    checkDirty();
+  }
 
   const selectRuleset = (targetIndex) =>
     screenMachine.send({
@@ -184,6 +204,7 @@
   on:deletetab="{({detail}) => sendTab('TAB_DELETED', detail)}"
   on:textchange={sendTabEdit}
 />
+
 
 <div 
   class="search" 
@@ -231,11 +252,11 @@
         <RulesetLabels
           rulesetDisabled={disabled}
           labels="{{ subject: fields.subject, content: fields.content }}"
-          on:hover={({ detail }) => sendRuleLabel('LABEL_OPTIONS_SELECTED', detail)}
-          on:unhover={({ detail }) => sendRuleLabel('LABEL_OPTIONS_DISMISSED', detail)}
-          on:disable={({ detail }) => sendRuleLabel('LABEL_DISABLED', detail)}
-          on:delete={({ detail }) => sendRuleLabel('LABEL_DELETED', detail)}
-          on:toggle={({ detail }) => sendRuleLabel('LABEL_TOGGLED', detail)}
+          on:hover={({ detail }) => sendRuleLabel('LABEL_OPTIONS_SELECTED', detail, i)}
+          on:unhover={({ detail }) => sendRuleLabel('LABEL_OPTIONS_DISMISSED', detail, i)}
+          on:disable={({ detail }) => sendRuleLabel('LABEL_DISABLED', detail, i)}
+          on:delete={({ detail }) => sendRuleLabel('LABEL_DELETED', detail, i)}
+          on:toggle={({ detail }) => sendRuleLabel('LABEL_TOGGLED', detail, i)}
         />
       </Ruleset>
     {/each}

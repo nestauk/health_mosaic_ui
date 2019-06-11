@@ -1,4 +1,4 @@
-import { union } from 'lamb';
+import * as _ from 'lamb';
 import { fieldGroups } from '../config';
 
 export const parseQuery = inputObject => {
@@ -21,7 +21,7 @@ export const parseQuery = inputObject => {
   };
 };
 
-const filterQueryObject = ({ visible, status }) =>
+const isVisibleField = ({ visible, status }) =>
   status !== 'default' && visible;
 
 const transFormFields = (acc, { field, status }) => [
@@ -29,13 +29,15 @@ const transFormFields = (acc, { field, status }) => [
   ...fieldGroups[field].map(v => ({ title: v, status })),
 ];
 
-const createValidFields = fields =>
-  fields.filter(filterQueryObject).reduce(transFormFields, []);
+const createValidFields = _.pipe([
+  _.filterWith(isVisibleField),
+  _.reduceWith(transFormFields, [])
+]);
 
-const transformValues = ({ value, status }) => ({ query: value, status });
+const transformValue = ({ value, status }) => ({ query: value, status });
 
 export const createQueryObject = queries =>
   queries.map(({ content, subject, value }) => ({
-    fields: createValidFields(union(content, subject)),
-    values: value.map(transformValues),
+    fields: createValidFields(_.union(content, subject)),
+    values: value.map(transformValue),
   }));
