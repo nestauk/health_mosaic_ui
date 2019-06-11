@@ -12,19 +12,34 @@ export const stringifyTerms = ({ status, term }) =>
 export const stringifyFields = ({ status, field }) =>
   (status === 'excluded' ? '-' : '') + field;
 
-export const filterQuery = uiQuery =>
-  uiQuery.filter(filterRuleset).map(query => ({
-    terms: query.terms.filter(({ term }) => term.length),
-    fields: [].concat(
-      query.fields.subject.filter(filterFields),
-      query.fields.content.filter(filterFields)
-    ),
-  }));
+const filterJoinedFields = _.pipe([_.flatten, _.filterWith(filterFields)]);
 
-export const queryToUrlString = query =>
-  query
-    .map(query => ({
-      terms: query.terms.map(stringifyTerms).join(','),
-      fields: query.fields.map(stringifyFields).join(','),
-    }))
-    .reduce((acc, { terms, fields }) => `${acc}(${terms},in:${fields})`, '');
+const joinWith = delimiter => arr => arr.join(delimiter);
+
+const removeEmptyTerm = ({ term }) => term.length;
+
+export const filterProperties = query => ({
+  terms: _.filter(query.terms, removeEmptyTerm),
+  fields: filterJoinedFields(Object.values(query.fields)),
+});
+
+export const filterQuery = _.pipe([
+  _.filterWith(filterRuleset),
+  _.mapWith(filterProperties),
+]);
+
+const termsToUrl = _.pipe([_.mapWith(stringifyTerms), joinWith(',')]);
+const fieldsToUrl = _.pipe([_.mapWith(stringifyFields), joinWith(',')]);
+
+const queryToStringArray = query => ({
+  terms: termsToUrl(query.terms),
+  fields: fieldsToUrl(query.fields),
+});
+
+const stringArrayToUrl = (acc, { terms, fields }) =>
+  `${acc}(${terms},in:${fields})`;
+
+export const queryToUrlString = _.pipe([
+  _.mapWith(queryToStringArray),
+  _.reduceWith(stringArrayToUrl, ''),
+]);
