@@ -5,8 +5,14 @@ import * as _ from 'lamb';
 
 import { createSearchConfig, searchOptions } from './search_machine';
 import { contentAliases, subjectAliases } from '../config';
-import { Tab, UIField, UITerm } from '../stores/interfaces';
-import { toggleBoolean, add1, removeLast } from '../util/transform';
+import { Tab } from '../stores/interfaces';
+import {
+  newRuleset,
+  newField,
+  toggleBoolean,
+  add1,
+  removeLast,
+} from '../util/transform';
 
 const screen_config = {
   id: 'screen',
@@ -167,30 +173,6 @@ const screen_config = {
 };
 
 export const screen_machine_base = Machine(screen_config);
-
-const newTerm = (term: string = '', status: 'and' | 'not' = 'and'): UITerm => ({
-  term,
-  status,
-});
-
-export const newField = (fields: string[]): UIField[] =>
-  fields.map(field => ({
-    field,
-    status: 'default',
-    options: false,
-    disabled: false,
-  }));
-
-const newRuleset = () => ({
-  terms: [newTerm()],
-  fields: {
-    subject: newField(subjectAliases),
-    content: newField(contentAliases),
-  },
-  options: false,
-  disabled: false,
-  selected: true,
-});
 
 const newTab = (machine, id): Tab => ({
   uiQuery: [newRuleset()],

@@ -1,5 +1,7 @@
 import * as _ from 'lamb';
 import { fieldGroups } from '../config';
+import { contentAliases, subjectAliases } from '../config';
+import { UIField, UITerm } from '../stores/interfaces';
 
 export const toggleBoolean = (x: boolean): boolean => !x;
 export const add1 = _.add(1);
@@ -36,3 +38,27 @@ export const queryToString = query =>
         (arr.length - 1 === i ? '' : ','),
       ''
     );
+
+const newTerm = (term: string = '', status: 'and' | 'not' = 'and'): UITerm => ({
+  term,
+  status,
+});
+
+export const newField = (fields: string[]): UIField[] =>
+  fields.map(field => ({
+    field,
+    status: 'default',
+    options: false,
+    disabled: false,
+  }));
+
+export const newRuleset = () => ({
+  terms: [newTerm()],
+  fields: {
+    subject: newField(subjectAliases),
+    content: newField(contentAliases),
+  },
+  options: false,
+  disabled: false,
+  selected: true,
+});
