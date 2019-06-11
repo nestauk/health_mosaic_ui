@@ -1,14 +1,18 @@
-import resolve from 'rollup-plugin-node-resolve';
-import replace from 'rollup-plugin-replace';
-import commonjs from 'rollup-plugin-commonjs';
-import svelte from 'rollup-plugin-svelte';
-import img from 'rollup-plugin-img';
-import babel from 'rollup-plugin-babel';
+import { sizeSnapshot } from "rollup-plugin-size-snapshot";
 import { terser } from 'rollup-plugin-terser';
-import config from 'sapper/config/rollup.js';
-import less from 'less';
-import typescript from 'rollup-plugin-typescript';
+import babel from 'rollup-plugin-babel';
+import commonjs from 'rollup-plugin-commonjs';
 import copy from 'rollup-plugin-copy-files';
+import filesize from 'rollup-plugin-filesize';
+import img from 'rollup-plugin-img';
+import less from 'less';
+import replace from 'rollup-plugin-replace';
+import resolve from 'rollup-plugin-node-resolve';
+import sizes from 'rollup-plugin-sizes';
+import svelte from 'rollup-plugin-svelte';
+import typescript from 'rollup-plugin-typescript';
+
+import config from 'sapper/config/rollup.js';
 import pkg from './package.json';
 
 import { graphqlEndpoint } from './src/config';
@@ -115,6 +119,10 @@ export default {
         terser({
           module: true,
         }),
+
+      sizes(),
+      // sizeSnapshot(),
+      filesize(),
     ],
   },
 
