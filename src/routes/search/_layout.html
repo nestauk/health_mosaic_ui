@@ -47,12 +47,12 @@
     data: screenStore,
     checkDirty: () => searchMachine.state.matches('Search.NotEmpty.Dirty')
   });
+  screenMachine.send(screenMachine.send({type: 'TAB_CREATED', id: $idStore, params: $page.query && $page.query.q }))
+
 
   onDestroy(() => {
     screenService.stop();
   })
-
-
 
   let formHeight, input;
 
@@ -75,10 +75,8 @@
   $: tabs = Object.entries($screenStore);
   $: isQueries = uiQuery[0] && uiQuery[0].terms[0].term;
 
-  screenMachine.send(screenMachine.send({type: 'TAB_CREATED', id: $idStore, params: $page.query && $page.query.q }))
-
   onMount(() => {
-    if($page.query && $page.query.q) { 
+    if($page.query && $page.query.q) {
       searchMachine.send('QUERY_ENTERED')
       searchMachine.send({ type:'SEARCHED', tab: $currentTab });
     }
@@ -202,6 +200,7 @@
   on:deletetab="{({detail}) => sendTab('TAB_DELETED', detail)}"
   on:textchange={sendTabEdit}
 />
+
 
 <div 
   class="search" 

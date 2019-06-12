@@ -98,7 +98,6 @@ export const searchOptions = {
 
       const currentQueryObject = get(queryObj)[tab];
       const urlQuery = queryToUrlString(currentQuery.uiQuery);
-      console.log('hello', currentQuery, urlQuery);
       goto(`/search?q=${urlQuery}`);
 
       screenStore.update(tabs => {

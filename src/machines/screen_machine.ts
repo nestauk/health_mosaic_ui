@@ -181,8 +181,8 @@ const screen_config = {
 
 export const screen_machine_base = Machine(screen_config);
 
-const newTab = (machine, id, params): Tab => ({
-  uiQuery: params || [newRuleset()],
+const newTab = (machine, id, params, selected): Tab => ({
+  uiQuery: params || [newRuleset(selected)],
   searchMachine: machine,
   name: 'Tab' + id,
   visible: true,
@@ -264,11 +264,15 @@ export const screen_options = {
       screenMachine.onTransition(e => screenStore.update(s => s));
 
       screenMachine.start();
-
       screenStore.update(
         _.setKey(
           id,
-          newTab(screenMachine, id, params ? parseQueryUrl(params) : false)
+          newTab(
+            screenMachine,
+            id,
+            params ? parseQueryUrl(params) : false,
+            true
+          )
         )
       );
       idStore.update(add1);

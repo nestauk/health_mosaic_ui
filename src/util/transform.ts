@@ -55,7 +55,7 @@ export const newField = (fields: string[]): UIField[] =>
     disabled: false,
   }));
 
-export const newRuleset = () => ({
+export const newRuleset = (selected = false) => ({
   terms: [newTerm()],
   fields: {
     subject: newField(subjectAliases),
@@ -63,5 +63,5 @@ export const newRuleset = () => ({
   },
   options: false,
   disabled: false,
-  selected: false,
+  selected: selected,
 });
