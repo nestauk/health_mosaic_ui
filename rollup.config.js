@@ -1,16 +1,17 @@
+import less from 'less';
+import babel from 'rollup-plugin-babel';
+import commonjs from 'rollup-plugin-commonjs';
+import copy from 'rollup-plugin-copy-files';
+import img from 'rollup-plugin-img';
+import json from 'rollup-plugin-json';
 import resolve from 'rollup-plugin-node-resolve';
 import replace from 'rollup-plugin-replace';
-import commonjs from 'rollup-plugin-commonjs';
 import svelte from 'rollup-plugin-svelte';
-import img from 'rollup-plugin-img';
-import babel from 'rollup-plugin-babel';
 import { terser } from 'rollup-plugin-terser';
-import config from 'sapper/config/rollup.js';
-import less from 'less';
 import typescript from 'rollup-plugin-typescript';
-import copy from 'rollup-plugin-copy-files';
-import pkg from './package.json';
+import config from 'sapper/config/rollup.js';
 
+import pkg from './package.json';
 import { graphqlEndpoint } from './src/config';
 
 const mode = process.env.NODE_ENV;
@@ -69,6 +70,7 @@ export default {
       copy({
         'node_modules/mapbox-gl/dist/mapbox-gl.css': 'static/mapbox-gl.css',
       }),
+      json(),
       replace({
         'process.browser': true,
         'process.env.NODE_ENV': JSON.stringify(mode),
@@ -134,6 +136,7 @@ export default {
         'process.env.NODE_ENV': JSON.stringify(mode),
         REPLACE_GRAPHQL_ENDPOINT: graphqlEndpoint,
       }),
+      json(),
       svelte({
         generate: 'ssr',
         dev,
@@ -157,6 +160,7 @@ export default {
     output: config.serviceworker.output(),
     plugins: [
       resolve(),
+      json(),
       replace({
         'process.browser': true,
         'process.env.NODE_ENV': JSON.stringify(mode),

@@ -2,24 +2,20 @@
   import { getContext } from 'svelte';
   import { stores } from '@sapper/app';
 
-  import { Results, ResultsItem } from '../../components/Results';
   import { screenStore, currentTab } from '../../stores/search.ts';
-  import { SEARCH } from './_layout.html';
 
+  import { SEARCH } from './_layout.html';
+  import { volume_geo } from './facets';
+
+  const facets = {volume_geo};
   const { checkDirty, transitionComplete } = getContext(SEARCH);
   const { page } = stores();
 
-  $: currentData = $screenStore[$currentTab].results.data;
   $: isDirty = $screenStore && checkDirty();
   $: $page && transitionComplete();
 </script>
 
-<div class="content">
-  <h1>{$page.params.facet}</h1>
-
-  <Results dirty="{isDirty}">
-    {#each currentData as data }
-    <ResultsItem {data}></ResultsItem>
-    {/each}
-  </Results>
-</div>
+<svelte:component
+  this={facets[$page.params.facet]}
+  {isDirty}
+/>

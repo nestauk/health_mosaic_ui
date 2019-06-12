@@ -1,17 +1,34 @@
-# sapper-v3
+# Health Innovation Scanner
 
-Modified v2 sapper template to work with Svelte 3.
+> Mapping health innovation globally for the Robert Wood Johnson Foundation.
 
-Note: Right now, sapper seems to expect a preload function to be exported from every route, it will still work without one but it will give you warnings. You can just `return` nothing from preload to silence it.
+## Build instruction
 
-To clone it and get started:
+For local development:
 
-```bash
-npx degit pngwn/sapper-v3 my-app
-cd my-app
-npm install # or yarn!
-npm run dev
-```
+- clone the repo:
+   `git clone git@github.com:nestauk/playground.git`
 
-Open up [localhost:3000](http://localhost:3000) and start clicking around.
+- enter the directory:
+   `cd playground`
 
+- install npm dependencies:
+   `npm i`
+
+- build the data:
+   `npm run data:geo:lookup`
+   `npm run data:geo:world`
+
+- build the lambda:
+   `npm run lambda:build`
+
+- run the lambda:
+   `npm run lambda:dev`
+
+- in a new terminal:
+   `npm run dev`
+
+   You should see a message like:
+   `> Listening on http://localhost:3000`
+
+- navigate to `http://localhost:3000`, then click on "search" or navigate directly to `http://localhost:3000/search`
