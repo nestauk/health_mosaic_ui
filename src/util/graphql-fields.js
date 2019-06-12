@@ -1,6 +1,6 @@
 const makeFieldExist = field => ({ exists: { field } });
 
-// current
+// prettier-ignore
 
 const fieldMaps = {
   body: [
