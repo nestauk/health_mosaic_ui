@@ -64,7 +64,7 @@ export const requiredFields = {
   MU: [
     { field: 'coordinate_of_group', type: 'geo_point' },
     { field: 'datetime_start_group', type: 'date' },
-    { field: 'id_iso2_country', type: 'keyword' },
+    { field: 'id_iso2_group', type: 'keyword' },
     { field: 'name_of_group', type: 'text' },
     { field: 'placeName_city_group', type: 'keyword' },
     { field: 'terms_topics_group', type: 'text' },
