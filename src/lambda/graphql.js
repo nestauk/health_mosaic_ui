@@ -7,7 +7,7 @@ import {
   NIH_index,
   CB_index,
   MU_index,
-  HS_index
+  HS_index,
 } from '../../src/config';
 import { queryMapper, mappedQueryBuilder } from '../util/graphql-fields';
 
@@ -249,7 +249,7 @@ const resolvers = {
       return data.hits.hits;
     },
   },
-  Item: { ...itemResolvers, type: parent => parent._index },
+  Item: itemResolvers,
 };
 
 const server = new ApolloServer({

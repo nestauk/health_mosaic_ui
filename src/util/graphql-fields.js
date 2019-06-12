@@ -101,6 +101,7 @@ const fieldMaps = {
   ],
   terms: [
     'terms_mesh_description',
+    'terms_topics_group',
     'terms_mesh_abstract',
   ],
   title: ['title_of_project'],
