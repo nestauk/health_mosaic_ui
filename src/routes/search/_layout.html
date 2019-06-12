@@ -3,12 +3,12 @@
 </script>
 
 <script>
+  import { stores } from '@sapper/app';
   import { writable } from 'svelte/store';
-  import { onDestroy, setContext } from 'svelte';
+  import { onMount, onDestroy, setContext } from 'svelte';
   import { interpret } from 'xstate';
   import compare from 'just-compare';
   import * as _ from 'lamb';
-
 
   import Nav from '../../components/Nav.svelte';
   import { Form, FormInput, FormLabels } from '../../components/QueryBuilder/Form';
@@ -26,7 +26,7 @@
   } from '../../stores/search.ts'
 
   
-
+  const { page } = stores();
   export const screenService = interpret(
     screen_machine.withContext({
       screenStore,
@@ -74,6 +74,17 @@
   $: isError = searchMachine.state.matches('Search.NotEmpty.Dirty.Error');
   $: tabs = Object.entries($screenStore);
   $: isQueries = uiQuery[0] && uiQuery[0].terms[0].term;
+  // $: console.log($page);
+  
+  screenMachine.send(screenMachine.send({type: 'TAB_CREATED', id: $idStore, params: $page.query && $page.query.q }))
+
+  onMount(() => {
+    if($page.query && $page.query.q) { 
+      console.log('boo', $screenStore)
+      searchMachine.send('QUERY_ENTERED')
+      searchMachine.send({ type:'SEARCHED', tab: $currentTab });
+    }
+  })
 
   const stripEmpties = _.filterWith(_.allOf([
     _.getPath('values.length'),

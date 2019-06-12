@@ -16,6 +16,7 @@ export const queryObj = derived(screenStore, $screenStore => {
   for (const key in $screenStore) {
     if ($screenStore[key].uiQuery) {
       let q = $screenStore[key].uiQuery;
+      console.log(q);
       if (
         q[0].terms.length === 0 ||
         (q[0].terms.length === 1 && q[0].terms[0].term.length === 0)

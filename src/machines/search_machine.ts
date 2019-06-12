@@ -1,3 +1,5 @@
+import { goto } from '@sapper/app';
+import { queryToUrlString } from '../util/urlParser';
 import { get } from 'svelte/store';
 import { query } from '../actions/queryApi';
 import * as _ from 'lamb';
@@ -92,14 +94,19 @@ export const searchOptions = {
     shareDirty: send('DIRTY', { to: 'Link' }),
     updateData: ({ screenStore, queryObj, currentTab }, evt) => {
       const tab = get(currentTab);
-      const currentQuery = get(queryObj)[tab];
-      console.log(currentQuery);
+      const currentQuery = get(screenStore)[tab];
+
+      const currentQueryObject = get(queryObj)[tab];
+      const urlQuery = queryToUrlString(currentQuery.uiQuery);
+      console.log('hello', currentQuery, urlQuery);
+      goto(`/search?q=${urlQuery}`);
+
       screenStore.update(tabs => {
         return {
           ...tabs,
           [tab]: {
             ...tabs[tab],
-            results: { data: evt.data.data.All, queryObj: currentQuery },
+            results: { data: evt.data.data.All, queryObj: currentQueryObject },
           },
         };
       });

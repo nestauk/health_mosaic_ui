@@ -39,7 +39,10 @@ export const queryToString = query =>
       ''
     );
 
-const newTerm = (term: string = '', status: 'and' | 'not' = 'and'): UITerm => ({
+export const newTerm = (
+  term: string = '',
+  status: 'and' | 'not' = 'and'
+): UITerm => ({
   term,
   status,
 });
@@ -60,5 +63,5 @@ export const newRuleset = () => ({
   },
   options: false,
   disabled: false,
-  selected: true,
+  selected: false,
 });

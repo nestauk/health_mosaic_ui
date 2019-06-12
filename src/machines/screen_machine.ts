@@ -6,18 +6,20 @@ import * as _ from 'lamb';
 import { createSearchConfig, searchOptions } from './search_machine';
 import { contentAliases, subjectAliases } from '../config';
 import { Tab } from '../stores/interfaces';
+import { parseQueryUrl } from '../util/urlParser';
 import {
   newRuleset,
   newField,
   toggleBoolean,
   add1,
   removeLast,
+  newTerm,
 } from '../util/transform';
 
 const screen_config = {
   id: 'screen',
   type: 'parallel',
-  onEntry: ['createTab', 'setCurrentTab', 'pushHistory'],
+  //onEntry: ['createTab', 'setCurrentTab', 'pushHistory'],
   states: {
     Form: {
       id: 'Form',
@@ -117,7 +119,12 @@ const screen_config = {
               actions: ['deleteTab', 'popHistory'],
             },
             TAB_CREATED: {
-              actions: ['createTab', 'setCurrentTab', 'pushHistory'],
+              actions: [
+                'createTab',
+                'setCurrentTab',
+                'pushHistory',
+                // 'selectRule',
+              ],
             },
             TAB_SELECTED: {
               actions: ['setCurrentTab', 'pushHistory'],
@@ -174,8 +181,8 @@ const screen_config = {
 
 export const screen_machine_base = Machine(screen_config);
 
-const newTab = (machine, id): Tab => ({
-  uiQuery: [newRuleset()],
+const newTab = (machine, id, params): Tab => ({
+  uiQuery: params || [newRuleset()],
   searchMachine: machine,
   name: 'Tab' + id,
   visible: true,
@@ -244,7 +251,7 @@ const toggleTerm = status => (status === 'and' ? 'not' : 'and');
 
 export const screen_options = {
   actions: {
-    createTab: ({ screenStore, idStore, queryObj, currentTab }) => {
+    createTab: ({ screenStore, idStore, queryObj, currentTab }, { params }) => {
       // xstate 4.6 -- spawn?
       const id = get(idStore);
       const screenMachine = interpret(
@@ -258,7 +265,12 @@ export const screen_options = {
 
       screenMachine.start();
 
-      screenStore.update(_.setKey(id, newTab(screenMachine, id)));
+      screenStore.update(
+        _.setKey(
+          id,
+          newTab(screenMachine, id, params ? parseQueryUrl(params) : false)
+        )
+      );
       idStore.update(add1);
     },
     deleteTab: ({ screenStore, historyStore, currentTab }, { id }) => {
@@ -338,7 +350,7 @@ export const screen_options = {
 
       screenStore.update(updateLabelStatus);
     },
-    selectRule: ({ screenStore }, { tabId, targetIndex }) => {
+    selectRule: ({ screenStore }, { tabId, targetIndex = 0 }) => {
       const hideOptions = _.updatePath(
         `${tabId}.uiQuery`,
         _.mapWith(deselectRule)

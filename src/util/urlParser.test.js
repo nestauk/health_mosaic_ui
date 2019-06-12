@@ -8,6 +8,7 @@ import {
   filterRuleset,
   filterQuery,
   makeRuleset,
+  parseQueryUrl,
   queryToUrlString,
   stringifyFields,
   stringifyTerms,
@@ -161,6 +162,13 @@ test('extractTermsFields', () => {
   expect(termsAndFields).toEqual(['one,-two', 'one,two']);
 });
 
+test('extractTermsFields: fields are optional', () => {
+  const string = 'one,-two';
+  const termsAndFields = extractTermsFields(string);
+
+  expect(termsAndFields).toEqual(['one,-two', '']);
+});
+
 test('createTerms', () => {
   const string = 'one,-two';
   const terms = createTerms(string);
@@ -181,7 +189,7 @@ test('createFields', () => {
   ]);
 });
 
-test('makeTermsFields', () => {
+test('makeRuleset', () => {
   const rulesetStrings = ['one,-two', 'one,-two'];
   const ruleset = makeRuleset(rulesetStrings);
 
@@ -253,6 +261,115 @@ test('applyRulesFromQuery', () => {
     },
     options: false,
     disabled: false,
-    selected: true,
+    selected: false,
   });
+});
+
+test('parseQueryUrl', () => {
+  const urlString = '(one,-two,in:body,-place)(three,-four,in:place,-body)';
+  const expected = [
+    {
+      terms: [
+        {
+          term: 'one',
+          status: 'and',
+        },
+        {
+          term: 'two',
+          status: 'not',
+        },
+      ],
+      fields: {
+        subject: [
+          {
+            field: 'name',
+            status: 'default',
+            options: false,
+            disabled: false,
+          },
+          {
+            field: 'place',
+            status: 'excluded',
+            options: false,
+            disabled: false,
+          },
+        ],
+        content: [
+          {
+            field: 'body',
+            status: 'included',
+            options: false,
+            disabled: false,
+          },
+          {
+            field: 'summary',
+            status: 'default',
+            options: false,
+            disabled: false,
+          },
+          {
+            field: 'terms',
+            status: 'default',
+            options: false,
+            disabled: false,
+          },
+        ],
+      },
+      options: false,
+      disabled: false,
+      selected: true,
+    },
+    {
+      terms: [
+        {
+          term: 'three',
+          status: 'and',
+        },
+        {
+          term: 'four',
+          status: 'not',
+        },
+      ],
+      fields: {
+        subject: [
+          {
+            field: 'name',
+            status: 'default',
+            options: false,
+            disabled: false,
+          },
+          {
+            field: 'place',
+            status: 'included',
+            options: false,
+            disabled: false,
+          },
+        ],
+        content: [
+          {
+            field: 'body',
+            status: 'excluded',
+            options: false,
+            disabled: false,
+          },
+          {
+            field: 'summary',
+            status: 'default',
+            options: false,
+            disabled: false,
+          },
+          {
+            field: 'terms',
+            status: 'default',
+            options: false,
+            disabled: false,
+          },
+        ],
+      },
+      options: false,
+      disabled: false,
+      selected: false,
+    },
+  ];
+  expect(parseQueryUrl(urlString)).toEqual(expected);
 });

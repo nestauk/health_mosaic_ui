@@ -2,6 +2,11 @@ import * as _ from 'lamb';
 import { newRuleset, newField } from './transform';
 // object to query string {} -> '( blah )'
 
+const tap = message => x => {
+  console.log(message, ': ', x);
+  return x;
+};
+
 export const filterFields = ({ disabled, status }) =>
   disabled || status !== 'default';
 
@@ -38,10 +43,12 @@ const queryToStringArray = query => ({
   fields: fieldsToUrl(query.fields),
 });
 
-const stringArrayToUrl = (acc, { terms, fields }) =>
-  `${acc}(${terms},in:${fields})`;
-
+const stringArrayToUrl = (acc, { terms, fields }) => {
+  console.log('fields', fields, !!fields);
+  return `${acc}(${terms}` + (fields ? `,in:${fields})` : ')');
+};
 export const queryToUrlString = _.pipe([
+  filterQuery,
   _.mapWith(queryToStringArray),
   _.reduceWith(stringArrayToUrl, ''),
 ]);
@@ -61,7 +68,10 @@ export const extractRulesets = str => {
   return matchArray;
 };
 
-export const extractTermsFields = str => str.split(',in:');
+export const extractTermsFields = str => {
+  const parts = str.split(',in:');
+  return parts[1] ? parts : [parts[0], ''];
+};
 
 const splitBy = delimiter => str => str.split(delimiter);
 const makeTerm = term => ({
@@ -105,3 +115,11 @@ export const applyRulesFromQuery = array =>
     _.setPath('terms', array[0]),
     _.updatePath('fields', applyFieldsFromQuery(array[1])),
   ])(newRuleset());
+
+const selectFirstRule = _.setPath(`0.selected`, true);
+
+export const parseQueryUrl = _.pipe([
+  makeRulesetObject,
+  _.mapWith(applyRulesFromQuery),
+  selectFirstRule,
+]);
