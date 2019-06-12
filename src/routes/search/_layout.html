@@ -74,13 +74,11 @@
   $: isError = searchMachine.state.matches('Search.NotEmpty.Dirty.Error');
   $: tabs = Object.entries($screenStore);
   $: isQueries = uiQuery[0] && uiQuery[0].terms[0].term;
-  // $: console.log($page);
-  
+
   screenMachine.send(screenMachine.send({type: 'TAB_CREATED', id: $idStore, params: $page.query && $page.query.q }))
 
   onMount(() => {
     if($page.query && $page.query.q) { 
-      console.log('boo', $screenStore)
       searchMachine.send('QUERY_ENTERED')
       searchMachine.send({ type:'SEARCHED', tab: $currentTab });
     }
@@ -98,7 +96,6 @@
     screenMachine.send({type: 'TAB_RENAMED', labelText: value , id: parseInt(id, 10)});
 
   const handleChange = ({ detail }) => {
-
     screenMachine.send({
       type: 'TEXT_CHANGED',
       tabId: $currentTab,
@@ -111,7 +108,10 @@
     } else {
       searchMachine.send('QUERY_CLEARED')
     }
+    checkDirty()
+  }
 
+  function checkDirty() {
     const cachedQuery =
       $queryObj[$currentTab]
       && stripEmpties($screenStore[$currentTab].results.queryObj);
@@ -140,37 +140,44 @@
     })
   }
 
-  const toggleTermStatus = (ruleIndex, termIndex) =>
+  const toggleTermStatus = (ruleIndex, termIndex) => {
     screenMachine.send({
       type: 'TERM_CLICKED',
       tabId: $currentTab,
       ruleIndex,
       termIndex
     })
-
-  const sendRule = (type, ruleIndex) =>
+    checkDirty();
+  }
+  const sendRule = (type, ruleIndex) => {
     screenMachine.send({
       type,
       tabId: $currentTab,
       ruleIndex
     });
+    checkDirty();
+  }
 
-  const sendRuleLabel = (type, { section, index: labelIndex } ) =>
+  const sendRuleLabel = (type, { section, index: labelIndex }, ruleIndex = rulesetIndex ) =>{
     screenMachine.send({
       type,
       tabId: $currentTab,
-      ruleIndex: rulesetIndex,
+      ruleIndex,
       section: section.toLowerCase(),
       labelIndex
     });
+    checkDirty();
+  }
 
-  const copyRuleset = (ruleIndex) =>
+  const copyRuleset = (ruleIndex) => {
     screenMachine.send({
       type: 'RULE_COPIED',
       tabId: $currentTab,
       ruleIndex,
       targetIndex: uiQuery.length
     })
+    checkDirty();
+  }
 
   const selectRuleset = (targetIndex) =>
     screenMachine.send({
@@ -242,11 +249,11 @@
         <RulesetLabels
           rulesetDisabled={disabled}
           labels="{{ subject: fields.subject, content: fields.content }}"
-          on:hover={({ detail }) => sendRuleLabel('LABEL_OPTIONS_SELECTED', detail)}
-          on:unhover={({ detail }) => sendRuleLabel('LABEL_OPTIONS_DISMISSED', detail)}
-          on:disable={({ detail }) => sendRuleLabel('LABEL_DISABLED', detail)}
-          on:delete={({ detail }) => sendRuleLabel('LABEL_DELETED', detail)}
-          on:toggle={({ detail }) => sendRuleLabel('LABEL_TOGGLED', detail)}
+          on:hover={({ detail }) => sendRuleLabel('LABEL_OPTIONS_SELECTED', detail, i)}
+          on:unhover={({ detail }) => sendRuleLabel('LABEL_OPTIONS_DISMISSED', detail, i)}
+          on:disable={({ detail }) => sendRuleLabel('LABEL_DISABLED', detail, i)}
+          on:delete={({ detail }) => sendRuleLabel('LABEL_DELETED', detail, i)}
+          on:toggle={({ detail }) => sendRuleLabel('LABEL_TOGGLED', detail, i)}
         />
       </Ruleset>
     {/each}
