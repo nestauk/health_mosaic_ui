@@ -47,8 +47,8 @@
     data: screenStore,
     checkDirty: () => searchMachine.state.matches('Search.NotEmpty.Dirty')
   });
-  screenMachine.send(screenMachine.send({type: 'TAB_CREATED', id: $idStore, params: $page.query && $page.query.q }))
-
+  
+  screenMachine.send({type: 'TAB_CREATED', id: $idStore, params: $page.query && $page.query.q });
 
   onDestroy(() => {
     screenService.stop();
