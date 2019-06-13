@@ -8,7 +8,7 @@ const tap = message => x => {
 };
 
 export const filterFields = ({ disabled, status }) =>
-  disabled || status !== 'default';
+  !disabled && status !== 'default';
 
 export const filterRuleset = ruleset =>
   !ruleset.disabled && ruleset.terms.every(({ term }) => term.length);
