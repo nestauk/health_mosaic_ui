@@ -6,7 +6,8 @@ import * as _ from 'lamb';
 import { createSearchConfig, searchOptions } from './search_machine';
 import { contentAliases, subjectAliases } from '../config';
 import { Tab } from '../stores/interfaces';
-import { parseQueryUrl } from '../util/urlParser';
+import { parseQueryUrl, queryToUrlString } from '../util/urlParser';
+
 import {
   newRuleset,
   newField,
@@ -116,18 +117,18 @@ const screen_config = {
         Idle: {
           on: {
             TAB_DELETED: {
-              actions: ['deleteTab', 'popHistory'],
+              actions: ['deleteTab', 'popHistory', 'setUrlQuery'],
             },
             TAB_CREATED: {
               actions: [
                 'createTab',
                 'setCurrentTab',
                 'pushHistory',
-                // 'selectRule',
+                'setUrlQuery',
               ],
             },
             TAB_SELECTED: {
-              actions: ['setCurrentTab', 'pushHistory'],
+              actions: ['setCurrentTab', 'pushHistory', 'setUrlQuery'],
             },
             TAB_RENAMED: {
               actions: ['setTabLabel'],
@@ -459,6 +460,13 @@ export const screen_options = {
     },
     changeRoute: (_, { path }) => {
       goto(path);
+    },
+    setUrlQuery: ({ screenStore, queryObj, currentTab }) => {
+      const tab = get(currentTab);
+      const currentQuery = get(screenStore)[tab];
+
+      const urlQuery = queryToUrlString(currentQuery.uiQuery);
+      goto(`/search${urlQuery ? '?q=' : ''}${urlQuery}`);
     },
   },
 };
