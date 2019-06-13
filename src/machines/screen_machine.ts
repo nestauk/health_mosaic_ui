@@ -250,6 +250,9 @@ const hideTabRuleOptions = tabId =>
 
 const toggleTerm = status => (status === 'and' ? 'not' : 'and');
 
+const removeHistoryEntries = removedTab =>
+  _.filterWith(history => history !== removedTab);
+
 export const screen_options = {
   actions: {
     createTab: ({ screenStore, idStore, queryObj, currentTab }, { params }) => {
@@ -280,13 +283,20 @@ export const screen_options = {
     },
     deleteTab: ({ screenStore, historyStore, currentTab }, { id }) => {
       // xstate 4.6 -- spawn?
-      get(screenStore)[id].searchMachine.stop();
+      let store = get(screenStore);
+
+      store[id].searchMachine.stop();
       screenStore.update(_.skipKeys([id]));
+
+      store = get(screenStore);
+      const tabs = Object.keys(store);
+
+      historyStore.update(removeHistoryEntries(id));
 
       const history = get(historyStore);
       const prev = history[history.length - 2];
 
-      currentTab.set(prev);
+      currentTab.set(prev ? prev : tabs[0]);
     },
     setCurrentTab: ({ currentTab }, { id = 0 }) => {
       currentTab.set(id);
