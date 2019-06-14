@@ -36,16 +36,20 @@
     }
   };
 
-  const stopEdit = ({ target, type, keyCode }) => {
-    if (editedTarget === null || (type === 'click' && target === editedTarget)) return;
+  const stopEdit = ({ target, type, keyCode, detail }) => {
+    
+    if (editedTarget === null || (type === 'click' && detail === 0 && target === editedTarget)) {
+      editedTarget && editedTarget.focus()
+      return;
 
-    if (type === 'click' || keyCode === 13) {
+    } else if (type === 'click' || keyCode === 13) {
       window.getSelection().removeAllRanges();
       editedTarget.blur();
       editedTarget.style.cursor = 'auto';
       editedTarget.contentEditable = false;
       editedTarget = null;
     }
+    
   };
 </script>
 
