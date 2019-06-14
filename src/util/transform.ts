@@ -12,12 +12,9 @@ export const paramToString = (acc, [key, value], i) =>
 export const makeParams = _.pipe([_.pairs, _.reduceWith(paramToString, '')]);
 
 export const makeRouteUrl = (path, params) => {
-  console.log(path, params);
-  console.log(params && _.pairs(params));
   const paramString = params ? '?' + makeParams(params) : '';
-
   const pathString = Array.isArray(params) ? path.join('/') : path;
-  console.log(path, params);
+
   return `/${pathString}${paramString}`;
 };
 

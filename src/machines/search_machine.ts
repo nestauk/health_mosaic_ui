@@ -95,14 +95,11 @@ export const searchOptions = {
     shareMatching: send('MATCHING', { to: 'Link' }),
     shareDirty: send('DIRTY', { to: 'Link' }),
     updateData: ({ screenStore, queryObj, currentTab }, evt) => {
-      console.log(evt);
       const tab = get(currentTab);
       const currentQueryObject = get(queryObj)[tab];
       const currentQuery = get(screenStore)[tab];
 
       const urlQuery = uiQueryToUrlString(currentQuery.uiQuery);
-      // goto(`/search?q=${urlQuery}`);
-      console.log(makeRouteUrl('search', { q: urlQuery }));
       goto(makeRouteUrl('search', { q: urlQuery }));
       screenStore.update(tabs => {
         return {
