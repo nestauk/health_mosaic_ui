@@ -3,12 +3,7 @@ import { joinWith, makeArrayTransformer, makeSplitBy } from '@svizzle/utils';
 import { newRuleset } from './query';
 import { filterQueryObject } from './transform';
 
-const tap = message => x => {
-  console.log(message, ': ', x);
-  return x;
-};
-
-export const filterRuleset = ruleset =>
+export const isValidRuleset = ruleset =>
   !ruleset.disabled && ruleset.terms.every(hasNonEmptyTerm);
 
 export const stringifyTerms = ({ status, term }) =>
@@ -31,7 +26,7 @@ export const filterProperties = query => ({
 });
 
 export const filterQuery = _.pipe([
-  _.filterWith(filterRuleset),
+  _.filterWith(isValidRuleset),
   _.mapWith(filterProperties),
 ]);
 

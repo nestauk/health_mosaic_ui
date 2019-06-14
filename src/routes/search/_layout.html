@@ -42,15 +42,15 @@
   screenService.onTransition(set);
   screenService.start();
 
+  onDestroy(() => {
+    screenService.stop();
+  })
+
   screenMachine.send({
     type: 'TAB_CREATED', 
     id: $idStore, 
     params: $page.query && $page.query.q 
   });
-
-  onDestroy(() => {
-    screenService.stop();
-  })
 
   setContext(SEARCH, {
     transitionComplete: () => screenMachine.send({ type: 'ROUTE_CHANGE_COMPLETED' }),
@@ -91,6 +91,21 @@
     _.getPath('values.0.query.length')
   ]));
 
+  function checkDirty() {
+    const cachedQuery =
+      $queryObj[$currentTab]
+      && stripEmpties($screenStore[$currentTab].results.queryObj);
+    const newQuery =
+      $queryObj[$currentTab]
+      && stripEmpties($queryObj[$currentTab]);
+
+    if ($queryObj[$currentTab] && compare(cachedQuery, newQuery)) {
+      searchMachine.send('QUERY_MATCHED')
+    } else {
+      searchMachine.send('QUERY_CHANGED')
+    }
+  }
+
   const newTab = () =>  screenMachine.send({type: 'TAB_CREATED', id: $idStore });
 
   const sendTab = (type, id) =>  screenMachine.send({type, id: parseInt(id, 10) });
@@ -111,21 +126,6 @@
       searchMachine.send('QUERY_CLEARED')
     }
     checkDirty()
-  }
-
-  function checkDirty() {
-    const cachedQuery =
-      $queryObj[$currentTab]
-      && stripEmpties($screenStore[$currentTab].results.queryObj);
-    const newQuery =
-      $queryObj[$currentTab]
-      && stripEmpties($queryObj[$currentTab]);
-
-    if ($queryObj[$currentTab] && compare(cachedQuery, newQuery)) {
-      searchMachine.send('QUERY_MATCHED')
-    } else {
-      searchMachine.send('QUERY_CHANGED')
-    }
   }
 
   const handleSend = (event) => {

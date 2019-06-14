@@ -4,7 +4,7 @@ import {
   createFields,
   extractRulesets,
   extractTermsFields,
-  filterRuleset,
+  isValidRuleset,
   filterQuery,
   makeRuleset,
   parseQueryUrl,
@@ -15,11 +15,11 @@ import {
 
 import { query } from './urlParser.data.js';
 
-test('filterRuleset', () => {
+test('isValidRuleset', () => {
   const ruleset = query['0'].uiQuery;
   const expected = [].concat(query['0'].uiQuery[0], query['0'].uiQuery[1]);
 
-  const filteredRuleset = ruleset.filter(filterRuleset);
+  const filteredRuleset = ruleset.filter(isValidRuleset);
 
   expect(filteredRuleset).toEqual(expected);
 });
