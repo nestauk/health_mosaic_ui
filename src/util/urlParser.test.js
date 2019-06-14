@@ -4,38 +4,16 @@ import {
   createFields,
   extractRulesets,
   extractTermsFields,
-  filterFields,
   filterRuleset,
   filterQuery,
   makeRuleset,
   parseQueryUrl,
-  queryToUrlString,
+  uiQueryToUrlString,
   stringifyFields,
   stringifyTerms,
 } from './urlParser.ts';
 
 import { query } from './urlParser.data.js';
-
-test('filterFields', () => {
-  const fields = query['0'].uiQuery[0].fields.subject;
-  const expected = [
-    {
-      field: 'name',
-      status: 'included',
-      options: false,
-      disabled: false,
-    },
-    {
-      field: 'place',
-      status: 'excluded',
-      options: false,
-      disabled: false,
-    },
-  ];
-  const filteredFields = fields.filter(filterFields);
-
-  expect(filteredFields).toEqual(expected);
-});
 
 test('filterRuleset', () => {
   const ruleset = query['0'].uiQuery;
@@ -140,12 +118,12 @@ test('filterQuery', () => {
   expect(filterQuery(ruleset)).toEqual(expected);
 });
 
-test('queryToUrlString', () => {
+test('uiQueryToUrlString', () => {
   const ruleset = query['0'].uiQuery;
   const expected =
     '(heart+plant,-disease,in:name,-place)(one,-two,-one+two+three,one+two+three,in:name,-place)';
 
-  expect(queryToUrlString(filterQuery(ruleset))).toBe(expected);
+  expect(uiQueryToUrlString(filterQuery(ruleset))).toBe(expected);
 });
 
 test('extractRulesets', () => {

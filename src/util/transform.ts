@@ -1,13 +1,27 @@
 import * as _ from 'lamb';
 import { fieldGroups } from '../config';
-import { contentAliases, subjectAliases } from '../config';
-import { UIField, UITerm } from '../stores/interfaces';
 
 export const toggleBoolean = (x: boolean): boolean => !x;
 export const add1 = _.add(1);
 export const removeLast = _.sliceAt(0, -1);
+export const isNot = _.not(_.is); // utils
 
-const filterQueryObject = ({ disabled, status }) => {
+export const paramToString = (acc, [key, value], i) =>
+  `${i !== 0 ? '&' : ''}${acc}${key}=${value}`;
+
+export const makeParams = _.pipe([_.pairs, _.reduceWith(paramToString, '')]);
+
+export const makeRouteUrl = (path, params) => {
+  console.log(path, params);
+  console.log(params && _.pairs(params));
+  const paramString = params ? '?' + makeParams(params) : '';
+
+  const pathString = Array.isArray(params) ? path.join('/') : path;
+  console.log(path, params);
+  return `/${pathString}${paramString}`;
+};
+
+export const filterQueryObject = ({ disabled, status }) => {
   return status !== 'default' && !disabled;
 };
 
@@ -38,30 +52,3 @@ export const queryToString = query =>
         (arr.length - 1 === i ? '' : ','),
       ''
     );
-
-export const newTerm = (
-  term: string = '',
-  status: 'and' | 'not' = 'and'
-): UITerm => ({
-  term,
-  status,
-});
-
-export const newField = (fields: string[]): UIField[] =>
-  fields.map(field => ({
-    field,
-    status: 'default',
-    options: false,
-    disabled: false,
-  }));
-
-export const newRuleset = (selected = false) => ({
-  terms: [newTerm()],
-  fields: {
-    subject: newField(subjectAliases),
-    content: newField(contentAliases),
-  },
-  options: false,
-  disabled: false,
-  selected: selected,
-});

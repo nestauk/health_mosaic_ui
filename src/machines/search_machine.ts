@@ -1,9 +1,11 @@
-import { goto } from '@sapper/app';
-import { queryToUrlString } from '../util/urlParser';
 import { get } from 'svelte/store';
-import { query } from '../actions/queryApi';
+import { goto } from '@sapper/app';
 import * as _ from 'lamb';
 import { send } from 'xstate';
+
+import { uiQueryToUrlString } from '../util/urlParser';
+import { makeRouteUrl } from '../util/transform';
+import { query } from '../actions/queryApi';
 
 export const createSearchConfig = childMachine => ({
   id: 'search',
@@ -93,13 +95,15 @@ export const searchOptions = {
     shareMatching: send('MATCHING', { to: 'Link' }),
     shareDirty: send('DIRTY', { to: 'Link' }),
     updateData: ({ screenStore, queryObj, currentTab }, evt) => {
+      console.log(evt);
       const tab = get(currentTab);
+      const currentQueryObject = get(queryObj)[tab];
       const currentQuery = get(screenStore)[tab];
 
-      const currentQueryObject = get(queryObj)[tab];
-      const urlQuery = queryToUrlString(currentQuery.uiQuery);
-      goto(`/search?q=${urlQuery}`);
-
+      const urlQuery = uiQueryToUrlString(currentQuery.uiQuery);
+      // goto(`/search?q=${urlQuery}`);
+      console.log(makeRouteUrl('search', { q: urlQuery }));
+      goto(makeRouteUrl('search', { q: urlQuery }));
       screenStore.update(tabs => {
         return {
           ...tabs,

@@ -1,17 +1,15 @@
 import * as _ from 'lamb';
-import { newRuleset, newField } from './transform';
-// object to query string {} -> '( blah )'
+import { joinWith, makeArrayTransformer, makeSplitBy } from '@svizzle/utils';
+import { newRuleset } from './query';
+import { filterQueryObject } from './transform';
 
 const tap = message => x => {
   console.log(message, ': ', x);
   return x;
 };
 
-export const filterFields = ({ disabled, status }) =>
-  !disabled && status !== 'default';
-
 export const filterRuleset = ruleset =>
-  !ruleset.disabled && ruleset.terms.every(({ term }) => term.length);
+  !ruleset.disabled && ruleset.terms.every(hasNonEmptyTerm);
 
 export const stringifyTerms = ({ status, term }) =>
   (status === 'not' ? '-' : '') + term.trim().replace(/ /g, '+');
@@ -19,15 +17,17 @@ export const stringifyTerms = ({ status, term }) =>
 export const stringifyFields = ({ status, field }) =>
   (status === 'excluded' ? '-' : '') + field;
 
-const filterJoinedFields = _.pipe([_.flatten, _.filterWith(filterFields)]);
+const filterJoinedFields = _.pipe([
+  _.values,
+  _.flatten,
+  _.filterWith(filterQueryObject),
+]);
 
-const joinWith = delimiter => arr => arr.join(delimiter);
-
-const removeEmptyTerm = ({ term }) => term.length;
+const hasNonEmptyTerm = ({ term }) => term.length;
 
 export const filterProperties = query => ({
-  terms: _.filter(query.terms, removeEmptyTerm),
-  fields: filterJoinedFields(Object.values(query.fields)),
+  terms: _.filter(query.terms, hasNonEmptyTerm),
+  fields: filterJoinedFields(query.fields),
 });
 
 export const filterQuery = _.pipe([
@@ -43,19 +43,14 @@ const queryToStringArray = query => ({
   fields: fieldsToUrl(query.fields),
 });
 
-const stringArrayToUrl = (acc, { terms, fields }) => {
-  console.log('fields', fields, !!fields);
-  return `${acc}(${terms}` + (fields ? `,in:${fields})` : ')');
-};
-export const queryToUrlString = _.pipe([
+const stringArrayToUrl = (acc, { terms, fields }) =>
+  `${acc}(${terms}` + (fields ? `,in:${fields})` : ')');
+
+export const uiQueryToUrlString = _.pipe([
   filterQuery,
   _.mapWith(queryToStringArray),
   _.reduceWith(stringArrayToUrl, ''),
 ]);
-
-// querystring to object '( blah )' -> {}
-
-// (one,-two, in:one, -two)(one,-two, in:one, -two)
 
 export const extractRulesets = str => {
   const re = /\((.*?)\)/g;
@@ -73,7 +68,8 @@ export const extractTermsFields = str => {
   return parts[1] ? parts : [parts[0], ''];
 };
 
-const splitBy = delimiter => str => str.split(delimiter);
+const splitByComma = makeSplitBy(',');
+
 const makeTerm = term => ({
   term: term[0] === '-' ? term.substring(1) : term,
   status: term[0] === '-' ? 'not' : 'and',
@@ -84,8 +80,8 @@ const makeField = field => ({
   status: field[0] === '-' ? 'excluded' : 'included',
 });
 
-export const createTerms = _.pipe([splitBy(','), _.mapWith(makeTerm)]);
-export const createFields = _.pipe([splitBy(','), _.mapWith(makeField)]);
+export const createTerms = _.pipe([splitByComma, _.mapWith(makeTerm)]);
+export const createFields = _.pipe([splitByComma, _.mapWith(makeField)]);
 
 export const makeRuleset = ([terms, fields]) => [
   createTerms(terms),

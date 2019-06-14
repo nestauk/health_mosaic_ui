@@ -1084,6 +1084,14 @@
   resolved "https://registry.yarnpkg.com/@protobufjs/utf8/-/utf8-1.1.0.tgz#a777360b5b39a1a2e5106f8e858f2fd2d060c570"
   integrity sha1-p3c2C1s5oaLlEG+OhY8v0tBgxXA=
 
+"@svizzle/utils@^0.2.0":
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/@svizzle/utils/-/utils-0.2.0.tgz#06ebcde142b8433798a775ef1846cfcda4c60e99"
+  integrity sha512-eCNZWM6+VFTxuT69ghywGEvH9rpI2F/uoiaRUBC1OzhFBiB9OIaT6uKr5roL8or0hGxa48nTpaqdFhcQcmDWgw==
+  dependencies:
+    lamb "^0.57.0"
+    lodash.isequal "^4.5.0"
+
 "@types/babel__core@^7.1.0":
   version "7.1.0"
   resolved "https://registry.yarnpkg.com/@types/babel__core/-/babel__core-7.1.0.tgz#710f2487dda4dcfd010ca6abb2b4dc7394365c51"
@@ -1198,10 +1206,10 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-10.14.6.tgz#9cbfcb62c50947217f4d88d4d274cc40c22625a9"
   integrity sha512-Fvm24+u85lGmV4hT5G++aht2C5I4Z4dYlWZIh62FAfFO/TfzXtPpoLI6I7AuBWkIFqZCnhFOoTT7RjjaIL5Fjg==
 
-"@types/node@^12.0.2":
-  version "12.0.2"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-12.0.2.tgz#3452a24edf9fea138b48fad4a0a028a683da1e40"
-  integrity sha512-5tabW/i+9mhrfEOUcLDu2xBPsHJ+X5Orqy9FKpale3SjDA17j5AEpYq5vfy3oAeAHGcvANRCO3NV3d2D6q3NiA==
+"@types/node@^12.0.8":
+  version "12.0.8"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-12.0.8.tgz#551466be11b2adc3f3d47156758f610bd9f6b1d8"
+  integrity sha512-b8bbUOTwzIY3V5vDTY1fIJ+ePKDUBqt2hC2woVGotdQQhG/2Sh62HOKHrT7ab+VerXAcPyAiTEipPu/FsreUtg==
 
 "@types/resolve@0.0.8":
   version "0.0.8"
@@ -8352,10 +8360,10 @@ rollup-plugin-replace@^2.2.0:
     magic-string "^0.25.2"
     rollup-pluginutils "^2.6.0"
 
-rollup-plugin-svelte@^5.0.3:
-  version "5.0.3"
-  resolved "https://registry.yarnpkg.com/rollup-plugin-svelte/-/rollup-plugin-svelte-5.0.3.tgz#1e4cce33a94b0b4b4831abc7d76eabdf333ab63d"
-  integrity sha512-3W/jbtBcsxohKQMI1Po2ZsUHRGUy3vEtgXLHvBin1+ms3wl2eomSyYBV7pwrkh6tWok9BVzdxGQgd7IqibG+Ew==
+rollup-plugin-svelte@^5.1.0:
+  version "5.1.0"
+  resolved "https://registry.yarnpkg.com/rollup-plugin-svelte/-/rollup-plugin-svelte-5.1.0.tgz#6c2d3998db9141a934343a0e7298499994aadd25"
+  integrity sha512-4MRZG29dAWDpoxEs5uIHzDnYafQEOLaKIJAuDYUtFIzEm1F1IGSTlFyjd8/qk4wltlHdu6V7YfZY53+CKryhMg==
   dependencies:
     require-relative "^0.8.7"
     rollup-pluginutils "^2.3.3"
@@ -8401,13 +8409,13 @@ rollup-pluginutils@^2.7.0:
     estree-walker "^0.6.0"
     micromatch "^3.1.10"
 
-rollup@^1.12.3:
-  version "1.12.3"
-  resolved "https://registry.yarnpkg.com/rollup/-/rollup-1.12.3.tgz#068b1957d5bebf6c0a758cfe42609b512add35a9"
-  integrity sha512-ueWhPijWN+GaPgD3l77hXih/gcDXmYph6sWeQegwBYtaqAE834e8u+MC2wT6FKIUsz1DBOyOXAQXUZB+rjWDoQ==
+rollup@^1.15.1:
+  version "1.15.4"
+  resolved "https://registry.yarnpkg.com/rollup/-/rollup-1.15.4.tgz#3d6d8cbc8f19651d63acdacf874da2f9ed06c8ba"
+  integrity sha512-EjdjLZ6K5z3J7NkboB+aPVBthZt1CexD7u0IIcc7NYGoXAFyV6AbdKrS8elfwGNrYmuBC5ZDOSOzwH9Ad4PQKg==
   dependencies:
     "@types/estree" "0.0.39"
-    "@types/node" "^12.0.2"
+    "@types/node" "^12.0.8"
     acorn "^6.1.1"
 
 rsvp@^4.8.4:

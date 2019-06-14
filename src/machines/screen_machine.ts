@@ -1,20 +1,19 @@
-import { Machine, interpret } from 'xstate';
 import { get } from 'svelte/store';
 import { goto } from '@sapper/app';
+import { Machine, interpret } from 'xstate';
 import * as _ from 'lamb';
 
 import { createSearchConfig, searchOptions } from './search_machine';
 import { contentAliases, subjectAliases } from '../config';
 import { Tab } from '../stores/interfaces';
-import { parseQueryUrl, queryToUrlString } from '../util/urlParser';
-
+import { parseQueryUrl, uiQueryToUrlString } from '../util/urlParser';
+import { newRuleset, newField, newTerm } from '../util/query';
 import {
-  newRuleset,
-  newField,
-  toggleBoolean,
   add1,
+  isNot,
+  makeRouteUrl,
+  toggleBoolean,
   removeLast,
-  newTerm,
 } from '../util/transform';
 
 const screen_config = {
@@ -182,8 +181,8 @@ const screen_config = {
 
 export const screen_machine_base = Machine(screen_config);
 
-const newTab = (machine, id, params, selected): Tab => ({
-  uiQuery: params || [newRuleset(selected)],
+const newTab = (machine, id, uiQuery): Tab => ({
+  uiQuery,
   searchMachine: machine,
   name: 'Tab' + id,
   visible: true,
@@ -250,8 +249,7 @@ const hideTabRuleOptions = tabId =>
 
 const toggleTerm = status => (status === 'and' ? 'not' : 'and');
 
-const removeHistoryEntries = removedTab =>
-  _.filterWith(history => history !== removedTab);
+const removeHistoryEntries = removedTab => _.filterWith(isNot(removedTab));
 
 export const screen_options = {
   actions: {
@@ -274,7 +272,7 @@ export const screen_options = {
           newTab(
             screenMachine,
             id,
-            params ? parseQueryUrl(params) : false,
+            params ? parseQueryUrl(params) : [newRuleset(true)],
             true
           )
         )
@@ -475,8 +473,9 @@ export const screen_options = {
       const tab = get(currentTab);
       const currentQuery = get(screenStore)[tab];
 
-      const urlQuery = queryToUrlString(currentQuery.uiQuery);
-      goto(`/search${urlQuery ? '?q=' : ''}${urlQuery}`);
+      const urlQuery = uiQueryToUrlString(currentQuery.uiQuery);
+      goto(makeRouteUrl('search', urlQuery ? { q: urlQuery } : false));
+      // goto(`/search${urlQuery ? '?q=' : ''}${urlQuery}`);
     },
   },
 };

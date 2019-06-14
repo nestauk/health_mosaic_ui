@@ -42,17 +42,21 @@
   screenService.onTransition(set);
   screenService.start();
 
+  screenMachine.send({
+    type: 'TAB_CREATED', 
+    id: $idStore, 
+    params: $page.query && $page.query.q 
+  });
+
+  onDestroy(() => {
+    screenService.stop();
+  })
+
   setContext(SEARCH, {
     transitionComplete: () => screenMachine.send({ type: 'ROUTE_CHANGE_COMPLETED' }),
     data: screenStore,
     checkDirty: () => searchMachine.state.matches('Search.NotEmpty.Dirty')
   });
-  
-  screenMachine.send({type: 'TAB_CREATED', id: $idStore, params: $page.query && $page.query.q });
-
-  onDestroy(() => {
-    screenService.stop();
-  })
 
   let formHeight, input;
 
