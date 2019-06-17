@@ -24,6 +24,8 @@ export const endpointScanner = `${BASE_URL}/${HS_index}`;
 export const endpointScannerCount = `${endpointScanner}/_count`;
 export const endpointScannerSearch = `${endpointScanner}/_search`;
 
+// export const aliases = `${BASE_URL}/_aliases`;
+
 export const size = dev ? 200 : 1000;
 export const graphqlEndpoint = dev
   ? '"http://localhost:9000/.netlify/functions/graphql"'

@@ -43,8 +43,9 @@
 
   .container {
     align-items: center;
+    margin-left: 10px;
   }
-  
+
   .master {
     width: 5rem;
     height: 100%;

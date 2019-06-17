@@ -7,11 +7,12 @@
   const isntStatusDefault = object => object.status !== 'default';
 
   $: labelArray = Object.entries(labels);
-  $: hasLabels = labelArray.some(array => array[1].some(isntStatusDefault));
+  $: hasLabels = labelArray.map(array => array[1].some(isntStatusDefault));
 </script>
 
-{#if hasLabels}
-  {#each labelArray as [section, labelCollection]}
+
+  {#each labelArray as [section, labelCollection], i }
+    {#if hasLabels[i]}
     <ul class="tag-container">
       {#each labelCollection as { field, status, disabled, options }, index}
         {#if status !== 'default'}
@@ -43,13 +44,13 @@
         {/if}
       {/each}
     </ul>
+    {/if}
   {/each}
-{/if}
 
 <style>
 .tag-container {
     display: flex;
-    margin: 10px 15px;
+    margin: 10px 5px;
     padding: 0px 0px;
     border: none;
     position: relative;

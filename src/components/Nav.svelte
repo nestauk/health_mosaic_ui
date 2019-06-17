@@ -9,7 +9,7 @@
   export let tabs,
     activeTab,
     tabHeight = 0,
-    isLoading, 
+    isLoading,
     isError;
 
   const dispatch = createEventDispatcher();
@@ -35,26 +35,30 @@
       selection.addRange(range);
     }
   };
- 
+
   // various keypresses trigger window click events for accessibility reasons
   // we need to check to ensure the click event is coming from an actual click rather than a keypress
   // we can do this by checking the detail property of the event object. 0 means it was not a true click
   // we also need to ensure that such click events to not cause the element to lose focus
 
   const stopEdit = ({ target, type, keyCode, detail }) => {
-    if (editedTarget === null || (type === 'click' && target === editedTarget)) return;	    
-    if (editedTarget === null || (type === 'click' && detail === 0 && target === editedTarget)) {
-      editedTarget && editedTarget.focus()
+
+    if (
+      editedTarget === null ||
+      (type === 'click' && detail === 0 && target === editedTarget) ||
+      (type === 'click' && target === editedTarget)
+    ) {
+      editedTarget && editedTarget.focus();
       return;
-     if (type === 'click' || keyCode === 13) {	    } else if (type === 'click' || keyCode === 13) {
-      window.getSelection().removeAllRanges();	      window.getSelection().removeAllRanges();
-      editedTarget.blur();	      editedTarget.blur();
-      editedTarget.style.cursor = 'auto';	      editedTarget.style.cursor = 'auto';
-      editedTarget.contentEditable = false;	      editedTarget.contentEditable = false;
-      editedTarget = null;	      editedTarget = null;
-    }	    }
-    
-  };	  };
+    } else if (type === 'click' || keyCode === 13) {
+      console.log('off')
+      window.getSelection().removeAllRanges();
+      editedTarget.blur();
+      editedTarget.style.cursor = 'auto';
+      editedTarget.contentEditable = false;
+      editedTarget = null;
+    }
+  };
 </script>
 
 <svelte:window on:click|preventDefault|stopPropagation="{stopEdit}" />
@@ -63,15 +67,16 @@
   <ul>
     {#each tabs as [id, tab]}
       <li>
-        <button
+        <div
           on:click|preventDefault="{() => dispatch('changetab', id)}"
           on:dblclick="{handleDoubleClick}"
           on:keydown="{stopEdit}"
           on:input="{({ target }) => dispatch('textchange', { value: target.innerText, id })}"
           class:selected="{parseInt(id, 10) === activeTab}"
+          class="button"
         >
           {tab.name}
-        </button>
+        </div>
 
         {#if tabs.length > 1}
         <span on:click="{() => dispatch('deletetab', id)}" class="remove">
@@ -154,7 +159,7 @@
     bottom: -1px;
   }
 
-  button {
+  .button {
     padding: 1em 0.5em;
     display: block;
     cursor: pointer;

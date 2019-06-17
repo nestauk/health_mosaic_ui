@@ -4,8 +4,8 @@
   export let terms, disabled;
 </script>
 
-<ul 
-  class="query-container" 
+<ul
+  class="query-container"
   style="{disabled ? 'opacity: 0.5;' : ''} transition: all 0.3s ease 0s;"
 >
   {#each terms as {term, status}, j}
@@ -19,7 +19,7 @@
 <style>
   .query-container {
     display: flex;
-    margin: 10px 15px 0 0;
+    margin: 10px 5px 0 0;
     padding: 5px;
     border: none;
     border: 1px solid #ccc;
