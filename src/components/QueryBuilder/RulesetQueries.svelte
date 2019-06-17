@@ -34,6 +34,8 @@
     display: flex;
     color: limegreen;
     line-height: 1;
+    user-select: none;
+    -moz-user-select: none;
   }
   .query.not {
     color: red;

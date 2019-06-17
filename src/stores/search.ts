@@ -22,7 +22,10 @@ export const queryObj = derived(screenStore, $screenStore => {
       ) {
         object[key] = false;
       } else {
-        object[key] = createQueryObject($screenStore[key].uiQuery);
+        object[key] = createQueryObject(
+          $screenStore[key].uiQuery,
+          $screenStore[key].index
+        );
       }
     }
   }

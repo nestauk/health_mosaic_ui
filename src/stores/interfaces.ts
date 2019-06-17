@@ -19,8 +19,8 @@ export interface UIQuery {
     subject: UIField[];
     content: UIField[];
   };
-  options: boolean;
   disabled: boolean;
+  options: boolean;
   selected: boolean;
 }
 
@@ -60,6 +60,7 @@ export interface Tab {
   name: string;
   results: Results;
   visible: boolean;
+  index: string;
 }
 
 // The whole shebang

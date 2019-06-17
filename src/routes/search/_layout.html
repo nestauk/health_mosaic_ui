@@ -11,11 +11,11 @@
   import * as _ from 'lamb';
 
   import Nav from '../../components/Nav.svelte';
-  import { Form, FormInput, FormLabels } from '../../components/QueryBuilder/Form';
+  import { Form, FormInput, FormLabels, FormDropdown } from '../../components/QueryBuilder/Form';
   import { Rules, Ruleset, RulesetQueries, RulesetLabels } from '../../components/QueryBuilder/Rules';
   import { Results, ResultsItem } from '../../components/Results';
 
-  import { subjectAliases, contentAliases } from '../../config';
+  import { subjectAliases, contentAliases, ESIndices } from '../../config';
   import { screen_machine } from '../../machines/screen_machine.ts';
   import {
     screenStore,
@@ -25,7 +25,7 @@
     queryObj
   } from '../../stores/search.ts'
 
-  
+
   const { page } = stores();
   export const screenService = interpret(
     screen_machine.withContext({
@@ -47,9 +47,10 @@
   })
 
   screenMachine.send({
-    type: 'TAB_CREATED', 
-    id: $idStore, 
-    params: $page.query && $page.query.q 
+    type: 'TAB_CREATED',
+    id: $idStore,
+    queryParams: $page.query && $page.query.q,
+    ESIndex: $page.query && $page.query.i
   });
 
   setContext(SEARCH, {
@@ -92,14 +93,25 @@
   ]));
 
   function checkDirty() {
-    const cachedQuery =
-      $queryObj[$currentTab]
-      && stripEmpties($screenStore[$currentTab].results.queryObj);
-    const newQuery =
-      $queryObj[$currentTab]
-      && stripEmpties($queryObj[$currentTab]);
+    const currentQ = $queryObj[$currentTab];
+    const lastQ = $screenStore[$currentTab].results.queryObj;
 
-    if ($queryObj[$currentTab] && compare(cachedQuery, newQuery)) {
+    const cachedQuery =
+      lastQ.query
+      && {
+        index: lastQ.index,
+        query: stripEmpties(lastQ.query)
+      };
+
+    const newQuery =
+      currentQ.query
+      && {
+        index: currentQ.index,
+        query: stripEmpties(currentQ.query)
+      };
+
+
+    if (currentQ.query && compare(cachedQuery, newQuery)) {
       searchMachine.send('QUERY_MATCHED')
     } else {
       searchMachine.send('QUERY_CHANGED')
@@ -109,7 +121,7 @@
   const newTab = () =>  screenMachine.send({type: 'TAB_CREATED', id: $idStore });
 
   const sendTab = (type, id) =>  screenMachine.send({type, id: parseInt(id, 10) });
-  const sendTabEdit = ({detail: { value, id }}) => 
+  const sendTabEdit = ({detail: { value, id }}) =>
     screenMachine.send({type: 'TAB_RENAMED', labelText: value , id: parseInt(id, 10)});
 
   const handleChange = ({ detail }) => {
@@ -128,7 +140,7 @@
     checkDirty()
   }
 
-  const handleSend = (event) => {
+  const handleSend = event => {
     event.preventDefault();
     searchMachine.send({ type:'SEARCHED', tab: $currentTab });
   };
@@ -171,7 +183,7 @@
     checkDirty();
   }
 
-  const copyRuleset = (ruleIndex) => {
+  const copyRuleset = ruleIndex => {
     screenMachine.send({
       type: 'RULE_COPIED',
       tabId: $currentTab,
@@ -181,12 +193,21 @@
     checkDirty();
   }
 
-  const selectRuleset = (targetIndex) =>
+  const selectRuleset = targetIndex =>
     screenMachine.send({
       type: 'RULE_SELECTED',
       tabId: $currentTab,
       targetIndex
     })
+
+  const changeIndex = ESIndex => {
+    screenMachine.send({
+      type: 'INDEX_CHANGED',
+      tabId: $currentTab,
+      ESIndex
+    })
+    checkDirty();
+  }
 </script>
 
 
@@ -206,9 +227,9 @@
 />
 
 
-<div 
-  class="search" 
-  style="{open ? '' : `transform: translateY(-${formHeight + 50}px)`}" 
+<div
+  class="search"
+  style="{open ? '' : `transform: translateY(-${formHeight + 50}px)`}"
 >
   <Form
     {isQueries}
@@ -227,7 +248,12 @@
       on:select="{({ detail }) => sendRuleLabel('LABEL_CLICKED', detail)}"
       {labels}
     />
-
+    <FormDropdown
+      index={$screenStore[$currentTab].index}
+      indices="{ESIndices}"
+      on:indexchange={({ detail }) => changeIndex(detail)}
+      {isQueries}
+    />
 
   {#if uiQuery.length}
   <Rules>
@@ -264,9 +290,9 @@
   {/if}
 </Form>
   {#if isQueries}
-      <div 
-        class="close-label" 
-        on:click="{() => sendTab('TAB_VISIBILITY_TOGGLED', $currentTab)}" 
+      <div
+        class="close-label"
+        on:click="{() => sendTab('TAB_VISIBILITY_TOGGLED', $currentTab)}"
         style="{open ? 'transform: rotate(180deg) ' : ''}"
       >
         <img alt="close search" src="arrow.svg"/>
@@ -276,32 +302,32 @@
 
 <ul class="facets">
   <li>
-    <a 
-      href="/search" 
+    <a
+      href="/search"
       on:click={() => searchMachine.send({type: 'ROUTE_CHANGED', path: '/search'})}
     >
       search index
     </a>
   </li>
   <li>
-    <a 
-      href="/search/facet1" 
+    <a
+      href="/search/facet1"
       on:click={() => searchMachine.send({type: 'ROUTE_CHANGED', path: '/search/facet1'})}
     >
       facet1
     </a>
   </li>
   <li>
-    <a 
-      href="/search/facet2" 
+    <a
+      href="/search/facet2"
       on:click={() => searchMachine.send({type: 'ROUTE_CHANGED', path: '/search/facet2'})}
     >
       facet2
     </a>
   </li>
   <li>
-    <a 
-      href="/search/facet3" 
+    <a
+      href="/search/facet3"
       on:click={() => searchMachine.send({type: 'ROUTE_CHANGED', path: '/search/facet3'})}
     >
       facet3
@@ -343,7 +369,7 @@
   ul.facets {
     padding-top: 500px;
   }
-  
+
   .content {
     padding-top: 200px;
   }

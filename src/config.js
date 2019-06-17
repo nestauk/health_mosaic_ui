@@ -49,6 +49,7 @@ export const fieldGroups = {
 
 export const subjectAliases = ['name', 'place'];
 export const contentAliases = ['body', 'summary', 'terms'];
+export const ESIndices = ['all', 'papers', 'companies', 'events'];
 
 export const requiredFields = {
   CB: [
@@ -74,8 +75,8 @@ export const requiredFields = {
   ],
   NIH: [
     { field: 'title_of_organisation', type: 'text' },
-    { field: 'textBody_abstract_project', type: 'text' },
-    { field: 'terms_mesh_abstract', type: 'text' },
+    // { field: 'textBody_abstract_project', type: 'text' },
+    // { field: 'terms_mesh_abstract', type: 'text' },
     { field: 'placeName_city_organisation', type: 'keyword' },
     { field: 'id_iso2_country', type: 'keyword' },
     { field: 'coordinate_of_organisation', type: 'geo_point' },

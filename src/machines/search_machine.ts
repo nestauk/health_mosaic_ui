@@ -99,14 +99,21 @@ export const searchOptions = {
       const currentQueryObject = get(queryObj)[tab];
       const currentQuery = get(screenStore)[tab];
 
-      const urlQuery = uiQueryToUrlString(currentQuery.uiQuery);
-      goto(makeRouteUrl('search', { q: urlQuery }));
+      const urlQuery = {
+        q: uiQueryToUrlString(currentQuery.uiQuery),
+        i: currentQuery.index.toLowerCase(),
+      };
+
+      goto(makeRouteUrl('search', urlQuery.q ? urlQuery : false));
+
+      const newData = Object.values(evt.data.data)[0];
+
       screenStore.update(tabs => {
         return {
           ...tabs,
           [tab]: {
             ...tabs[tab],
-            results: { data: evt.data.data.All, queryObj: currentQueryObject },
+            results: { data: newData, queryObj: currentQueryObject },
           },
         };
       });
@@ -117,7 +124,7 @@ export const searchOptions = {
       const tab = get(currentTab);
       const currentQuery = get(queryObj)[tab];
 
-      return query(currentQuery);
+      return query(currentQuery.query, currentQuery.index);
     },
   },
 };

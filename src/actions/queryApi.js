@@ -1,40 +1,14 @@
-import ApolloClient, { gql } from 'apollo-boost';
+import ApolloClient from 'apollo-boost';
+import { endpointQueries } from './gqlQueries';
 
-export async function query(query) {
-  const QUERY_ALL = gql`
-    query All($query: [QueryObject]) {
-      All(query: $query) {
-        city
-        continent_id
-        cost_ref
-        countries_ids
-        country_id
-        end
-        funders
-        is_health_related
-        location {
-          lon
-          lat
-        }
-        name
-        novelty
-        region
-        sdg_labels
-        state_id
-        start
-        terms
-        type
-      }
-    }
-  `;
-
+export async function query(query, endpoint) {
   const client = new ApolloClient({
     /* eslint-disable-next-line no-undef */
     uri: REPLACE_GRAPHQL_ENDPOINT,
   });
 
   const results = await client.query({
-    query: QUERY_ALL,
+    query: endpointQueries[endpoint],
     variables: {
       query,
     },

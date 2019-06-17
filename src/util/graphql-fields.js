@@ -109,6 +109,7 @@ const fieldMaps = {
     'url_of_organisation',
     'url_of_group'
   ],
+  type: ['type_of_entity']
 };
 
 const makeFieldMatch = ({ field }) => makeFieldExist(field);

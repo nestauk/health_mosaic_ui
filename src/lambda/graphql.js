@@ -104,6 +104,7 @@ const sources = [
   //  url
   'url_of_organisation',
   'url_of_group',
+  'type_of_entity',
 ];
 
 // eslint-disable-next-line no-undef
@@ -129,6 +130,7 @@ class HealthScanner extends RESTDataSource {
         },
       },
       size,
+      _source: sources,
     });
   }
 
@@ -142,6 +144,7 @@ class HealthScanner extends RESTDataSource {
         },
       },
       size,
+      _source: sources,
     });
   }
 
@@ -153,8 +156,9 @@ class HealthScanner extends RESTDataSource {
         bool: {
           must: [{ query_string: { query: queryString } }, existsQuery],
         },
-        size,
       },
+      size,
+      _source: sources,
     });
   }
 
@@ -230,17 +234,19 @@ const typeDefs = gql`
 const resolvers = {
   Query: {
     CB: async (_source, { query }, { dataSources }) => {
-      return dataSources.HealthScanner.getCB(query);
+      const data = await dataSources.HealthScanner.getCB(query);
+      return data.hits.hits;
     },
     MU: async (_source, { query }, { dataSources }) => {
-      return dataSources.HealthScanner.getMU(query);
+      const data = await dataSources.HealthScanner.getMU(query);
+      return data.hits.hits;
     },
     NIH: async (_source, { query }, { dataSources }) => {
-      return dataSources.HealthScanner.getNIH(query);
+      const data = await dataSources.HealthScanner.getNIH(query);
+      return data.hits.hits;
     },
     All: async (_source, { query }, { dataSources }) => {
       const data = await dataSources.HealthScanner.getAll(query);
-
       return data.hits.hits;
     },
   },

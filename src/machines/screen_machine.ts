@@ -48,6 +48,9 @@ const screen_config = {
         TERM_CLICKED: {
           actions: ['toggleTermStatus'],
         },
+        INDEX_CHANGED: {
+          actions: ['changeIndex'],
+        },
       },
       states: {
         Idle: {
@@ -183,7 +186,7 @@ const screen_config = {
 
 export const screen_machine_base = Machine(screen_config);
 
-const newTab = (machine, id, uiQuery): Tab => ({
+const newTab = (machine, id, uiQuery, index): Tab => ({
   uiQuery,
   searchMachine: machine,
   name: 'Tab' + id,
@@ -192,6 +195,7 @@ const newTab = (machine, id, uiQuery): Tab => ({
     data: [],
     queryObj: [],
   },
+  index,
 });
 
 const toggleLabelBinaryUpdater = labelStatus =>
@@ -255,7 +259,10 @@ const removeHistoryEntries = removedTab => _.filterWith(isNot(removedTab));
 
 export const screen_options = {
   actions: {
-    createTab: ({ screenStore, idStore, queryObj, currentTab }, { params }) => {
+    createTab: (
+      { screenStore, idStore, queryObj, currentTab },
+      { queryParams, ESIndex }
+    ) => {
       // xstate 4.6 -- spawn?
       const id = get(idStore);
       const screenMachine = interpret(
@@ -274,8 +281,8 @@ export const screen_options = {
           newTab(
             screenMachine,
             id,
-            params ? parseQueryUrl(params) : [newRuleset(true)],
-            true
+            queryParams ? parseQueryUrl(queryParams) : [newRuleset(true)],
+            ESIndex ? ESIndex : 'all'
           )
         )
       );
@@ -475,9 +482,15 @@ export const screen_options = {
       const tab = get(currentTab);
       const currentQuery = get(screenStore)[tab];
 
-      const urlQuery = uiQueryToUrlString(currentQuery.uiQuery);
-      goto(makeRouteUrl('search', urlQuery ? { q: urlQuery } : false));
-      // goto(`/search${urlQuery ? '?q=' : ''}${urlQuery}`);
+      const urlQuery = {
+        q: uiQueryToUrlString(currentQuery.uiQuery),
+        i: currentQuery.index && currentQuery.index,
+      };
+
+      goto(makeRouteUrl('search', urlQuery.q ? urlQuery : false));
+    },
+    changeIndex: ({ screenStore }, { tabId, ESIndex }) => {
+      screenStore.update(_.setPath(`${tabId}.index`, ESIndex));
     },
   },
 };

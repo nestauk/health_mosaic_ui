@@ -10,7 +10,7 @@ export const isNot = _.not(_.is); // utils
 export const splitByComma = makeSplitBy(',');
 
 export const paramToString = (acc, [key, value], i) =>
-  `${i !== 0 ? '&' : ''}${acc}${key}=${value}`;
+  `${acc}${i !== 0 ? '&' : ''}${key}=${value}`;
 
 export const makeParams = _.pipe([_.pairs, _.reduceWith(paramToString, '')]);
 
@@ -35,11 +35,13 @@ const createValidFields = fields =>
 
 const transformTerm = ({ term, status }) => ({ query: term, status });
 
-export const createQueryObject = queries =>
-  queries.map(({ terms, fields: { subject, content } }) => ({
+export const createQueryObject = (queries, index) => ({
+  query: queries.map(({ terms, fields: { subject, content } }) => ({
     fields: createValidFields(_.union(content, subject)),
     values: terms.map(transformTerm),
-  }));
+  })),
+  index,
+});
 
 export const queryToString = query =>
   Object.values(query)
