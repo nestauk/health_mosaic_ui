@@ -4,8 +4,6 @@
   export let formHeight = 0, isQueries;
   const dispatch = createEventDispatcher();
   let tooltip;
-
-  $:console.log(formHeight)
 </script>
 
 <form on:submit|preventDefault style="position: static;">

@@ -4,7 +4,8 @@ import { Machine, interpret } from 'xstate';
 import * as _ from 'lamb';
 
 import { createSearchConfig, searchOptions } from './search_machine';
-import { contentAliases, subjectAliases } from '../config';
+import { contentAliases, subjectAliases, searchRouteName } from '../config';
+
 import { Tab } from '../stores/interfaces';
 import { parseQueryUrl } from '../util/urlParser';
 import { uiQueryToUrlString } from '../util/urlBuilder';
@@ -21,7 +22,6 @@ import {
 const screen_config = {
   id: 'screen',
   type: 'parallel',
-  //onEntry: ['createTab', 'setCurrentTab', 'pushHistory'],
   states: {
     Form: {
       id: 'Form',
@@ -196,6 +196,7 @@ const newTab = (machine, id, uiQuery, index): Tab => ({
     queryObj: [],
   },
   index,
+  route: `/${searchRouteName}`,
 });
 
 const toggleLabelBinaryUpdater = labelStatus =>
@@ -260,8 +261,8 @@ const removeHistoryEntries = removedTab => _.filterWith(isNot(removedTab));
 export const screen_options = {
   actions: {
     createTab: (
-      { screenStore, idStore, queryObj, currentTab },
-      { queryParams, ESIndex }
+      { screenStore, idStore, queryObj, currentTab, routeStore },
+      { queryParams, ESIndex, isPageInit }
     ) => {
       // xstate 4.6 -- spawn?
       const id = get(idStore);
@@ -269,7 +270,12 @@ export const screen_options = {
         Machine(
           createSearchConfig(screen_machine_base),
           searchOptions
-        ).withContext({ screenStore, queryObj, currentTab, path: '' })
+        ).withContext({
+          screenStore,
+          queryObj,
+          currentTab,
+          routeStore,
+        })
       );
 
       screenMachine.onTransition(e => screenStore.update(s => s));
@@ -281,7 +287,9 @@ export const screen_options = {
           newTab(
             screenMachine,
             id,
-            queryParams ? parseQueryUrl(queryParams) : [newRuleset(true)],
+            queryParams && isPageInit
+              ? parseQueryUrl(queryParams)
+              : [newRuleset(true)],
             ESIndex ? ESIndex : 'all'
           )
         )
@@ -294,16 +302,15 @@ export const screen_options = {
 
       store[id].searchMachine.stop();
       screenStore.update(_.skipKeys([id]));
+      const current = get(currentTab);
 
       store = get(screenStore);
       const tabs = Object.keys(store);
-
       historyStore.update(removeHistoryEntries(id));
-
       const history = get(historyStore);
-      const prev = history[history.length - 2];
+      const prev = history[history.length - 1];
 
-      currentTab.set(prev ? prev : tabs[0]);
+      currentTab.set(id === current ? prev : current);
     },
     setCurrentTab: ({ currentTab }, { id = 0 }) => {
       currentTab.set(id);
@@ -475,19 +482,31 @@ export const screen_options = {
     toggleTabVisibility: ({ screenStore }, { id }) => {
       screenStore.update(_.updatePath(`${id}.visible`, toggleBoolean));
     },
-    changeRoute: (_, { path }) => {
-      goto(path);
-    },
-    setUrlQuery: ({ screenStore, queryObj, currentTab }) => {
+    changeRoute: ({ screenStore, currentTab, routeStore }, { route: path }) => {
       const tab = get(currentTab);
       const currentQuery = get(screenStore)[tab];
+      routeStore.set(path);
+
+      screenStore.update(_.setPath(`${tab}.route`, path));
 
       const urlQuery = {
         q: uiQueryToUrlString(currentQuery.uiQuery),
         i: currentQuery.index && currentQuery.index,
       };
 
-      goto(makeRouteUrl('search', urlQuery.q ? urlQuery : false));
+      goto(makeRouteUrl(path, urlQuery));
+    },
+    setUrlQuery: ({ screenStore, currentTab, routeStore }, { route: path }) => {
+      const tab = get(currentTab);
+      const currentQuery = get(screenStore)[tab];
+      routeStore.set(currentQuery.route);
+
+      const urlQuery = {
+        q: uiQueryToUrlString(currentQuery.uiQuery),
+        i: currentQuery.index && currentQuery.index,
+      };
+
+      goto(makeRouteUrl(currentQuery.route, urlQuery));
     },
     changeIndex: ({ screenStore }, { tabId, ESIndex }) => {
       screenStore.update(_.setPath(`${tabId}.index`, ESIndex));

@@ -3,22 +3,38 @@ import { makeSplitBy } from '@svizzle/utils';
 
 import { fieldGroups } from '../config';
 
+const tap = message => x => {
+  console.log(message, ': ', x);
+  return x;
+};
+
 export const toggleBoolean = (x: boolean): boolean => !x;
 export const add1 = _.add(1);
 export const removeLast = _.sliceAt(0, -1);
-export const isNot = _.not(_.is); // utils
+export const isNot = x => _.not(_.is(x));
 export const splitByComma = makeSplitBy(',');
+const removeUndefinedAt1 = _.filterWith(x => !!x[1]);
+const addQueryMark = q => (q ? '?' + q : '');
 
 export const paramToString = (acc, [key, value], i) =>
   `${acc}${i !== 0 ? '&' : ''}${key}=${value}`;
 
-export const makeParams = _.pipe([_.pairs, _.reduceWith(paramToString, '')]);
+export const makeParams: Function = _.pipe([
+  _.pairs,
+  removeUndefinedAt1,
+  _.reduceWith(paramToString, ''),
+]);
 
-export const makeRouteUrl = (path, params) => {
-  const paramString = params ? '?' + makeParams(params) : '';
-  const pathString = Array.isArray(params) ? path.join('/') : path;
+const makeParamString = _.pipe([makeParams, addQueryMark]);
 
-  return `/${pathString}${paramString}`;
+export const makeRouteUrl = (
+  path: string,
+  params: { [x: string]: string }
+): string => {
+  const pathString = path ? (path.startsWith('/') ? path.slice(0) : path) : '';
+  const paramString = params.q ? makeParamString(params) : '';
+
+  return `${pathString}${paramString}`;
 };
 
 export const isValidField = ({ disabled, status }) => {

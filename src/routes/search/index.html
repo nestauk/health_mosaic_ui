@@ -8,6 +8,7 @@
   const { checkDirty } = getContext(SEARCH);
 
   $: currentData = $screenStore[$currentTab].results.data;
+
   $: isDirty = $screenStore && checkDirty();
 </script>
 

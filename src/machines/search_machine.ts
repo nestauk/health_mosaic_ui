@@ -94,7 +94,7 @@ export const searchOptions = {
     shareError: send('ERROR', { to: 'Link' }),
     shareMatching: send('MATCHING', { to: 'Link' }),
     shareDirty: send('DIRTY', { to: 'Link' }),
-    updateData: ({ screenStore, queryObj, currentTab }, evt) => {
+    updateData: ({ screenStore, queryObj, currentTab, routeStore }, evt) => {
       const tab = get(currentTab);
       const currentQueryObject = get(queryObj)[tab];
       const currentQuery = get(screenStore)[tab];
@@ -104,7 +104,7 @@ export const searchOptions = {
         i: currentQuery.index.toLowerCase(),
       };
 
-      goto(makeRouteUrl('search', urlQuery.q ? urlQuery : false));
+      goto(makeRouteUrl(get(routeStore), urlQuery));
 
       const newData = Object.values(evt.data.data)[0];
 
@@ -121,6 +121,7 @@ export const searchOptions = {
   },
   services: {
     apiRequest: ({ queryObj, currentTab }) => {
+      // path
       const tab = get(currentTab);
       const currentQuery = get(queryObj)[tab];
 
