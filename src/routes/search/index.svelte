@@ -3,7 +3,7 @@
 
   import { Results, ResultsItem } from '../../components/Results';
   import { screenStore, currentTab } from '../../stores/search.ts';
-  import { SEARCH } from './_layout.html';
+  import { SEARCH } from './_layout.svelte';
 
   const { checkDirty } = getContext(SEARCH);
 

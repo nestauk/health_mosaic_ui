@@ -3,7 +3,7 @@
   import { schemeSet3 } from 'd3-scale-chromatic';
   import { stores } from '@sapper/app';
 
-  import BarchartV from '../../../components/BarchartV.html';
+  import BarchartV from '../../../components/BarchartV.svelte';
   import { WorldMapWithHistogramScaleHTML } from '../../../components/WorldMapWithHistogramScale';
   import { screenStore, currentTab  } from '../../../stores/search.ts';
   import {

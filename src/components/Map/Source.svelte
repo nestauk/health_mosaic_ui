@@ -4,7 +4,7 @@
 
 <script>
   import { onMount, getContext, setContext } from 'svelte';
-  import { MAPBOX } from './Mapbox.html';
+  import { MAPBOX } from './Mapbox.svelte';
 
   export let source, sourceId;
   const { getMap } = getContext(MAPBOX);

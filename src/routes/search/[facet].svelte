@@ -4,7 +4,7 @@
 
   import { screenStore, currentTab } from '../../stores/search.ts';
 
-  import { SEARCH } from './_layout.html';
+  import { SEARCH } from './_layout.svelte';
   import { volume_geo } from './facets';
 
   const facets = {volume_geo};

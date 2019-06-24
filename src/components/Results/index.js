@@ -1,2 +1,2 @@
-export { default as Results } from './Results.html';
-export { default as ResultsItem } from './ResultsItem.html';
+export { default as Results } from './Results.svelte';
+export { default as ResultsItem } from './ResultsItem.svelte';

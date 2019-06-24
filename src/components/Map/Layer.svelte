@@ -1,7 +1,7 @@
 <script>
   import { onMount, getContext } from 'svelte';
-  import { MAPBOX } from './Mapbox.html';
-  import { MB_SOURCE } from './Source.html';
+  import { MAPBOX } from './Mapbox.svelte';
+  import { MB_SOURCE } from './Source.svelte';
 
   export let layer;
   let sourceId;

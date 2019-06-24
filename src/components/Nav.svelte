@@ -1,7 +1,7 @@
 <script>
   import { createEventDispatcher } from 'svelte';
-  import Spinner from './Spinner.html';
-  import Alert from './Icons/Alert.html';
+  import Spinner from './Spinner.svelte';
+  import Alert from './Icons/Alert.svelte';
 
   import closeIcon from 'ionicons/dist/ionicons/svg/ios-close-circle-outline.svg';
   import addIcon from 'ionicons/dist/ionicons/svg/ios-add-circle-outline.svg';
