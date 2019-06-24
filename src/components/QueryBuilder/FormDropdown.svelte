@@ -30,7 +30,7 @@ const dispatch = createEventDispatcher();
     right: 30px;
 
     &.offset {
-      right: 170px;
+      right: 200px;
     }
 
     &::after {

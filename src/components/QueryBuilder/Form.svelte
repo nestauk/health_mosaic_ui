@@ -1,7 +1,8 @@
 <script>
   import { createEventDispatcher } from 'svelte';
+  import { Sync } from '../Icons/'
 
-  export let formHeight = 0, isQueries;
+  export let formHeight = 0, isQueries, isDirty;
   const dispatch = createEventDispatcher();
   let tooltip;
 </script>
@@ -25,6 +26,13 @@
 </span>
   <slot />
   {#if isQueries}
+    <span
+      class="reset-button"
+      class:active="{isDirty}"
+      on:click="{() => dispatch('reset')}"
+    >
+      <Sync  />
+    </span>
     <button class="search-button" on:click="{() => dispatch('search')}">Search</button>
   {/if}
 </form>
@@ -85,11 +93,23 @@
     background: #333;
   }
 
-  .search-button {
-	position: absolute;
-	cursor: pointer;
-	right: 80px;
-  bottom: 20px;
-	transition: 0.2s;
-}
+  .search-button, .reset-button {
+    position: absolute;
+    cursor: pointer;
+    right: 110px;
+    bottom: 20px;
+    transition: 0.2s;
+  }
+
+  .reset-button {
+    right: 67px;
+    width: 30px;
+    bottom: 16px;
+    opacity: 0.5;
+  }
+
+  .active {
+    opacity: 1;
+  }
+
 </style>

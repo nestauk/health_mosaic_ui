@@ -11,3 +11,4 @@ export { default as Dots } from './Dots.svelte';
 export { default as Copy } from './Copy.svelte';
 export { default as Trash } from './Trash.svelte';
 export { default as Toggle } from './Toggle.svelte';
+export { default as Sync } from './Sync.svelte';

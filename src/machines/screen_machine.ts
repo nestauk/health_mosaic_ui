@@ -51,6 +51,9 @@ const screen_config = {
         INDEX_CHANGED: {
           actions: ['changeIndex'],
         },
+        QUERY_RESET: {
+          actions: ['resetQuery'],
+        },
       },
       states: {
         Idle: {
@@ -510,6 +513,17 @@ export const screen_options = {
     },
     changeIndex: ({ screenStore }, { tabId, ESIndex }) => {
       screenStore.update(_.setPath(`${tabId}.index`, ESIndex));
+    },
+    resetQuery: ({ screenStore }, { tab }) => {
+      const lastQuery = get(screenStore)[tab].results;
+
+      if (lastQuery.prevQuery) {
+        const resetQuery = _.pipe([
+          _.setPath(`${tab}.uiQuery`, lastQuery.prevQuery),
+          _.setPath(`${tab}.index`, lastQuery.lastIndex),
+        ]);
+        screenStore.update(resetQuery);
+      }
     },
   },
 };

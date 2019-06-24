@@ -51,8 +51,6 @@
     type: 'TAB_CREATED',
     id: $idStore,
     route: $page.path,
-    queryParams: $page.query && $page.query.q,
-    ESIndex: $page.query && $page.query.i
   });
 
   const sendTab = (type, id) =>  screenMachine.send({

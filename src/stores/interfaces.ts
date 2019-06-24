@@ -61,6 +61,7 @@ export interface Tab {
   results: Results;
   visible: boolean;
   index: string;
+  route: string;
 }
 
 // The whole shebang

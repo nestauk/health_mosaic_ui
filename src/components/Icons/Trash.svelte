@@ -1,3 +1,5 @@
+<!-- ionicons/dist/ionicons/svg/ios-trash.svg -->
+
 <svg
   version="1.1"
   id="Layer_1"

@@ -34,6 +34,7 @@
   $: open = $screenStore[$currentTab].visible;
   $: isLoading = searchMachine.state.matches('Search.NotEmpty.Dirty.Pending');
   $: isError = searchMachine.state.matches('Search.NotEmpty.Dirty.Error');
+  $: isDirty = searchMachine.state.matches('Search.NotEmpty.Dirty');
   $: tabs = Object.entries($screenStore);
   $: isQueries = uiQuery[0] && uiQuery[0].terms[0].term;
 
@@ -59,7 +60,6 @@
         index: currentQ.index,
         query: stripEmpties(currentQ.query)
       };
-
 
     if (currentQ.query && compare(cachedQuery, newQuery)) {
       searchMachine.send('QUERY_MATCHED')
@@ -95,6 +95,13 @@
     searchMachine.send({ type:'SEARCHED', tab: $currentTab, route: $page.path });
   };
 
+  const handleReset = event => {
+    event.preventDefault();
+    screenMachine.send({ type:'QUERY_RESET', tab: $currentTab });
+    checkDirty();
+    input.focus();
+  };
+
   const newRuleset = () => {
     input.focus();
     screenMachine.send({
@@ -113,6 +120,7 @@
     })
     checkDirty();
   }
+
   const sendRule = (type, ruleIndex) => {
     screenMachine.send({
       type,
@@ -170,6 +178,8 @@
     on:submit="{handleSend}"
     on:newrule="{newRuleset}"
     on:search="{handleSend}"
+    on:reset="{handleReset}"
+    {isDirty}
   >
     <FormInput
       bind:this={input}
@@ -232,8 +242,6 @@
       </div>
     {/if}
 </div>
-
-
 
 <style>
   .search {

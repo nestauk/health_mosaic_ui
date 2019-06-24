@@ -1,7 +1,7 @@
 import ApolloClient from 'apollo-boost';
 import { endpointQueries } from './gqlQueries';
 
-export async function query(query, endpoint) {
+export async function query(query, endpoint, id) {
   const client = new ApolloClient({
     /* eslint-disable-next-line no-undef */
     uri: REPLACE_GRAPHQL_ENDPOINT,
@@ -14,7 +14,7 @@ export async function query(query, endpoint) {
     },
   });
 
-  return results;
+  return { results, id };
 }
 
 // TODO: Error are weird with gql, needs more research

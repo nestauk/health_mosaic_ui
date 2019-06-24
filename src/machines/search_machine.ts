@@ -95,6 +95,10 @@ export const searchOptions = {
     shareMatching: send('MATCHING', { to: 'Link' }),
     shareDirty: send('DIRTY', { to: 'Link' }),
     updateData: ({ screenStore, queryObj, currentTab, routeStore }, evt) => {
+      if (!get(screenStore).hasOwnProperty(evt.data.id)) {
+        return;
+      }
+
       const tab = get(currentTab);
       const currentQueryObject = get(queryObj)[tab];
       const currentQuery = get(screenStore)[tab];
@@ -105,27 +109,29 @@ export const searchOptions = {
       };
 
       goto(makeRouteUrl(get(routeStore), urlQuery));
-
-      const newData = Object.values(evt.data.data)[0];
+      const newData = Object.values(evt.data.results.data)[0];
 
       screenStore.update(tabs => {
         return {
           ...tabs,
-          [tab]: {
-            ...tabs[tab],
-            results: { data: newData, queryObj: currentQueryObject },
+          [evt.data.id]: {
+            ...tabs[evt.data.id],
+            results: {
+              data: newData,
+              queryObj: currentQueryObject,
+              prevQuery: currentQuery.uiQuery,
+              lastIndex: currentQuery.index,
+            },
           },
         };
       });
     },
   },
   services: {
-    apiRequest: ({ queryObj, currentTab }) => {
-      // path
-      const tab = get(currentTab);
+    apiRequest: ({ queryObj }, { tab }) => {
       const currentQuery = get(queryObj)[tab];
 
-      return query(currentQuery.query, currentQuery.index);
+      return query(currentQuery.query, currentQuery.index, tab);
     },
   },
 };
