@@ -3,7 +3,7 @@
   import { schemeSet3 } from 'd3-scale-chromatic';
   import { stores } from '@sapper/app';
 
-  import BarChartV from '../../../components/BarChartV.html';
+  import BarchartV from '../../../components/BarchartV.html';
   import { WorldMapWithHistogramScaleHTML } from '../../../components/WorldMapWithHistogramScale';
   import { screenStore, currentTab  } from '../../../stores/search.ts';
   import {
@@ -30,7 +30,7 @@
 
 <div class="container" class:dirty="{isDirty}">
   <div class="col col1-2">
-    <BarChartV
+    <BarchartV
       title="Amount by country"
       items={itemsByCountryId}
     />
@@ -45,7 +45,7 @@
     />
   </div>
   <div class="col col11-12">
-    <BarChartV
+    <BarchartV
       title="Amount by city"
       items={itemsByCity}
     />
