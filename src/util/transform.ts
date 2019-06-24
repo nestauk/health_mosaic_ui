@@ -50,12 +50,15 @@ const createValidFields = fields =>
   fields.filter(isValidField).reduce(transFormFields, []);
 
 const transformTerm = ({ term, status }) => ({ query: term, status });
+const removeDisabled = _.pipe([_.getKey('disabled'), isNot(true)]);
 
 export const createQueryObject = (queries, index) => ({
-  query: queries.map(({ terms, fields: { subject, content } }) => ({
-    fields: createValidFields(_.union(content, subject)),
-    values: terms.map(transformTerm),
-  })),
+  query: queries
+    .filter(removeDisabled)
+    .map(({ terms, fields: { subject, content } }) => ({
+      fields: createValidFields(_.union(content, subject)),
+      values: terms.map(transformTerm),
+    })),
   index,
 });
 
