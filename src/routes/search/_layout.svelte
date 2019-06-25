@@ -8,6 +8,7 @@
 
   import Nav from '../../components/Nav.svelte';
   import QueryBuilder from '../../components/QueryBuilder.svelte';
+  import RouterLink from '../../components/RouterLink.svelte';
 
   import { screenMachine } from '../../services/screen_service.ts';
 
@@ -108,16 +109,20 @@
 
 <QueryBuilder />
 
-<!-- <div class="facets" class:dirty="{dirty}"> -->
 <div class="facets">
   <div class="tabs">
     <ul>
       {#each facetTabs as {id, label}}
       <li
         class:selected="{id === selectedFacet}"
-        on:click="{onFacetTabClick(id)}"
       >
-        {label}
+        <RouterLink
+          on:navigate={onFacetTabClick(id)}
+          base={searchRouteName}
+          href={id}
+        >
+          <div>{label}</div>
+        </RouterLink>
       </li>
       {/each}
     </ul>
@@ -129,16 +134,10 @@
 
 <style lang="less">
   .facets {
-    /* padding-top: 500px; */
     padding-top: 16rem;
     height: 100%;
     width: 100%;
     display: flex;
-
-    /* &.dirty {
-      background-color: grey;
-      border: 1px solid red;
-    } */
 
     .tabs {
       flex: 0 0 200px;
@@ -155,8 +154,6 @@
 
         li {
           border-bottom: 1px solid #ccc;
-          padding: 20px;
-          cursor: pointer;
           user-select: none;
 
           &:hover {
@@ -165,7 +162,13 @@
 
           &.selected {
             background: #ececec;
-            /* color: #333; */
+          }
+
+          div {
+            width: 100%;
+            height: 100%;
+            display: block;
+            padding: 20px;
           }
         }
       }

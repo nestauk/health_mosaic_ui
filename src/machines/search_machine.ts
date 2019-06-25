@@ -108,7 +108,6 @@ export const searchOptions = {
         q: uiQueryToUrlString(currentQuery.uiQuery),
         i: currentQuery.index.toLowerCase(),
       };
-
       goto(makeRouteUrl(get(routeStore), urlQuery));
       const newData = Object.values(evt.data.results.data)[0];
 

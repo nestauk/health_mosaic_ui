@@ -505,14 +505,14 @@ export const screen_options = {
     setUrlQuery: ({ screenStore, currentTab, routeStore }, { route: path }) => {
       const tab = get(currentTab);
       const currentQuery = get(screenStore)[tab];
-      routeStore.set(currentQuery.route);
+      routeStore.set(path);
 
       const urlQuery = {
         q: uiQueryToUrlString(currentQuery.uiQuery),
         i: currentQuery.index && currentQuery.index,
       };
 
-      const newPath = makeRouteUrl(currentQuery.route, urlQuery);
+      const newPath = makeRouteUrl(path, urlQuery);
       if (process.browser && newPath !== path) {
         goto(newPath);
       }
