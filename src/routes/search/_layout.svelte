@@ -11,12 +11,11 @@
   import RouterLink from '../../components/RouterLink.svelte';
 
   import { screenMachine } from '../../services/screen_service.ts';
-
   import {
     screenStore,
     idStore,
     currentTab,
-  } from '../../stores/search.ts'
+  } from '../../stores/search.ts';
 
   import { searchRouteName } from '../../config';
   const { page } = stores();
@@ -42,9 +41,13 @@
   });
 
   setContext(SEARCH, {
-    transitionComplete: () => screenMachine.send({ type: 'ROUTE_CHANGE_COMPLETED' }),
+    transitionComplete:
+      () => screenMachine.send({ type: 'ROUTE_CHANGE_COMPLETED' }),
     data: screenStore,
-    checkDirty: () => searchMachine && searchMachine.state.matches('Search.NotEmpty.Dirty')
+    checkDirty: () =>
+      searchMachine && searchMachine.state.matches('Search.NotEmpty.Dirty'),
+    select: (selection, tabId) =>
+      screenMachine.send({type: 'SELECTION_UPDATED', tabId, selection})
   });
 
   $: searchMachine = $screenMachine.context.searchMachines[$currentTab];
@@ -178,6 +181,7 @@
       flex: 1;
       height: 100%;
       max-height: 100%;
+      padding: 1em;
     }
   }
 </style>

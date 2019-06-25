@@ -1,7 +1,8 @@
 <script>
-  import { onMount } from 'svelte';
+  import { createEventDispatcher, onMount } from 'svelte';
   import * as _ from 'lamb';
   import { toPx, makeStyle } from '@svizzle/dom';
+  import { toggleItem } from '@svizzle/utils';
 
   import { countries } from '../../../data/geo/iso_a2_to_name_by_type.json';
   import { exactAmountBins } from '../../util/array';
@@ -10,11 +11,14 @@
   import { WorldMapSVG } from '../WorldMap';
   import { histogramMargin, pointerMargin } from './index';
 
+  const dispatch = createEventDispatcher();
+
   export let colors;
   export let keyAccessor;
   export let items = [];
   export let title;
   export let valueAccessor;
+  export let selectedIds = [];
 
   let bbox;
   let width = 0;
@@ -49,6 +53,12 @@
   const offTarget = () => {
     target = null;
   };
+  const toggleTarget = ({detail: id}) =>
+    dispatch('selected', {
+      key: 'country_id',
+      type: 'include',
+      value: toggleItem(selectedIds, id)
+    });
 
   const getSvgOrigin = () => {
     bbox = svg.getBoundingClientRect();
@@ -67,6 +77,8 @@
       y: event.clientY - bbox.y,
     };
 
+    const hasData = _.has(itemsByKey, target);
+
     tooltip = {
       target,
       label: countries[target],
@@ -84,7 +96,8 @@
           ? toPx(pointer.x + pointerMargin)
           : null,
       })),
-      value: itemsByKey[target] && itemsByKey[target].value
+      value: hasData && itemsByKey[target].value,
+      hasData
     };
   };
 </script>
@@ -114,8 +127,11 @@
           {items}
           key="iso_a2"
           {keyToColor}
-          on:enter={onTarget}
-          on:exit={offTarget}
+          on:enterTarget={onTarget}
+          on:exitTarget={offTarget}
+          on:clickTarget={toggleTarget}
+          on:clickedSea
+          {selectedIds}
           {valueAccessor}
           {width}
         />
@@ -132,6 +148,7 @@
       {#if tooltip}
       <div
         class="tooltip"
+        class:active="{tooltip.hasData}"
         style="{tooltip.style}"
       >
         <span>{tooltip.label}</span>
@@ -164,6 +181,7 @@
       width: 100%;
       height: calc(100% - @header-height);
       padding: 10px;
+      user-select: none;
 
       .board {
         width: 100%;
@@ -178,16 +196,27 @@
         .tooltip {
           position: absolute;
           padding: 0.25em 0.5em;
-          background-color: rgba(15,15,15,0.7);
-          color: lightgrey;
           pointer-events: none;
 
-          span:nth-child(1) {
-            font-weight: bold;
+          background-color: rgba(255,255,255,0.75);
+          border: 1px solid #888;
+          color: #555;
+          font-weight: light;
+          font-size: 0.8em;
+
+          &.active {
+            background-color: rgba(15,15,15,0.7);
+            color: lightgrey;
+            font-size: 1em;
+
+            span:nth-child(1) {
+              font-weight: bold;
+            }
+            span:nth-child(2) {
+              font-style: italic;
+            }
           }
-          span:nth-child(3) {
-            font-style: italic;
-          }
+
         }
       }
     }

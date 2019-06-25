@@ -53,14 +53,23 @@ interface Results {
   queryObj: any[];
 }
 
+interface Selection {
+  key: string;
+  type: string;
+  value: any[];
+}
+
 // An individual tab
 export interface Tab {
-  uiQuery: UIQuery[];
+  index: string;
   name: string;
   results: Results;
-  visible: boolean;
-  index: string;
   route: string;
+  searchMachine: any;
+  selected: Results;
+  selections: Selection[],
+  uiQuery: UIQuery[];
+  visible: boolean;
 }
 
 // The whole shebang

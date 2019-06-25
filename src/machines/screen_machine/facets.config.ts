@@ -27,6 +27,12 @@ export const facets_config = {
   states: {
     Interactive: {
       id: 'Interactive',
+      on: {
+        SELECTION_UPDATED: {
+          target: '#Interactive',
+          actions: ['updateSelections'],
+        },
+      },
     },
     Disabled: {
       id: 'Disabled',

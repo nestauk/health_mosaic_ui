@@ -1,38 +1,43 @@
 <script>
   import { onMount, tick, getContext } from 'svelte';
   import { schemeSet3 } from 'd3-scale-chromatic';
+  import * as _ from 'lamb';
   import { stores } from '@sapper/app';
 
   import BarchartV from '../../../components/BarchartV.svelte';
   import { WorldMapWithHistogramScaleHTML } from '../../../components/WorldMapWithHistogramScale';
-  import { screenStore, currentTab  } from '../../../stores/search.ts';
+  import { screenStore, currentTab } from '../../../stores/search.ts';
+  import { makeIsIncluded } from '../../../util/array';
   import {
     countByCity,
     countByCountryId,
     getKey,
     getValue,
-    makeCountryIdToLabel
   } from '../../../util/domain';
-  // import { SEARCH } from '../_layout.html';
+  import { SEARCH } from '../_layout.svelte';
+
+  const { select } = getContext(SEARCH);
 
   export let isDirty;
 
-  // seems to be unneeded as it is in [facet] already, ok to remove?
-  // const { page } = stores();
-  // const { transitionComplete } = getContext(SEARCH);
-  // $: $page && transitionComplete();
-
   $: items = $screenStore[$currentTab].results.data;
   $: itemsByCountryId = countByCountryId(items); // {key: country_id, value: number}[]
-  $: itemsByCity = countByCity(items); // {key: city, value: number}[]
-  $: countryLabels = makeCountryIdToLabel(items); // {id: country}[]
+  $: selections = $screenStore[$currentTab].selections;
+  $: selectedCountries = selections.country_id && selections.country_id.value || [];
+  $: selectedItems = $screenStore[$currentTab].selected;
+  $: selectedItemsByCountry = countByCountryId(selectedItems); // {key: country_id, value: number}[]
+  $: selectedItemsByCity = countByCity(selectedItems);
+
+  // TODO utils?
+  const updateSelections = ({detail: selection}) => select(selection, $currentTab);
+  const deselectCountries = () => select({key: 'country_id', value: undefined}, $currentTab);
 </script>
 
 <div class="container" class:dirty="{isDirty}">
   <div class="col col1-2">
     <BarchartV
       title="Amount by country"
-      items={itemsByCountryId}
+      items={selectedItemsByCountry}
     />
   </div>
   <div class="col col3-10">
@@ -40,6 +45,9 @@
       colors={schemeSet3}
       items={itemsByCountryId}
       keyAccessor="{getKey}"
+      on:selected="{updateSelections}"
+      on:clickedSea="{deselectCountries}"
+      selectedIds="{selectedCountries}"
       title="Amount by country"
       valueAccessor="{getValue}"
     />
@@ -47,7 +55,7 @@
   <div class="col col11-12">
     <BarchartV
       title="Amount by city"
-      items={itemsByCity}
+      items={selectedItemsByCity}
     />
   </div>
 </div>

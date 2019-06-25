@@ -5,15 +5,17 @@ import { Tab } from '../../stores/interfaces';
 import { isNot } from '../../util/transform';
 
 export const newTab = (id, uiQuery, index): Tab => ({
-  uiQuery,
+  index,
   name: 'Tab' + id,
-  visible: true,
   results: {
     data: [],
     queryObj: [],
   },
-  index,
+  selected: [],
+  selections: {},
   route: `/${searchRouteName}`,
+  uiQuery,
+  visible: true,
 });
 
 export const toggleLabelBinaryUpdater = labelStatus =>

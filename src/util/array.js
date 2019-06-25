@@ -39,3 +39,7 @@ export const makeBinsVisibleTicks = _.pipe([
   _.filterWith(_.getPath('values.length')),
   makeBinsTicks
 ]);
+
+/* rest */
+
+export const makeIsIncluded = array => value => array.includes(value);

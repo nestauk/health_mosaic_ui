@@ -8,13 +8,11 @@ const countBy = key =>
   _.pipe([
     _.countBy(_.getKey(key)),
     objectToKeyValueArray,
-    _.sortWith([_.sorterDesc(getValue)]),
+    _.sortWith([
+      _.sorterDesc(getValue),
+      getKey,
+    ]),
   ]);
 
 export const countByCity = countBy('city');
 export const countByCountryId = countBy('country_id');
-
-export const makeCountryIdToLabel = _.pipe([
-  _.indexBy(_.getKey('country_id')),
-  _.mapValuesWith(_.getKey('country'))
-]);

@@ -14,8 +14,9 @@
   $: scale = scaleLinear().domain([0, max]).range([0, 100]);
   $: bars = items.map(item => ({
     ...item,
-    style: { width: scale(item.value) },
+    barStyle: { width: scale(item.value) },
   }));
+
 </script>
 
 <div class="container">
@@ -25,13 +26,13 @@
   </header>
   {/if}
   <main>
-    {#each bars as {key, style, value} (key)}
+    {#each bars as {barStyle, key, value} (key)}
     <div class="item">
       <div class="labels">
         <span>{labels ? labels[key] : key}</span>
         <span>{value}</span>
       </div>
-      <div class="bar" style="width: {style.width}%"></div>
+      <div class="bar" style="width: {barStyle.width}%"></div>
     </div>
     {/each}
   </main>

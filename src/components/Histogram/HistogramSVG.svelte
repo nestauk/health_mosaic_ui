@@ -86,6 +86,7 @@
     text {
       stroke: none;
       dominant-baseline: middle;
+      user-select: none;
 
       &.range {
         fill: black;

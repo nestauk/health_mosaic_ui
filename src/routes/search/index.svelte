@@ -1,5 +1,6 @@
 <script>
   import { getContext } from 'svelte';
+  import * as _ from 'lamb';
 
   import { Results, ResultsItem } from '../../components/Results';
   import { screenStore, currentTab } from '../../stores/search.ts';
@@ -7,15 +8,22 @@
 
   const { checkDirty } = getContext(SEARCH);
 
-  $: currentData = $screenStore[$currentTab].results.data;
-
+  $: selectedItems = $screenStore[$currentTab].selected;
   $: isDirty = $screenStore && checkDirty();
 </script>
 
 <div class="content">
   <Results dirty="{isDirty}">
-    {#each currentData as data }
-    <ResultsItem {data}></ResultsItem>
+    <p>Found {selectedItems.length} items</p>
+    {#each selectedItems as data, index}
+    <ResultsItem {data} {index}></ResultsItem>
     {/each}
   </Results>
 </div>
+
+<style lang="less">
+  .content {
+    height: 100%;
+    overflow-y: auto;
+  }
+</style>
