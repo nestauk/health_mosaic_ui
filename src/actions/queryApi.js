@@ -8,7 +8,7 @@ export async function query(query, endpoint, id) {
   });
 
   const results = await client.query({
-    query: endpointQueries[endpoint],
+    query: endpointQueries[endpoint.toLowerCase()],
     variables: {
       query,
     },

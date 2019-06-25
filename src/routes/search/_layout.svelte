@@ -4,7 +4,7 @@
 
 <script>
   import { stores } from '@sapper/app';
-  import { onMount, setContext } from 'svelte';
+  import { onMount, onDestroy, setContext } from 'svelte';
 
   import Nav from '../../components/Nav.svelte';
   import QueryBuilder from '../../components/QueryBuilder.svelte';
@@ -25,6 +25,10 @@
       searchMachine.send('QUERY_ENTERED')
       searchMachine.send({ type:'SEARCHED', tab: $currentTab });
     }
+  })
+
+  onDestroy(() => {
+    screenMachine.send('STORE_RESET');
   })
 
   screenMachine.send({

@@ -54,6 +54,9 @@ const screen_config = {
         QUERY_RESET: {
           actions: ['resetQuery'],
         },
+        STORE_RESET: {
+          actions: ['resetStore'],
+        },
       },
       states: {
         Idle: {
@@ -509,7 +512,10 @@ export const screen_options = {
         i: currentQuery.index && currentQuery.index,
       };
 
-      goto(makeRouteUrl(currentQuery.route, urlQuery));
+      const newPath = makeRouteUrl(currentQuery.route, urlQuery);
+      if (process.browser && newPath !== path) {
+        goto(newPath);
+      }
     },
     changeIndex: ({ screenStore }, { tabId, ESIndex }) => {
       screenStore.update(_.setPath(`${tabId}.index`, ESIndex));
@@ -524,6 +530,13 @@ export const screen_options = {
         ]);
         screenStore.update(resetQuery);
       }
+    },
+    resetStore: ({ screenStore, historyStore, currentTab, idStore }) => {
+      Object.values(get(screenStore)).forEach(tab => tab.searchMachine.stop());
+      screenStore.set({});
+      currentTab.set(0);
+      historyStore.set([]);
+      idStore.set(0);
     },
   },
 };

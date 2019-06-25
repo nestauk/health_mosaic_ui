@@ -65,6 +65,7 @@ export const createSearchConfig = childMachine => ({
                     },
                     onError: {
                       target: '#Error',
+                      actions: (_, evt) => console.log(evt),
                     },
                   },
                 },
