@@ -1,7 +1,11 @@
-import { newField, screen_machine_base, screen_options } from './screen_machine';
-import { subjectAliases, contentAliases } from '../config';
+import {
+  newField,
+  screen_machine_base,
+  screen_options,
+} from '../screen_machine';
+import { subjectAliases, contentAliases } from '../../config';
 import { Machine } from 'xstate';
-import { createSearchConfig, searchOptions } from './search_machine';
+import { createSearchConfig, searchOptions } from '../search_machine';
 import { writable } from 'svelte/store';
 
 const {
@@ -49,7 +53,10 @@ const createExpected = id => ({
         selected: false,
       },
     ],
-    searchMachine: Machine(createSearchConfig(screen_machine_base), searchOptions),
+    searchMachine: Machine(
+      createSearchConfig(screen_machine_base),
+      searchOptions
+    ),
     name: `Tab${id}`,
   },
 });
@@ -95,7 +102,10 @@ const createExpectedBigger = id => ({
         selected: false,
       },
     ],
-    searchMachine: Machine(createSearchConfig(screen_machine_base), searchOptions),
+    searchMachine: Machine(
+      createSearchConfig(screen_machine_base),
+      searchOptions
+    ),
     name: `Tab${id}`,
   },
 });

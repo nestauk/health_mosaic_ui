@@ -18,8 +18,8 @@
   const { page } = stores();
   let formHeight, input;
 
-  $: searchMachine = $screenStore[$currentTab].searchMachine;
-  $: uiQuery = $screenStore[$currentTab]&& $screenStore[$currentTab].uiQuery;
+  $: searchMachine = $screenMachine.context.searchMachines[$currentTab];
+  $: uiQuery = $screenStore[$currentTab] && $screenStore[$currentTab].uiQuery;
   $: ruleset = uiQuery !== undefined
     ? uiQuery.find(( { selected } ) => selected)
     : false;
@@ -32,13 +32,13 @@
   };
   $: data = $screenStore[$currentTab].results.data
   $: open = $screenStore[$currentTab].visible;
-  $: isLoading = searchMachine.state.matches('Search.NotEmpty.Dirty.Pending');
-  $: isError = searchMachine.state.matches('Search.NotEmpty.Dirty.Error');
-  $: isDirty = searchMachine.state.matches('Search.NotEmpty.Dirty');
+  $: isLoading = searchMachine && searchMachine.state.matches('Search.NotEmpty.Dirty.Pending');
+  $: isError = searchMachine && searchMachine.state.matches('Search.NotEmpty.Dirty.Error');
+  $: isDirty = searchMachine && searchMachine.state.matches('Search.NotEmpty.Dirty');
   $: tabs = Object.entries($screenStore);
   $: isQueries = uiQuery[0] && uiQuery[0].terms[0].term;
 
-  const stripEmpties = _.filterWith(_.allOf([
+const stripEmpties = _.filterWith(_.allOf([
     _.getPath('values.length'),
     _.getPath('values.0.query.length')
   ]));
@@ -92,7 +92,7 @@
 
   const handleSend = event => {
     event.preventDefault();
-    searchMachine.send({ type:'SEARCHED', tab: $currentTab, route: $page.path });
+    searchMachine.send({ type:'SEARCHED', tabId: $currentTab, route: $page.path });
   };
 
   const handleReset = event => {

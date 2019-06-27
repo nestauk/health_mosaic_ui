@@ -56,7 +56,6 @@ interface Results {
 // An individual tab
 export interface Tab {
   uiQuery: UIQuery[];
-  searchMachine: any;
   name: string;
   results: Results;
   visible: boolean;

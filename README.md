@@ -32,3 +32,19 @@ For local development:
    `> Listening on http://localhost:3000`
 
 - navigate to `http://localhost:3000`, then click on "search" or navigate directly to `http://localhost:3000/search`
+
+## Statecharts
+
+There are some commands that you can run to copy the state machine configuratins to your clipboard allowing you to visit the [xstate visualiser](https://statecharts.github.io/xstate-viz/) and paste the configuration into the window and see a preview of that machine.
+
+To copy the `screen_machine` configuration to your clipboard run the following command:
+
+```bash
+npm run copy:screen
+```
+
+To copy the `search_machine` configuration to your clipboard run the following command:
+
+```bash
+npm run copy:search
+```

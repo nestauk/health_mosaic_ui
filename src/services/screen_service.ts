@@ -1,7 +1,7 @@
 import { interpret } from 'xstate';
 import { writable } from 'svelte/store';
 
-import { screen_machine } from '../machines/screen_machine';
+import { screen_machine } from '../machines/screen_machine/';
 import {
   screenStore,
   idStore,
@@ -19,6 +19,7 @@ export const screenService = interpret(
     currentTab,
     queryObj,
     routeStore,
+    searchMachines: {},
   })
 );
 

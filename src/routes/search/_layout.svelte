@@ -24,7 +24,7 @@
   onMount(() => {
     if($page.query && $page.query.q) {
       searchMachine.send('QUERY_ENTERED')
-      searchMachine.send({ type:'SEARCHED', tab: $currentTab });
+      searchMachine.send({ type:'SEARCHED', tabId: $currentTab });
     }
   })
 
@@ -34,7 +34,7 @@
 
   screenMachine.send({
     type: 'TAB_CREATED',
-    id: $idStore,
+    tabId: $idStore,
     route: $page.path,
     queryParams: $page.query && $page.query.q,
     ESIndex: $page.query && $page.query.i,
@@ -47,20 +47,20 @@
     checkDirty: () => searchMachine && searchMachine.state.matches('Search.NotEmpty.Dirty')
   });
 
-  $: searchMachine = $screenStore[$currentTab] && $screenStore[$currentTab].searchMachine;
+  $: searchMachine = $screenMachine.context.searchMachines[$currentTab];
   $: isLoading = searchMachine && searchMachine.state.matches('Search.NotEmpty.Dirty.Pending');
   $: isError = searchMachine && searchMachine.state.matches('Search.NotEmpty.Dirty.Error');
   $: tabs = Object.entries($screenStore);
 
   const sendTabCreated = () =>  screenMachine.send({
     type: 'TAB_CREATED',
-    id: $idStore,
+    tabId: $idStore,
     route: $page.path,
   });
 
   const sendTab = (type, id) =>  screenMachine.send({
     type,
-    id: parseInt(id, 10),
+    tabId: parseInt(id, 10),
     route: $page.path,
     queryParams: $page.query && $page.query.q,
     ESIndex: $page.query && $page.query.i
