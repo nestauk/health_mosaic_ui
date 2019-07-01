@@ -4,10 +4,13 @@ import { goto } from '@sapper/app';
 import * as _ from 'lamb';
 
 import { contentAliases, subjectAliases } from '../../config';
-import { uiQueryToUrlString } from '../../util/urlBuilder';
+import {
+  uiQueryToUrlString,
+  selectionToUrlString,
+} from '../../util/urlBuilder';
 import { newRuleset, newField, newTerm } from '../../util/query';
 
-import { makeRouteUrl, toggleBoolean } from '../../util/transform';
+import { makeRouteUrl, toggleBoolean, removeEmpty } from '../../util/transform';
 import {
   toggleLabelBinaryUpdater,
   toggleLabelTernaryUpdater,
@@ -186,6 +189,7 @@ export const form_options = {
 
       const urlQuery = {
         q: uiQueryToUrlString(currentQuery.uiQuery),
+        s: selectionToUrlString(removeEmpty(currentQuery.selections)),
         i: currentQuery.index && currentQuery.index,
       };
 

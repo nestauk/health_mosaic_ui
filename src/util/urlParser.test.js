@@ -2,15 +2,20 @@ import {
   applyRulesFromQuery,
   createTerms,
   createFields,
-  extractRulesets,
+  extractParenContents,
   extractTermsFields,
   makeRuleset,
   parseQueryUrl,
+  parseSelectionUrl,
+  detectTypes,
+  convertWithin,
+  convertInclude,
+  convertIs,
 } from './urlParser.ts';
 
-test('extractRulesets', () => {
+test('extractParenContents', () => {
   const queryString = '(one,-two,in:one,-two)(three,-four,in:one,-two)';
-  const rulesets = extractRulesets(queryString);
+  const rulesets = extractParenContents(queryString);
 
   expect(rulesets).toEqual(['one,-two,in:one,-two', 'three,-four,in:one,-two']);
 });
@@ -232,4 +237,78 @@ test('parseQueryUrl', () => {
     },
   ];
   expect(parseQueryUrl(urlString)).toEqual(expected);
+});
+
+test('detectTypes', () => {
+  const types = [
+    ['key1', 'one,two and a,three'],
+    ['key2', '10..20'],
+    ['key3', 'my value'],
+  ];
+
+  const expected = [
+    ['key1', 'one,two and a,three', 'include'],
+    ['key2', '10..20', 'within'],
+    ['key3', 'my value', 'is'],
+  ];
+
+  expect(types.map(v => detectTypes(v))).toEqual(expected);
+});
+
+test('convertWithin', () => {
+  const input = ['key1', '1..10', 'within'];
+  const expected = [
+    'key1',
+    {
+      type: 'within',
+      value: [1, 10],
+    },
+  ];
+  expect(convertWithin(input)).toEqual(expected);
+});
+
+test('convertInclude', () => {
+  const input = ['key1', 'one,two+and+a,three', 'include'];
+  const expected = [
+    'key1',
+    {
+      type: 'include',
+      value: ['one', 'two and a', 'three'],
+    },
+  ];
+  expect(convertInclude(input)).toEqual(expected);
+});
+
+test('convertIs', () => {
+  const input = ['key1', 'two+and+a', 'is'];
+  const expected = [
+    'key1',
+    {
+      type: 'is',
+      value: 'two and a',
+    },
+  ];
+  expect(convertIs(input)).toEqual(expected);
+});
+
+test('parseSelectionUrl', () => {
+  const selectionUrl =
+    '(prop_one:ONE,TWO)(prop_two:10..20)(prop_three:some_value)';
+
+  const expected = {
+    prop_one: {
+      type: 'include',
+      value: ['ONE', 'TWO'],
+    },
+    prop_two: {
+      type: 'within',
+      value: [10, 20],
+    },
+    prop_three: {
+      type: 'is',
+      value: 'some_value',
+    },
+  };
+
+  expect(parseSelectionUrl(selectionUrl)).toEqual(expected);
 });

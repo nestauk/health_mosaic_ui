@@ -9,10 +9,14 @@ const tap = message => x => {
 };
 
 export const toggleBoolean = (x: boolean): boolean => !x;
+export const removeEmpty = _.pickIf(x => !!x.value.length);
 export const add1 = _.add(1);
 export const removeLast = _.sliceAt(0, -1);
 export const isNot = x => _.not(_.is(x));
 export const splitByComma = makeSplitBy(',');
+export const splitByTwoDots = makeSplitBy('..');
+export const castToInt = str => parseInt(str, 10);
+export const convertPlusToSpace = str => str.replace(/\+/g, ' ');
 const removeUndefinedAt1 = _.filterWith(x => !!x[1]);
 const addQueryMark = q => (q ? '?' + q : '');
 

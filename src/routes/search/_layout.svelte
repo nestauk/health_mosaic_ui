@@ -36,6 +36,7 @@
     tabId: $idStore,
     route: $page.path,
     queryParams: $page.query && $page.query.q,
+    selectionParams: $page.query && $page.query.s,
     ESIndex: $page.query && $page.query.i,
     isPageInit: true
   });
@@ -47,7 +48,7 @@
     checkDirty: () =>
       searchMachine && searchMachine.state.matches('Search.NotEmpty.Dirty'),
     select: (selection, tabId) =>
-      screenMachine.send({type: 'SELECTION_UPDATED', tabId, selection})
+      screenMachine.send({type: 'SELECTION_UPDATED', tabId, selection, route: $page.path})
   });
 
   $: searchMachine = $screenMachine.context.searchMachines[$currentTab];

@@ -30,7 +30,7 @@ export const facets_config = {
       on: {
         SELECTION_UPDATED: {
           target: '#Interactive',
-          actions: ['updateSelections'],
+          actions: ['updateSelections', 'changeRoute'],
         },
       },
     },

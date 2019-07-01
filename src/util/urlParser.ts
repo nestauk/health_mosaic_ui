@@ -1,8 +1,13 @@
 import * as _ from 'lamb';
 import { newRuleset } from './query';
-import { splitByComma } from './transform';
+import {
+  splitByComma,
+  splitByTwoDots,
+  castToInt,
+  convertPlusToSpace,
+} from './transform';
 
-export const extractRulesets = str => {
+export const extractParenContents = str => {
   const re = /\((.*?)\)/g;
   let matchArray = [];
   let match;
@@ -37,7 +42,7 @@ export const makeRuleset = ([terms, fields]) => [
 ];
 
 export const makeRulesetObject = _.pipe([
-  extractRulesets,
+  extractParenContents,
   _.mapWith(extractTermsFields),
   _.mapWith(makeRuleset),
 ]);
@@ -66,4 +71,43 @@ export const parseQueryUrl = _.pipe([
   makeRulesetObject,
   _.mapWith(applyRulesFromQuery),
   selectFirstRule,
+]);
+
+// selection
+
+const separateKeyValue = selectString => selectString.split(':');
+
+export const detectTypes = ([key, value]) => {
+  if (value.match(/.+,.+/)) return [key, value, 'include'];
+  if (value.match(/.+\.\..+/)) return [key, value, 'within'];
+  return [key, value, 'include'];
+};
+
+export const convertWithin = ([key, value, type]) => [
+  key,
+  {
+    type,
+    value: _.pipe([splitByTwoDots, _.mapWith(castToInt)])(value),
+  },
+];
+
+export const convertInclude = ([key, value, type]) => [
+  key,
+  {
+    type,
+    value: _.pipe([splitByComma, _.mapWith(convertPlusToSpace)])(value),
+  },
+];
+
+const handleTypes = _.pipe([
+  _.when(([, , type]) => type === 'within', convertWithin),
+  _.when(([, , type]) => type === 'include', convertInclude),
+]);
+
+const parseSelection = _.pipe([separateKeyValue, detectTypes, handleTypes]);
+
+export const parseSelectionUrl = _.pipe([
+  extractParenContents,
+  _.mapWith(parseSelection),
+  _.fromPairs,
 ]);

@@ -4,7 +4,7 @@ import { searchRouteName } from '../../config';
 import { Tab } from '../../stores/interfaces';
 import { isNot } from '../../util/transform';
 
-export const newTab = (id, uiQuery, index): Tab => ({
+export const newTab = (id, uiQuery, index, selections = {}): Tab => ({
   index,
   name: 'Tab' + id,
   results: {
@@ -12,7 +12,7 @@ export const newTab = (id, uiQuery, index): Tab => ({
     queryObj: [],
   },
   selected: [],
-  selections: {},
+  selections,
   route: `/${searchRouteName}`,
   uiQuery,
   visible: true,

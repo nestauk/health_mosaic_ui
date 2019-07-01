@@ -54,9 +54,12 @@ interface Results {
 }
 
 interface Selection {
-  key: string;
   type: string;
   value: any[];
+}
+
+interface Selections {
+  [x: string]: Selection;
 }
 
 // An individual tab
@@ -67,7 +70,7 @@ export interface Tab {
   route: string;
   searchMachine: any;
   selected: Results;
-  selections: Selection[],
+  selections: Selections;
   uiQuery: UIQuery[];
   visible: boolean;
 }

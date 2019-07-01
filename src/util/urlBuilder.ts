@@ -45,3 +45,22 @@ export const uiQueryToUrlString = _.pipe([
   _.mapWith(queryToStringArray),
   _.reduceWith(stringArrayToUrl, ''),
 ]);
+
+// selections
+
+export const includeToString = ([name, { value }]) =>
+  `(${name}:${value.join(',').replace(/\s/g, '+')})`;
+
+export const withinToString = ([name, { value }]) =>
+  `(${name}:${value[0]}..${value[1]})`;
+
+export const selectionToStringArray = _.pipe([
+  _.when(([, { type }]) => type === 'include', includeToString),
+  _.when(([, { type }]) => type === 'within', withinToString),
+]);
+
+export const selectionToUrlString = _.pipe([
+  _.pairs,
+  _.mapWith(selectionToStringArray),
+  joinWith(''),
+]);

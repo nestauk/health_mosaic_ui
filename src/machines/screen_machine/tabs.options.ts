@@ -5,10 +5,18 @@ import * as _ from 'lamb';
 import { assign, spawn } from 'xstate';
 
 import { search_machine } from '../search_machine/';
-import { parseQueryUrl } from '../../util/urlParser';
-import { uiQueryToUrlString } from '../../util/urlBuilder';
+import { parseQueryUrl, parseSelectionUrl } from '../../util/urlParser';
+import {
+  uiQueryToUrlString,
+  selectionToUrlString,
+} from '../../util/urlBuilder';
 
-import { add1, makeRouteUrl, removeLast } from '../../util/transform';
+import {
+  add1,
+  makeRouteUrl,
+  removeLast,
+  removeEmpty,
+} from '../../util/transform';
 import { newTab, removeHistoryEntries } from './utils';
 import { newRuleset } from '../../util/query';
 
@@ -16,7 +24,7 @@ export const tabs_options = {
   actions: {
     createTab: (
       { screenStore, idStore },
-      { queryParams, ESIndex, isPageInit }
+      { queryParams, selectionParams, ESIndex, isPageInit }
     ) => {
       const id = get(idStore);
 
@@ -28,12 +36,14 @@ export const tabs_options = {
             queryParams && isPageInit
               ? parseQueryUrl(queryParams)
               : [newRuleset(true)],
-            ESIndex ? ESIndex : 'all'
+            ESIndex ? ESIndex : 'all',
+            selectionParams && parseSelectionUrl(selectionParams)
           )
         )
       );
       idStore.update(add1);
     },
+
     setCurrentTab: ({ currentTab }, { tabId = 0 }) => {
       currentTab.set(tabId);
     },
@@ -74,6 +84,7 @@ export const tabs_options = {
 
       const urlQuery = {
         q: uiQueryToUrlString(currentQuery.uiQuery),
+        s: selectionToUrlString(removeEmpty(currentQuery.selections)),
         i: currentQuery.index && currentQuery.index,
       };
 
