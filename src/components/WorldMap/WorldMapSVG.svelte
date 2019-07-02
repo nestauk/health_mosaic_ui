@@ -1,26 +1,32 @@
-<script>
-  import { createEventDispatcher } from 'svelte';
-  import { geoPath } from 'd3-geo';
-  import { geoCylindricalEqualArea } from 'd3-geo-projection';
+<script context="module">
   import { feature } from 'topojson-client';
   import { setGeometryPrecision } from '@svizzle/geo';
-  import * as _ from 'lamb';
 
   import worldBorders from '../../../data/geo/world_110m_iso_a2.json';
-  import { createColoredFeatures } from '../../util/geo';
 
-  const dispatch = createEventDispatcher();
+  // FIXME truncate after projection for perfs?
   const truncateGeojson = setGeometryPrecision(4);
   const geojson = truncateGeojson(
     feature(worldBorders, worldBorders.objects.countries)
   );
+</script>
+
+<script>
+  import { createEventDispatcher } from 'svelte';
+  import { geoPath } from 'd3-geo';
+  import { geoCylindricalEqualArea } from 'd3-geo-projection';
+  import * as _ from 'lamb';
+
+  import { createColoredFeatures } from '../../util/geo';
+
+  const dispatch = createEventDispatcher();
 
   export let height;
   export let items = []; // {key, value}
   export let key;
   export let keyToColor;
   export let width;
-  export let selectedIds = [];
+  export let selectedKeys = [];
 
   $: getFeatures = createColoredFeatures(keyToColor, key);
   $: features = getFeatures(geojson);
@@ -34,9 +40,9 @@
   }
   const hasColor = feature => feature.properties.color;
   const isDeselected = feature =>
-    selectedIds &&
-    selectedIds.length &&
-    !selectedIds.includes(feature.properties[key]);
+    selectedKeys &&
+    selectedKeys.length &&
+    !selectedKeys.includes(feature.properties[key]);
 </script>
 
 <svelte:options namespace="svg" />
@@ -45,7 +51,7 @@
   <rect
     {width}
     {height}
-    on:click="{() => {dispatch('clickedSea')}}"
+    on:click="{() => {dispatch('deselectAll')}}"
   />
   {#if geopath}
   {#each features as feature}

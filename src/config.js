@@ -87,6 +87,12 @@ export const requiredFields = {
   ],
 };
 
+/* logging */
+
+export const log = {
+  transitions: 0
+}
+
 /* mapbox */
 
 export const MAPBOXGL_STYLEURL =

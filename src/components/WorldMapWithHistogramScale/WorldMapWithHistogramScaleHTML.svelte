@@ -18,7 +18,7 @@
   export let items = [];
   export let title;
   export let valueAccessor;
-  export let selectedIds = [];
+  export let selectedKeys = [];
 
   let bbox;
   let width = 0;
@@ -55,9 +55,18 @@
   };
   const toggleTarget = ({detail: id}) =>
     dispatch('selected', {
-      key: 'country_id',
+      key: 'country_id', // TODO pass the key as prop to make it generic
       type: 'include',
-      value: toggleItem(selectedIds, id)
+      value: toggleItem(selectedKeys, id)
+    });
+
+  const clickedBin = ({detail: {ids, verb}}) =>
+    dispatch('selected', {
+      key: 'country_id', // TODO pass the key as prop to make it generic
+      type: 'include',
+      value: verb === 'add'
+        ? selectedKeys.concat(ids)
+        : _.pullFrom(selectedKeys, ids)
     });
 
   const getSvgOrigin = () => {
@@ -127,11 +136,11 @@
           {items}
           key="iso_a2"
           {keyToColor}
-          on:enterTarget={onTarget}
-          on:exitTarget={offTarget}
-          on:clickTarget={toggleTarget}
-          on:clickedSea
-          {selectedIds}
+          on:enterTarget="{onTarget}"
+          on:exitTarget="{offTarget}"
+          on:clickTarget="{toggleTarget}"
+          on:deselectAll
+          {selectedKeys}
           {valueAccessor}
           {width}
         />
@@ -140,8 +149,11 @@
             height="{histogramHeight}"
             {bins}
             {colors}
+            {keyAccessor}
+            {selectedKeys}
             {valueAccessor}
             width="{histogramWidth}"
+            on:clickedBin="{clickedBin}"
           />
         </g>
       </svg>

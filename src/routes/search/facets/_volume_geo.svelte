@@ -4,6 +4,7 @@
   import * as _ from 'lamb';
   import { stores } from '@sapper/app';
 
+  import { countries } from '../../../../data/geo/iso_a2_to_name_by_type.json';
   import BarchartV from '../../../components/BarchartV.svelte';
   import { WorldMapWithHistogramScaleHTML } from '../../../components/WorldMapWithHistogramScale';
   import { screenStore, currentTab } from '../../../stores/search.ts';
@@ -38,6 +39,7 @@
     <BarchartV
       title="Amount by country"
       items={selectedItemsByCountry}
+      labels={countries}
     />
   </div>
   <div class="col col3-10">
@@ -46,8 +48,8 @@
       items={itemsByCountryId}
       keyAccessor="{getKey}"
       on:selected="{updateSelections}"
-      on:clickedSea="{deselectCountries}"
-      selectedIds="{selectedCountries}"
+      on:deselectAll="{deselectCountries}"
+      selectedKeys="{selectedCountries}"
       title="Amount by country"
       valueAccessor="{getValue}"
     />

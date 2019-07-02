@@ -1,6 +1,8 @@
 import { interpret } from 'xstate';
 import { writable } from 'svelte/store';
 
+import { log } from '../config';
+import { logTransition } from '../util/xstateHelper';
 import { screen_machine } from '../machines/screen_machine/';
 import {
   screenStore,
@@ -27,4 +29,6 @@ const { set, subscribe } = writable({}, () => () => screenService.stop());
 export const screenMachine = { subscribe, send: screenService.send };
 
 screenService.onTransition(set);
+log.transitions && screenService.onTransition(logTransition);
+
 screenService.start();

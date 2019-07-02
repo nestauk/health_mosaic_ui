@@ -12,13 +12,27 @@ export const exactAmountBins = (array, amount, accessor = _.identity) => {
   // which might then exclude items in the last bin
   const ranges = pairs(_.range(min, max, step).concat([max]));
 
-  return _.map(ranges, range => ({
-    range,
-    values: _.filter(array, _.pipe([
-      accessor,
-      makeIsWithinRange(range)
-    ]))
-  }));
+  // FIXME is there a _.find function in lamb to do this?
+  // TODO if not, make a util
+  const findRangeIndex = _.adapter(
+    _.map(ranges, (range, index) => {
+      const predicate = _.pipe([
+        accessor,
+        makeIsWithinRange(range)
+      ]);
+
+      return value => predicate(value) ? index : undefined
+    })
+  );
+
+  return _.reduce(array,
+    (acc, item) => {
+      const index = findRangeIndex(item);
+      acc[index].values.push(item)
+      return acc;
+    },
+    _.map(ranges, range => ({range, values: []}))
+  );
 }
 
 export const getBinsItems = _.pipe([

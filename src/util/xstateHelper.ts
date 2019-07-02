@@ -57,3 +57,7 @@ export function createMachina(
     contextStores,
   };
 }
+
+export const logTransition = (state, event) => {
+  console.log(`${event} => ${state.value}`);
+}

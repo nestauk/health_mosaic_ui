@@ -35,7 +35,7 @@ For local development:
 
 ## Statecharts
 
-There are some commands that you can run to copy the state machine configuratins to your clipboard allowing you to visit the [xstate visualiser](https://statecharts.github.io/xstate-viz/) and paste the configuration into the window and see a preview of that machine.
+There are some commands that you can run to copy the state machine configurations to your clipboard allowing you to visit the [xstate visualiser](https://statecharts.github.io/xstate-viz/) and paste the configuration into the window and see a preview of that machine.
 
 To copy the `screen_machine` configuration to your clipboard run the following command:
 
