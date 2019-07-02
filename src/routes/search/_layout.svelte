@@ -138,7 +138,7 @@
 
 <style lang="less">
   .facets {
-    padding-top: 16rem;
+    padding-top: 21rem;
     height: 100%;
     width: 100%;
     display: flex;

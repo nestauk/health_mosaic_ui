@@ -6,6 +6,7 @@
   import { ESIndices } from '../config';
   import { Form, FormInput, FormLabels, FormDropdown } from './QueryBuilder/Form';
   import { Rules, Ruleset, RulesetQueries, RulesetLabels } from './QueryBuilder/Rules';
+  import Selections from './Selections.svelte';
 
   import { screenMachine } from '../services/screen_service.ts';
   import {
@@ -37,6 +38,8 @@
   $: isDirty = searchMachine && searchMachine.state.matches('Search.NotEmpty.Dirty');
   $: tabs = Object.entries($screenStore);
   $: isQueries = uiQuery[0] && uiQuery[0].terms[0].term;
+  $: selections = $screenStore[$currentTab] && $screenStore[$currentTab].selections;;
+  $: console.log(selections)
 
 const stripEmpties = _.filterWith(_.allOf([
     _.getPath('values.length'),
@@ -166,6 +169,14 @@ const stripEmpties = _.filterWith(_.allOf([
     })
     checkDirty();
   }
+
+  const toggleSelection = ({ detail }) =>
+    screenMachine.send({
+      type: 'SELECTION_UPDATED',
+      tabId: $currentTab,
+      selection: detail,
+      route: $page.path
+    })
 </script>
 
 <div
@@ -230,6 +241,7 @@ const stripEmpties = _.filterWith(_.allOf([
       </Ruleset>
     {/each}
   </Rules>
+  <Selections {selections} on:toggleselection={toggleSelection}/>
   {/if}
 </Form>
   {#if isQueries}
