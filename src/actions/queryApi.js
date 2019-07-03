@@ -1,8 +1,21 @@
 import ApolloClient from 'apollo-boost';
 import { endpointQueries } from './gqlQueries';
 
+const cache = {
+  all: new Map(),
+  papers: new Map(),
+  events: new Map(),
+  companies: new Map(),
+};
 // endpoint = 'all' to prevent undefined endpoint
 export async function query(query, endpoint = 'all', id) {
+  const queryString = JSON.stringify(query, null, 0);
+  const cachedQuery = cache[endpoint].get(queryString);
+
+  if (cachedQuery) {
+    return { results: cachedQuery, id };
+  }
+
   const client = new ApolloClient({
     /* eslint-disable-next-line no-undef */
     uri: REPLACE_GRAPHQL_ENDPOINT,
@@ -14,6 +27,8 @@ export async function query(query, endpoint = 'all', id) {
       query,
     },
   });
+
+  cache[endpoint].set(queryString, results);
 
   return { results, id };
 }
