@@ -1,6 +1,7 @@
-import { parseQuery, dslBuilder, createFields } from './parse.ts';
+import { parseQuery, createFields } from './parse.ts';
+import { dslBuilder } from './graphql-fields.js';
 
-describe.skip('parseQuery', () => {
+describe('parseQuery', () => {
   test('parse simple queries', () => {
     expect(parseQuery({ value: 'one, two, three' })).toEqual({
       value: [
@@ -36,8 +37,8 @@ describe.skip('dslBuilder', () => {
   test('create a valid query string from a query object', () => {
     expect(
       dslBuilder(
-        [{ value: 'hello', status: 'and' }],
-        [{ status: 'included', field: 'field' }]
+        [{ query: 'hello', status: 'and' }],
+        [{ status: 'included', title: 'field' }]
       )
     ).toBe('field:("hello")');
   });
@@ -45,10 +46,10 @@ describe.skip('dslBuilder', () => {
   test('create a valid query string with multiple fields', () => {
     expect(
       dslBuilder(
-        [{ value: 'hello', status: 'and' }],
+        [{ query: 'hello', status: 'and' }],
         [
-          { status: 'included', field: 'field' },
-          { status: 'included', field: 'field2' },
+          { status: 'included', title: 'field' },
+          { status: 'included', title: 'field2' },
         ]
       )
     ).toBe('field:("hello") AND field2:("hello")');
@@ -57,10 +58,10 @@ describe.skip('dslBuilder', () => {
   test('create a valid query string with more complex queries', () => {
     expect(
       dslBuilder(
-        [{ value: 'hello world', status: 'and' }],
+        [{ query: 'hello world', status: 'and' }],
         [
-          { status: 'included', field: 'field' },
-          { status: 'included', field: 'field2' },
+          { status: 'included', title: 'field' },
+          { status: 'included', title: 'field2' },
         ]
       )
     ).toBe('field:("hello world") AND field2:("hello world")');
@@ -70,12 +71,12 @@ describe.skip('dslBuilder', () => {
     expect(
       dslBuilder(
         [
-          { value: 'hello world', status: 'and' },
-          { value: 'hello everyone', status: 'and' },
+          { query: 'hello world', status: 'and' },
+          { query: 'hello everyone', status: 'and' },
         ],
         [
-          { field: 'field', status: 'included' },
-          { field: 'field2', status: 'included' },
+          { title: 'field', status: 'included' },
+          { title: 'field2', status: 'included' },
         ]
       )
     ).toBe(
@@ -87,8 +88,8 @@ describe.skip('dslBuilder', () => {
     expect(
       dslBuilder(
         [
-          { value: 'hello world', status: 'not' },
-          { value: 'hello everyone', status: 'and' },
+          { query: 'hello world', status: 'not' },
+          { query: 'hello everyone', status: 'and' },
         ],
         [
           { field: 'field', status: 'included' },
@@ -104,8 +105,8 @@ describe.skip('dslBuilder', () => {
     expect(
       dslBuilder(
         [
-          { value: 'hello world', status: 'not' },
-          { value: 'hello everyone', status: 'and' },
+          { query: 'hello world', status: 'not' },
+          { query: 'hello everyone', status: 'and' },
         ],
         [
           { field: 'field', status: 'included' },
@@ -122,8 +123,8 @@ describe.skip('dslBuilder', () => {
     expect(
       dslBuilder(
         [
-          { value: 'hello world', status: 'and' },
-          { value: 'hello everyone', status: 'and' },
+          { query: 'hello world', status: 'and' },
+          { query: 'hello everyone', status: 'and' },
         ],
         [
           { field: 'field', status: 'default' },
@@ -138,8 +139,8 @@ describe.skip('dslBuilder', () => {
     expect(
       dslBuilder(
         [
-          { value: 'hello world', status: 'and' },
-          { value: 'hello everyone', status: 'and' },
+          { query: 'hello world', status: 'and' },
+          { query: 'hello everyone', status: 'and' },
         ],
         [
           { field: 'field', status: 'excluded' },

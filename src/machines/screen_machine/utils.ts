@@ -11,7 +11,7 @@ export const newTab = (id, uiQuery, index, selections = {}): Tab => ({
     data: [],
     queryObj: [],
   },
-  selected: [],
+  selected: { data: [], queryObj: [] },
   selections,
   route: `/${searchRouteName}`,
   uiQuery,

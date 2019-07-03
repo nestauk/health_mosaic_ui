@@ -9,7 +9,7 @@
   import { presentMachineConfig, presentMachineOptions } from '../machines/present';
   import { createMachina } from '../util/xstateHelper.ts';
 
-  import { testMemos } from '../stores/test.js';
+  import { testMemos } from '../stores/fake_memos.js';
 
   const { machine: presentMachine, contextStores: { bounds, memo } } = createMachina(
     presentMachineConfig, presentMachineOptions, {

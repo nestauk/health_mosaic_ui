@@ -4,7 +4,9 @@ module.exports = {
   coveragePathIgnorePatterns: ['node_modules', '.+fixtures.+'],
   testPathIgnorePatterns: ['node_modules', '/cypress/'],
   testEnvironment: 'node',
-
+  moduleNameMapper: {
+    '@sapper/app': '<rootDir>/test/sapper.js',
+  },
   globals: {
     'ts-jest': {
       diagnostics: {

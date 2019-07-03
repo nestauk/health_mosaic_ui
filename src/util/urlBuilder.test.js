@@ -7,7 +7,7 @@ import {
   includeToString,
   withinToString,
   isToString,
-  selectionToUrlString
+  selectionToUrlString,
 } from './urlBuilder.ts';
 
 import { query } from './urlParser.data.js';
@@ -124,60 +124,45 @@ test('uiQueryToUrlString', () => {
 });
 
 test('includeToString', () => {
-  const item = ['prop_one', {
-    type: 'include',
-    value: ['ONE', 'TWO']
-  }];
+  const item = [
+    'prop_one',
+    {
+      type: 'include',
+      value: ['ONE', 'TWO'],
+    },
+  ];
   const expected = '(prop_one:ONE,TWO)';
 
   expect(includeToString(item)).toBe(expected);
 });
 
 test('withinToString', () => {
-  const item = ['prop_two', {
-    type: 'within',
-    value: [10, 20]
-  }];
+  const item = [
+    'prop_two',
+    {
+      type: 'within',
+      value: [10, 20],
+    },
+  ];
   const expected = '(prop_two:10..20)';
 
   expect(withinToString(item)).toBe(expected);
 });
 
-test('isToString', () => {
-  const item = ['prop_three', {
-    type: 'is',
-    value: 'some_value'
-  }];
-  const expected = '(prop_three:some_value)';
-
-  expect(isToString(item)).toBe(expected);
-});
-
-test('isToString: spaces should be replaced with +', () => {
-  const item = ['prop_three', {
-    type: 'is',
-    value: 'some other value'
-  }];
-  const expected = '(prop_three:some+other+value)';
-
-  expect(isToString(item)).toBe(expected);
-});
-
 test('selectionToUrlString', () => {
-
   const selection = {
     prop_one: {
       type: 'include',
-      value: ['ONE', 'TWO']
+      value: ['ONE', 'TWO'],
     },
     prop_two: {
       type: 'within',
-      value: [10, 20]
+      value: [10, 20],
     },
     prop_three: {
-      type: 'is',
-      value: 'some_value'
-    }
+      type: 'include',
+      value: ['some_value'],
+    },
   };
 
   const expected = '(prop_one:ONE,TWO)(prop_two:10..20)(prop_three:some_value)';

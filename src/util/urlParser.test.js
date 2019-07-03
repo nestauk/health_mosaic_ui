@@ -10,7 +10,6 @@ import {
   detectTypes,
   convertWithin,
   convertInclude,
-  convertIs,
 } from './urlParser.ts';
 
 test('extractParenContents', () => {
@@ -240,16 +239,11 @@ test('parseQueryUrl', () => {
 });
 
 test('detectTypes', () => {
-  const types = [
-    ['key1', 'one,two and a,three'],
-    ['key2', '10..20'],
-    ['key3', 'my value'],
-  ];
+  const types = [['key1', 'one,two and a,three'], ['key2', '10..20']];
 
   const expected = [
     ['key1', 'one,two and a,three', 'include'],
     ['key2', '10..20', 'within'],
-    ['key3', 'my value', 'is'],
   ];
 
   expect(types.map(v => detectTypes(v))).toEqual(expected);
@@ -279,18 +273,6 @@ test('convertInclude', () => {
   expect(convertInclude(input)).toEqual(expected);
 });
 
-test('convertIs', () => {
-  const input = ['key1', 'two+and+a', 'is'];
-  const expected = [
-    'key1',
-    {
-      type: 'is',
-      value: 'two and a',
-    },
-  ];
-  expect(convertIs(input)).toEqual(expected);
-});
-
 test('parseSelectionUrl', () => {
   const selectionUrl =
     '(prop_one:ONE,TWO)(prop_two:10..20)(prop_three:some_value)';
@@ -305,8 +287,8 @@ test('parseSelectionUrl', () => {
       value: [10, 20],
     },
     prop_three: {
-      type: 'is',
-      value: 'some_value',
+      type: 'include',
+      value: ['some_value'],
     },
   };
 
