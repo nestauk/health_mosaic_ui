@@ -1,4 +1,6 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
+/* eslint-disable no-prototype-builtins */
+
 const { ApolloServer, gql } = require('apollo-server-lambda');
 const { RESTDataSource } = require('apollo-datasource-rest');
 
@@ -75,6 +77,7 @@ const sources = [
   'cost_total_project',
 
   //  region
+
   'placeName_region_organisation',
 
   //  sdg_labels
@@ -130,7 +133,7 @@ class HealthScanner extends RESTDataSource {
         },
       },
       size,
-      _source: sources,
+      // _source: sources,
     });
   }
 
@@ -144,7 +147,7 @@ class HealthScanner extends RESTDataSource {
         },
       },
       size,
-      _source: sources,
+      // _source: sources,
     });
   }
 
@@ -158,7 +161,7 @@ class HealthScanner extends RESTDataSource {
         },
       },
       size,
-      _source: sources,
+      // _source: sources,
     });
   }
 
@@ -172,7 +175,7 @@ class HealthScanner extends RESTDataSource {
         },
       },
       size,
-      _source: sources,
+      // _source: sources,
     });
   }
 }
@@ -231,6 +234,12 @@ const typeDefs = gql`
   }
 `;
 
+const compare = (a, b) =>
+  a
+    .trim()
+    .toLowerCase()
+    .localeCompare(b.trim().toLowerCase());
+
 const resolvers = {
   Query: {
     CB: async (_source, { query }, { dataSources }) => {
@@ -250,7 +259,57 @@ const resolvers = {
       return data.hits.hits;
     },
   },
-  Item: itemResolvers,
+  Item: {
+    ...itemResolvers,
+    countries_ids: parent => {
+      if (parent._source.hasOwnProperty('terms_of_countryTags'))
+        return (
+          parent._source.terms_of_countryTags &&
+          parent._source.terms_of_countryTags.sort(compare)
+        );
+    },
+    funders: parent => {
+      if (parent._source.hasOwnProperty('terms_of_funders'))
+        return (
+          parent._source.terms_of_funders &&
+          parent._source.terms_of_funders.sort(compare)
+        );
+    },
+    sdg_labels: parent => {
+      if (parent._source.hasOwnProperty('_terms_sdg_summary'))
+        return (
+          parent._source._terms_sdg_summary &&
+          parent._source._terms_sdg_summary.sort(compare)
+        );
+      if (parent._source.hasOwnProperty('_terms_sdg_description'))
+        return (
+          parent._source._terms_sdg_description &&
+          parent._source._terms_sdg_description.sort(compare)
+        );
+      if (parent._source.hasOwnProperty('_terms_sdg_abstract'))
+        return (
+          parent._source._terms_sdg_abstract &&
+          parent._source._terms_sdg_abstract.sort(compare)
+        );
+    },
+    terms: parent => {
+      if (parent._source.hasOwnProperty('terms_mesh_description'))
+        return (
+          parent._source.terms_mesh_description &&
+          parent._source.terms_mesh_description.sort(compare)
+        );
+      if (parent._source.hasOwnProperty('terms_topics_group'))
+        return (
+          parent._source.terms_topics_group &&
+          parent._source.terms_topics_group.sort(compare)
+        );
+      if (parent._source.hasOwnProperty('terms_mesh_abstract'))
+        return (
+          parent._source.terms_mesh_abstract &&
+          parent._source.terms_mesh_abstract.sort(compare)
+        );
+    },
+  },
 };
 
 const server = new ApolloServer({

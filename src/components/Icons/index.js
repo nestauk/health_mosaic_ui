@@ -12,3 +12,6 @@ export { default as Copy } from './Copy.svelte';
 export { default as Trash } from './Trash.svelte';
 export { default as Toggle } from './Toggle.svelte';
 export { default as Sync } from './Sync.svelte';
+export { default as Link } from './Link.svelte';
+export { default as AddCircle } from './AddCircle.svelte';
+export { default as RemoveCircle } from './RemoveCircle.svelte';

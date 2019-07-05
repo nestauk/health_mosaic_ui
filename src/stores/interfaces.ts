@@ -68,7 +68,7 @@ export interface Tab {
   name: string;
   results: Results;
   route: string;
-  selected: Results;
+  selected: any[];
   selections: Selections;
   uiQuery: UIQuery[];
   visible: boolean;

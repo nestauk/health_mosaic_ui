@@ -42,7 +42,6 @@
   // we also need to ensure that such click events to not cause the element to lose focus
 
   const stopEdit = ({ target, type, keyCode, detail }) => {
-
     if (
       editedTarget === null ||
       (type === 'click' && detail === 0 && target === editedTarget) ||
@@ -51,7 +50,6 @@
       editedTarget && editedTarget.focus();
       return;
     } else if (type === 'click' || keyCode === 13) {
-      console.log('off')
       window.getSelection().removeAllRanges();
       editedTarget.blur();
       editedTarget.style.cursor = 'auto';
@@ -61,7 +59,7 @@
   };
 </script>
 
-<svelte:window on:click|preventDefault|stopPropagation="{stopEdit}" />
+<svelte:window on:click|stopPropagation="{stopEdit}" />
 
 <nav bind:offsetHeight="{tabHeight}">
   <ul>

@@ -1,14 +1,36 @@
 <script>
+  import { afterUpdate } from 'svelte';
+
   export let dirty;
+  export let changed;
+
+  let container;
+
+  afterUpdate (() => {
+    if (changed) {
+      container.scrollTop = 0;
+    }
+  })
 </script>
 
-<h1>Results</h1>
-<ul class:dirty="{dirty}">
-  <slot></slot>
-</ul>
+<div bind:this="{container}">
+  <ul class:dirty="{dirty}">
+    <slot></slot>
+  </ul>
+</div>
 
 <style>
+  div {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    overflow-y: auto;
+  }
   .dirty {
     color: grey;
+  }
+  ul {
+    height: 100%;
   }
 </style>

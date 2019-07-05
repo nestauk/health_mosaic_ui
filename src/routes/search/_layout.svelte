@@ -5,6 +5,7 @@
 <script>
   import { stores } from '@sapper/app';
   import { onMount, onDestroy, setContext } from 'svelte';
+  import { isIterableEmpty, isObjNotEmpty } from '@svizzle/utils';
 
   import Nav from '../../components/Nav.svelte';
   import QueryBuilder from '../../components/QueryBuilder.svelte';
@@ -51,6 +52,10 @@
       screenMachine.send({type: 'SELECTION_UPDATED', tabId, selection, route: $page.path})
   });
 
+  $: uiQuery = $screenStore[$currentTab].uiQuery;
+  $: hasNoQuery = isIterableEmpty(uiQuery[0].terms[0].term);
+  $: withSelections = isObjNotEmpty($screenStore[$currentTab].selections);
+  $: visible = $screenStore[$currentTab].visible;
   $: searchMachine = $screenMachine.context.searchMachines[$currentTab];
   $: isLoading = searchMachine && searchMachine.state.matches('Search.NotEmpty.Dirty.Pending');
   $: isError = searchMachine && searchMachine.state.matches('Search.NotEmpty.Dirty.Error');
@@ -113,7 +118,14 @@
 
 <QueryBuilder />
 
-<div class="facets">
+<div
+  class="facets"
+  class:noQuery="{hasNoQuery}"
+  class:foldedWithNoSelections="{!hasNoQuery && !visible && !withSelections}"
+  class:foldedWithSelections="{!hasNoQuery && !visible && withSelections}"
+  class:withNoSelections="{!hasNoQuery && visible && !withSelections}"
+  class:withSelections="{!hasNoQuery && visible && withSelections}"
+>
   <div class="tabs">
     <ul>
       {#each facetTabs as {id, label}}
@@ -137,24 +149,43 @@
 </div>
 
 <style lang="less">
+  @import '../../styles/mixins.less';
+
   .facets {
-    padding-top: 21rem;
+    padding-top: 16rem;
     height: 100%;
     width: 100%;
     display: flex;
 
+    .drawerTransition();
+
+    &.noQuery {
+      padding-top: 12.3rem;
+    }
+    &.foldedWithNoSelections {
+      padding-top: 9rem;
+    }
+    &.foldedWithSelections {
+      padding-top: 13.4rem;
+    }
+    &.withNoSelections {
+      padding-top: 16.8rem;
+    }
+    &.withSelections {
+      padding-top: 21rem;
+    }
+
     .tabs {
       flex: 0 0 200px;
       height: 100%;
-      border-right: 1px solid #efefef;
-      box-shadow: 1em 1em 1em #efefef;
+      border-right: 1px solid #dcdcdc;
+      box-shadow: 0.1em 0.1em 1em #efefef;
 
       ul {
         width: 200px;
         height: 100%;
         display: flex;
         flex-direction: column;
-        border-right: 1px solid #ccc;
 
         li {
           border-bottom: 1px solid #ccc;
@@ -182,7 +213,7 @@
       flex: 1;
       height: 100%;
       max-height: 100%;
-      padding: 1em;
+      padding: 1em 1em 0 1em;
     }
   }
 </style>

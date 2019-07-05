@@ -39,7 +39,6 @@
   $: tabs = Object.entries($screenStore);
   $: isQueries = uiQuery[0] && uiQuery[0].terms[0].term;
   $: selections = $screenStore[$currentTab] && $screenStore[$currentTab].selections;;
-  $: console.log(selections)
 
 const stripEmpties = _.filterWith(_.allOf([
     _.getPath('values.length'),
@@ -209,53 +208,55 @@ const stripEmpties = _.filterWith(_.allOf([
       {isQueries}
     />
 
-  {#if uiQuery.length}
-  <Rules>
-    {#each uiQuery as { options, disabled, selected, terms, fields }, i}
-      <Ruleset
-        {terms}
-        {selected}
-        {disabled}
-        {options}
-        on:open="{() => sendRule('RULE_OPTIONS_SELECTED', i)}"
-        on:close="{() => sendRule('RULE_OPTIONS_DISMISSED', i)}"
-        on:select="{() => selectRuleset(i)}"
-        on:copy="{() => copyRuleset(i)}"
-        on:delete="{() => sendRule('RULE_DELETED', i)}"
-        on:disable="{() => sendRule('RULE_DISABLED', i)}"
-      >
-        <RulesetQueries
-          {disabled}
+    {#if uiQuery.length}
+    <Rules>
+      {#each uiQuery as { options, disabled, selected, terms, fields }, i}
+        <Ruleset
           {terms}
-          on:toggle="{({detail}) => toggleTermStatus(i, detail)}"
-        />
-        <RulesetLabels
-          rulesetDisabled={disabled}
-          labels="{{ subject: fields.subject, content: fields.content }}"
-          on:hover={({ detail }) => sendRuleLabel('LABEL_OPTIONS_SELECTED', detail, i)}
-          on:unhover={({ detail }) => sendRuleLabel('LABEL_OPTIONS_DISMISSED', detail, i)}
-          on:disable={({ detail }) => sendRuleLabel('LABEL_DISABLED', detail, i)}
-          on:delete={({ detail }) => sendRuleLabel('LABEL_DELETED', detail, i)}
-          on:toggle={({ detail }) => sendRuleLabel('LABEL_TOGGLED', detail, i)}
-        />
-      </Ruleset>
-    {/each}
-  </Rules>
-  <Selections {selections} on:toggleselection={toggleSelection}/>
-  {/if}
-</Form>
-  {#if isQueries}
-      <div
-        class="close-label"
-        on:click="{() => sendTab('TAB_VISIBILITY_TOGGLED', $currentTab)}"
-        style="{open ? 'transform: rotate(180deg) ' : ''}"
-      >
-        <img alt="close search" src="arrow.svg"/>
-      </div>
+          {selected}
+          {disabled}
+          {options}
+          on:open="{() => sendRule('RULE_OPTIONS_SELECTED', i)}"
+          on:close="{() => sendRule('RULE_OPTIONS_DISMISSED', i)}"
+          on:select="{() => selectRuleset(i)}"
+          on:copy="{() => copyRuleset(i)}"
+          on:delete="{() => sendRule('RULE_DELETED', i)}"
+          on:disable="{() => sendRule('RULE_DISABLED', i)}"
+        >
+          <RulesetQueries
+            {disabled}
+            {terms}
+            on:toggle="{({detail}) => toggleTermStatus(i, detail)}"
+          />
+          <RulesetLabels
+            rulesetDisabled={disabled}
+            labels="{{ subject: fields.subject, content: fields.content }}"
+            on:hover={({ detail }) => sendRuleLabel('LABEL_OPTIONS_SELECTED', detail, i)}
+            on:unhover={({ detail }) => sendRuleLabel('LABEL_OPTIONS_DISMISSED', detail, i)}
+            on:disable={({ detail }) => sendRuleLabel('LABEL_DISABLED', detail, i)}
+            on:delete={({ detail }) => sendRuleLabel('LABEL_DELETED', detail, i)}
+            on:toggle={({ detail }) => sendRuleLabel('LABEL_TOGGLED', detail, i)}
+          />
+        </Ruleset>
+      {/each}
+    </Rules>
+    <Selections {selections} on:toggleselection={toggleSelection}/>
     {/if}
+  </Form>
+  {#if isQueries}
+  <div
+    class="close-label"
+    on:click="{() => sendTab('TAB_VISIBILITY_TOGGLED', $currentTab)}"
+    style="{open ? 'transform: rotate(180deg) ' : ''}"
+  >
+    <img alt="close search" src="arrow.svg"/>
+  </div>
+  {/if}
 </div>
 
-<style>
+<style lang="less">
+  @import '../styles/mixins.less';
+
   .search {
     position: fixed;
     width: 100%;
@@ -263,10 +264,12 @@ const stripEmpties = _.filterWith(_.allOf([
     left: 0;
     box-shadow: 0 1px 5px 1px rgba(0,0,0,0.2);
     padding: 1rem 3em 0.5em 3em;
-    transition: 0.5s;
     z-index: 3;
     background: #fff;
+
+    .drawerTransition();
   }
+
   .close-label {
     position: absolute;
     padding: 5px 0;
@@ -276,9 +279,10 @@ const stripEmpties = _.filterWith(_.allOf([
     right: 30px;
     bottom: 22px;
     transition: 0.2s;
+
+    img {
+      margin-top: -5px;
+    }
   }
 
-  img {
-    margin-top: -5px;
-  }
 </style>
