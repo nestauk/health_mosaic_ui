@@ -28,9 +28,9 @@
   <div class="header">
     <p>Showing: {selectedItems.length} items</p>
     <ul>
-      <li class="paper">Papers</li>
+      <li class="paper">Research</li>
       <li class="company">Companies</li>
-      <li class="event">Events</li>
+      <li class="event">Social</li>
     </ul>
   </div>
 

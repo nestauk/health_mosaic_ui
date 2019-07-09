@@ -3,8 +3,8 @@ import { endpointQueries } from './gqlQueries';
 
 const cache = {
   all: new Map(),
-  papers: new Map(),
-  events: new Map(),
+  research: new Map(),
+  social: new Map(),
   companies: new Map(),
 };
 // endpoint = 'all' to prevent undefined endpoint

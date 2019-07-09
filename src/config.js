@@ -50,7 +50,7 @@ export const fieldGroups = {
 
 export const subjectAliases = ['name', 'place'];
 export const contentAliases = ['body', 'summary', 'terms'];
-export const ESIndices = ['all', 'papers', 'companies', 'events'];
+export const ESIndices = ['all', 'research', 'companies', 'social'];
 
 export const requiredFields = {
   CB: [
@@ -90,8 +90,8 @@ export const requiredFields = {
 /* logging */
 
 export const log = {
-  transitions: 0
-}
+  transitions: 0,
+};
 
 /* mapbox */
 

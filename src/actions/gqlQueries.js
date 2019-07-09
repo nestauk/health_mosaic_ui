@@ -149,8 +149,8 @@ export const QUERY_NIH = gql`
 `;
 
 export const endpointQueries = {
-  papers: QUERY_NIH,
+  research: QUERY_NIH,
   companies: QUERY_CB,
-  events: QUERY_MU,
+  social: QUERY_MU,
   all: QUERY_ALL,
 };
