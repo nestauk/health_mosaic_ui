@@ -72,6 +72,7 @@ export interface Tab {
   selections: Selections;
   uiQuery: UIQuery[];
   visible: boolean;
+  logic: 'AND' | 'OR';
 }
 
 // The whole shebang

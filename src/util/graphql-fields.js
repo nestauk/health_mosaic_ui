@@ -1,3 +1,5 @@
+import * as _ from 'lamb';
+
 const makeFieldExist = field => ({ exists: { field } });
 
 // prettier-ignore
@@ -122,11 +124,7 @@ export const makeQuery = querystring => {
   };
 };
 
-/*
-eslint-disable indent
-
-see foo
-*/
+/* eslint-disable indent */
 export const makeRequiredFields = requiredFields => ({
   bool: {
     should: Object.keys(requiredFields).map(index => ({
@@ -160,55 +158,36 @@ export const makeResolvers = () => {
   return `${resolvers} \n}`;
 };
 
-const fieldBuilder = (fieldArr, q, type = '') =>
-  fieldArr.reduce((acc, next, arr, i) => {
-    // if (!next.visible) return acc;
-    return (
-      acc +
-      (type === 'exclude' ? 'NOT ' : '') +
-      next +
-      `:(${q})` +
-      (arr[i + 1] ? ' OR ' : '')
-    );
-  }, '');
+const fieldBuilder = (q, status) => (acc, next) =>
+  acc +
+  (next.status === 'excluded' ? ` ${status} NOT ` : ` ${status} `) +
+  next.title +
+  `:(${q})`;
 
-const queryBuilder = query =>
-  query
-    .reduce((acc, next, i, arr) => {
-      return (
-        acc +
-        (next.status === 'not' ? '-' : '') +
-        `"${next.query}"` +
-        (arr[i + 1] ? ' OR ' : '')
-      );
-    }, '')
-    .trim();
+const queryBuilder = (acc, next, i, arr) =>
+  acc +
+  (next.status === 'not' ? '-' : '') +
+  `"${next.query}"` +
+  (arr[i + 1] ? ' AND ' : '');
 
-export const dslBuilder = (query, fields) => {
-  const q = queryBuilder(query);
-  const splitFields = fields.reduce(
-    (acc, next) => {
-      acc[next.status] = acc[next.status].concat(next.title);
-      return acc;
-    },
-    { included: [], excluded: [] }
-  );
+const hasIncluded = arr =>
+  _.filter(arr, ({ status }) => status === 'included').length > 0;
 
-  let queryString = splitFields.included.length
-    ? `${fieldBuilder(splitFields.included, q)}`
-    : q;
+const createFullQuery = (query, status) =>
+  _.pipe([
+    _.filterWith(v => v.status !== 'default'),
+    _.reduceWith(fieldBuilder(query, status), ''),
+  ]);
 
-  if (splitFields.excluded.length) {
-    queryString = `${queryString}${fieldBuilder(
-      splitFields.excluded,
-      q,
-      'exclude'
-    )}`;
-  }
+export const dslBuilder = (query, fields, status = 'AND') => {
+  const q = _.reduce(query, queryBuilder, '');
+  let queryString = createFullQuery(q, status)(fields);
 
+  queryString = hasIncluded(fields) ? queryString : `${q}  ${queryString}`;
   return queryString
     .trim()
-    .replace(/^AND/, '')
+    .replace(/^AND|^OR |^OR NOT |^AND NOT/, '')
+    .replace(/\s{2,}/g, ' ')
     .trim();
 };
 
@@ -220,13 +199,14 @@ export const queryMapper = queryObject =>
     }))
   );
 
-export const mappedQueryBuilder = mappedQuery =>
+export const mappedQueryBuilder = (mappedQuery, logic) =>
   mappedQuery.reduce(
-    (acc, next, i, arr) =>
-      `${acc} ` +
+    (acc, next, i) =>
+      `${acc} ${i ? 'OR ' : ''}` +
       next.reduce(
-        (acc, { fields, values }) =>
-          `(${acc} ${dslBuilder(values, fields)})` + (arr[i + 1] ? ' OR' : ''),
+        (acc, { fields, values }, i2, arr2) =>
+          `(${acc} ${dslBuilder(values, fields, logic)})` +
+          (arr2[i2 + 1] ? ` ${logic}` : ''),
         ''
       ),
     ''

@@ -24,7 +24,7 @@ export const tabs_options = {
   actions: {
     createTab: (
       { screenStore, idStore },
-      { queryParams, selectionParams, ESIndex, isPageInit }
+      { queryParams, selectionParams, ESIndex, ESLogic, isPageInit }
     ) => {
       const id = get(idStore);
 
@@ -37,7 +37,8 @@ export const tabs_options = {
               ? parseQueryUrl(queryParams)
               : [newRuleset(true)],
             ESIndex ? ESIndex : 'all',
-            selectionParams && parseSelectionUrl(selectionParams)
+            selectionParams && parseSelectionUrl(selectionParams),
+            ESLogic
           )
         )
       );
@@ -86,6 +87,7 @@ export const tabs_options = {
         q: uiQueryToUrlString(currentQuery.uiQuery),
         s: selectionToUrlString(removeEmpty(currentQuery.selections)),
         i: currentQuery.index && currentQuery.index,
+        o: currentQuery.logic,
       };
 
       const newPath = makeRouteUrl(path, urlQuery);

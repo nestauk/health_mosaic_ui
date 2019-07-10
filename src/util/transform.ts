@@ -58,7 +58,7 @@ const removeDisabled = _.pipe([_.getKey('disabled'), isNot(true)]);
 const removeEmptyQuery = ({ terms }) =>
   terms && terms.every(({ term }) => term && term.length > 0);
 
-export const createQueryObject = (queries, index) => ({
+export const createQueryObject = (queries, index, logic) => ({
   query: queries
     .filter(removeDisabled)
     .filter(removeEmptyQuery)
@@ -67,6 +67,7 @@ export const createQueryObject = (queries, index) => ({
       values: terms.map(transformTerm),
     })),
   index,
+  logic,
 });
 
 export const queryToString = query =>

@@ -25,7 +25,8 @@ export const queryObj = derived(screenStore, $screenStore => {
       } else {
         object[key] = createQueryObject(
           $screenStore[key].uiQuery,
-          $screenStore[key].index
+          $screenStore[key].index,
+          $screenStore[key].logic
         );
       }
     }

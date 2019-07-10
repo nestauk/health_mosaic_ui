@@ -1,4 +1,4 @@
-import { parseQuery, createFields } from './parse.ts';
+import { parseQuery } from './parse.ts';
 import { dslBuilder } from './graphql-fields.js';
 
 describe('parseQuery', () => {
@@ -33,7 +33,7 @@ describe('parseQuery', () => {
   });
 });
 
-describe.skip('dslBuilder', () => {
+describe('dslBuilder', () => {
   test('create a valid query string from a query object', () => {
     expect(
       dslBuilder(
@@ -92,8 +92,8 @@ describe.skip('dslBuilder', () => {
           { query: 'hello everyone', status: 'and' },
         ],
         [
-          { field: 'field', status: 'included' },
-          { field: 'field2', status: 'included' },
+          { title: 'field', status: 'included' },
+          { title: 'field2', status: 'included' },
         ]
       )
     ).toBe(
@@ -109,9 +109,9 @@ describe.skip('dslBuilder', () => {
           { query: 'hello everyone', status: 'and' },
         ],
         [
-          { field: 'field', status: 'included' },
-          { field: 'field2', status: 'included' },
-          { field: 'field3', status: 'excluded' },
+          { title: 'field', status: 'included' },
+          { title: 'field2', status: 'included' },
+          { title: 'field3', status: 'excluded' },
         ]
       )
     ).toBe(
@@ -127,9 +127,9 @@ describe.skip('dslBuilder', () => {
           { query: 'hello everyone', status: 'and' },
         ],
         [
-          { field: 'field', status: 'default' },
-          { field: 'field2', status: 'default' },
-          { field: 'field3', status: 'default' },
+          { title: 'field', status: 'default' },
+          { title: 'field2', status: 'default' },
+          { title: 'field3', status: 'default' },
         ]
       )
     ).toBe('"hello world" OR "hello everyone"');
@@ -143,43 +143,32 @@ describe.skip('dslBuilder', () => {
           { query: 'hello everyone', status: 'and' },
         ],
         [
-          { field: 'field', status: 'excluded' },
-          { field: 'field2', status: 'default' },
-          { field: 'field3', status: 'default' },
+          { title: 'field', status: 'excluded' },
+          { title: 'field2', status: 'default' },
+          { title: 'field3', status: 'default' },
         ]
       )
     ).toBe(
       '"hello world" OR "hello everyone" AND NOT field:("hello world" OR "hello everyone")'
     );
   });
-});
 
-describe.skip('createFields', () => {
-  const subject = {
-    name: ['title_of_organisation', 'name_of_organisation', 'name_of_group'],
-    location: [
-      'placeName_country_organisation',
-      'placeName_region_organisation',
-      'placeName_state_organisation',
-    ],
-    category: ['type_of_organisation', 'terms_category_organisation'],
-  };
-  test('create full field list from subject list and a field map', () => {
+  test('create a valid query string from excluded and default fields with OR parameter', () => {
     expect(
-      createFields(subject, [
-        { field: 'name', status: 'included' },
-        { field: 'location', status: 'excluded' },
-        { field: 'category', status: 'default' },
-      ])
-    ).toEqual([
-      { field: 'title_of_organisation', status: 'included' },
-      { field: 'name_of_organisation', status: 'included' },
-      { field: 'name_of_group', status: 'included' },
-      { field: 'placeName_country_organisation', status: 'excluded' },
-      { field: 'placeName_region_organisation', status: 'excluded' },
-      { field: 'placeName_state_organisation', status: 'excluded' },
-      { field: 'type_of_organisation', status: 'default' },
-      { field: 'terms_category_organisation', status: 'default' },
-    ]);
+      dslBuilder(
+        [
+          { query: 'hello world', status: 'and' },
+          { query: 'hello everyone', status: 'and' },
+        ],
+        [
+          { title: 'field', status: 'excluded' },
+          { title: 'field2', status: 'default' },
+          { title: 'field3', status: 'default' },
+        ],
+        'OR'
+      )
+    ).toBe(
+      '"hello world" OR "hello everyone" OR NOT field:("hello world" OR "hello everyone")'
+    );
   });
 });

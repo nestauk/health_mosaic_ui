@@ -65,10 +65,7 @@ export const createExpected = id => ({
       queryObj: [],
     },
     route: '/search',
-    selected: {
-      data: [],
-      queryObj: [],
-    },
+    selected: [],
     selections: {},
     visible: true,
   },

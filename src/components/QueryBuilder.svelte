@@ -7,6 +7,7 @@
   import { Form, FormInput, FormLabels, FormDropdown } from './QueryBuilder/Form';
   import { Rules, Ruleset, RulesetQueries, RulesetLabels } from './QueryBuilder/Rules';
   import Selections from './Selections.svelte';
+  import Switch from './Switch.svelte';
 
   import { screenMachine } from '../services/screen_service.ts';
   import {
@@ -38,7 +39,8 @@
   $: isDirty = searchMachine && searchMachine.state.matches('Search.NotEmpty.Dirty');
   $: tabs = Object.entries($screenStore);
   $: isQueries = uiQuery[0] && uiQuery[0].terms[0].term;
-  $: selections = $screenStore[$currentTab] && $screenStore[$currentTab].selections;;
+  $: selections = $screenStore[$currentTab] && $screenStore[$currentTab].selections;
+  $: logic = $screenStore[$currentTab].logic;
 
 const stripEmpties = _.filterWith(_.allOf([
     _.getPath('values.length'),
@@ -52,6 +54,7 @@ const stripEmpties = _.filterWith(_.allOf([
     const cachedQuery =
       lastQ.query
       && {
+        logic: lastQ.logic,
         index: lastQ.index,
         query: stripEmpties(lastQ.query)
       };
@@ -59,6 +62,7 @@ const stripEmpties = _.filterWith(_.allOf([
     const newQuery =
       currentQ.query
       && {
+        logic: currentQ.logic,
         index: currentQ.index,
         query: stripEmpties(currentQ.query)
       };
@@ -176,6 +180,16 @@ const stripEmpties = _.filterWith(_.allOf([
       selection: detail,
       route: $page.path
     })
+
+  const toggleSearchLogic = ({ detail }) => {
+    screenMachine.send({
+      type: 'LOGIC_TOGGLED',
+      tabId: $currentTab,
+      logic: detail,
+      route: $page.path
+    })
+    checkDirty();
+  }
 </script>
 
 <div
@@ -201,6 +215,14 @@ const stripEmpties = _.filterWith(_.allOf([
       on:select="{({ detail }) => sendRuleLabel('LABEL_CLICKED', detail)}"
       {labels}
     />
+
+    <Switch
+      on:toggle={toggleSearchLogic}
+      values={["AND", "OR"]}
+      current={logic}
+      compact={!isQueries}
+    />
+
     <FormDropdown
       index={$screenStore[$currentTab].index}
       indices="{ESIndices}"
@@ -238,6 +260,9 @@ const stripEmpties = _.filterWith(_.allOf([
             on:toggle={({ detail }) => sendRuleLabel('LABEL_TOGGLED', detail, i)}
           />
         </Ruleset>
+        {#if uiQuery[i+1] && uiQuery[i+1].terms.length && uiQuery[i+1].terms[0].term}
+          <li class="status {logic}">●</li>
+        {/if}
       {/each}
     </Rules>
     <Selections {selections} on:toggleselection={toggleSelection}/>
@@ -282,6 +307,24 @@ const stripEmpties = _.filterWith(_.allOf([
 
     img {
       margin-top: -5px;
+    }
+  }
+
+  .status {
+    height: 20px;
+    padding: 20px 5px;
+    display: flex;
+    align-items: center;
+    border-radius: 30px;
+    margin-top: 17px;
+    cursor: default;
+
+    &.AND {
+      color: #fa99ff;
+    }
+
+    &.OR {
+      color: #66c9ff;
     }
   }
 

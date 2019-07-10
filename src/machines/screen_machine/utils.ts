@@ -4,7 +4,13 @@ import { searchRouteName } from '../../config';
 import { Tab } from '../../stores/interfaces';
 import { isNot } from '../../util/transform';
 
-export const newTab = (id, uiQuery, index, selections = {}): Tab => ({
+export const newTab = (
+  id,
+  uiQuery,
+  index,
+  selections = {},
+  logic: 'AND' | 'OR' = 'AND'
+): Tab => ({
   index,
   name: 'Tab' + id,
   results: {
@@ -16,6 +22,7 @@ export const newTab = (id, uiQuery, index, selections = {}): Tab => ({
   route: `/${searchRouteName}`,
   uiQuery,
   visible: true,
+  logic,
 });
 
 export const toggleLabelBinaryUpdater = labelStatus =>

@@ -23,6 +23,7 @@ export const facets_options = {
         q: uiQueryToUrlString(currentQuery.uiQuery),
         s: selectionToUrlString(removeEmpty(currentQuery.selections)),
         i: currentQuery.index && currentQuery.index,
+        o: currentQuery.logic,
       };
 
       goto(makeRouteUrl(path, urlQuery));

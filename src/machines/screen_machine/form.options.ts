@@ -191,6 +191,7 @@ export const form_options = {
         q: uiQueryToUrlString(currentQuery.uiQuery),
         s: selectionToUrlString(removeEmpty(currentQuery.selections)),
         i: currentQuery.index && currentQuery.index,
+        o: currentQuery.logic,
       };
 
       const newPath = makeRouteUrl(path, urlQuery);
@@ -209,6 +210,7 @@ export const form_options = {
         const resetQuery = _.pipe([
           _.setPath(`${tab}.uiQuery`, lastQuery.prevQuery),
           _.setPath(`${tab}.index`, lastQuery.lastIndex),
+          _.setPath(`${tab}.logic`, lastQuery.lastLogic),
         ]);
         screenStore.update(resetQuery);
       }
@@ -227,6 +229,9 @@ export const form_options = {
       currentTab.set(0);
       historyStore.set([]);
       idStore.set(0);
+    },
+    toggleSearchLogic: ({ screenStore }, { tabId, logic }) => {
+      screenStore.update(_.setPath(`${tabId}.logic`, logic));
     },
   },
 };

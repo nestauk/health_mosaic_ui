@@ -1,8 +1,8 @@
 import { gql } from 'apollo-boost';
 
 export const QUERY_ALL = gql`
-  query All($query: [QueryObject]) {
-    All(query: $query) {
+  query All($query: [QueryObject], $logic: String) {
+    All(query: $query, logic: $logic) {
       body
       city
       continent
@@ -38,8 +38,8 @@ export const QUERY_ALL = gql`
 `;
 
 export const QUERY_CB = gql`
-  query CB($query: [QueryObject]) {
-    CB(query: $query) {
+  query CB($query: [QueryObject], $logic: String) {
+    CB(query: $query, logic: $logic) {
       body
       city
       continent
@@ -75,8 +75,8 @@ export const QUERY_CB = gql`
 `;
 
 export const QUERY_MU = gql`
-  query MU($query: [QueryObject]) {
-    MU(query: $query) {
+  query MU($query: [QueryObject], $logic: String) {
+    MU(query: $query, logic: $logic) {
       body
       city
       continent
@@ -112,8 +112,8 @@ export const QUERY_MU = gql`
 `;
 
 export const QUERY_NIH = gql`
-  query NIH($query: [QueryObject]) {
-    NIH(query: $query) {
+  query NIH($query: [QueryObject], $logic: String) {
+    NIH(query: $query, logic: $logic) {
       body
       city
       continent

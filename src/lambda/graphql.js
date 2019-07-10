@@ -123,8 +123,8 @@ class HealthScanner extends RESTDataSource {
     this.baseURL = BASE_URL;
   }
 
-  async getCB(queryObject) {
-    const queryString = mappedQueryBuilder(queryMapper(queryObject));
+  async getCB(queryObject, logic) {
+    const queryString = mappedQueryBuilder(queryMapper(queryObject), logic);
 
     return this.post(`/${CB_index}/_search`, {
       query: {
@@ -137,8 +137,8 @@ class HealthScanner extends RESTDataSource {
     });
   }
 
-  async getMU(queryObject) {
-    const queryString = mappedQueryBuilder(queryMapper(queryObject));
+  async getMU(queryObject, logic) {
+    const queryString = mappedQueryBuilder(queryMapper(queryObject), logic);
 
     return this.post(`/${MU_index}/_search`, {
       query: {
@@ -151,8 +151,8 @@ class HealthScanner extends RESTDataSource {
     });
   }
 
-  async getNIH(queryObject) {
-    const queryString = mappedQueryBuilder(queryMapper(queryObject));
+  async getNIH(queryObject, logic) {
+    const queryString = mappedQueryBuilder(queryMapper(queryObject), logic);
 
     return this.post(`/${NIH_index}/_search`, {
       query: {
@@ -165,8 +165,8 @@ class HealthScanner extends RESTDataSource {
     });
   }
 
-  async getAll(queryObject) {
-    const queryString = mappedQueryBuilder(queryMapper(queryObject));
+  async getAll(queryObject, logic) {
+    const queryString = mappedQueryBuilder(queryMapper(queryObject), logic);
 
     return this.post(`/${HS_index}/_search`, {
       query: {
@@ -227,10 +227,10 @@ const typeDefs = gql`
     values: [ESValue]
   }
   type Query {
-    CB(query: [QueryObject]): [Item]
-    MU(query: [QueryObject]): [Item]
-    NIH(query: [QueryObject]): [Item]
-    All(query: [QueryObject]): [Item]
+    CB(query: [QueryObject], logic: String): [Item]
+    MU(query: [QueryObject], logic: String): [Item]
+    NIH(query: [QueryObject], logic: String): [Item]
+    All(query: [QueryObject], logic: String): [Item]
   }
 `;
 
@@ -242,20 +242,21 @@ const compare = (a, b) =>
 
 const resolvers = {
   Query: {
-    CB: async (_source, { query }, { dataSources }) => {
-      const data = await dataSources.HealthScanner.getCB(query);
+    CB: async (_source, { query, logic }, { dataSources }) => {
+      const data = await dataSources.HealthScanner.getCB(query, logic);
+
       return data.hits.hits;
     },
-    MU: async (_source, { query }, { dataSources }) => {
-      const data = await dataSources.HealthScanner.getMU(query);
+    MU: async (_source, { query, logic }, { dataSources }) => {
+      const data = await dataSources.HealthScanner.getMU(query, logic);
       return data.hits.hits;
     },
-    NIH: async (_source, { query }, { dataSources }) => {
-      const data = await dataSources.HealthScanner.getNIH(query);
+    NIH: async (_source, { query, logic }, { dataSources }) => {
+      const data = await dataSources.HealthScanner.getNIH(query, logic);
       return data.hits.hits;
     },
-    All: async (_source, { query }, { dataSources }) => {
-      const data = await dataSources.HealthScanner.getAll(query);
+    All: async (_source, { query, logic }, { dataSources }) => {
+      const data = await dataSources.HealthScanner.getAll(query, logic);
       return data.hits.hits;
     },
   },

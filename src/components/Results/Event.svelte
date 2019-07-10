@@ -6,6 +6,14 @@
   export let data;
   let show = false;
 
+  export function close() {
+    show = false;
+  }
+
+  export function open() {
+    show = true;
+  }
+
   $: ({
     body,
     city,
@@ -118,6 +126,8 @@
       border-right: 3px solid orange;
       padding: 0.5em 1em;
       text-align: right;
+      max-width: 20em;
+      overflow-wrap: break-word;
 
       .icon {
         display: flex;

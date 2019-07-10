@@ -40,6 +40,7 @@ export const search_options: any = {
           q: uiQueryToUrlString(currentQuery.uiQuery),
           s: selectionToUrlString(removeEmpty(currentQuery.selections)),
           i: currentQuery.index.toLowerCase(),
+          o: currentQuery.logic,
         };
         goto(makeRouteUrl(get(routeStore), urlQuery));
       }
@@ -57,6 +58,7 @@ export const search_options: any = {
               queryObj: responseTabQueryObject,
               prevQuery: responseTab.uiQuery,
               lastIndex: responseTab.index,
+              lastLogic: responseTab.logic,
             },
             selected,
           })
@@ -68,7 +70,12 @@ export const search_options: any = {
     apiRequest: ({ queryObj }, { tabId }) => {
       const currentQuery = get(queryObj)[tabId];
 
-      return query(currentQuery.query, currentQuery.index, tabId);
+      return query(
+        currentQuery.query,
+        currentQuery.index,
+        currentQuery.logic,
+        tabId
+      );
     },
   },
 };

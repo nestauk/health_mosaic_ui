@@ -35,7 +35,7 @@ export const graphqlEndpoint = dev
 export const fieldGroups = {
   // subject
   name: ['name'],
-  place: ['continent', 'country', 'state', 'region', 'city'],
+  place: ['continent', 'country', 'state', 'city'],
 
   // content
   body: ['body'],

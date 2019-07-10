@@ -32,6 +32,9 @@ export const form_config = {
     STORE_RESET: {
       actions: ['resetStore'],
     },
+    LOGIC_TOGGLED: {
+      actions: ['toggleSearchLogic'],
+    },
   },
   states: {
     Idle: {

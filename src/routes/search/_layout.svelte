@@ -39,6 +39,7 @@
     queryParams: $page.query && $page.query.q,
     selectionParams: $page.query && $page.query.s,
     ESIndex: $page.query && $page.query.i,
+    ESLogic: $page.query && $page.query.l,
     isPageInit: true
   });
 
