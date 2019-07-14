@@ -6,6 +6,7 @@ import {
   stringToNumber,
   convertPlusToSpace,
 } from './transform';
+import { nullString } from './urlBuilder';
 
 export const extractParenContents = str => {
   const re = /\((.*?)\)/g;
@@ -75,47 +76,74 @@ export const parseQueryUrl = _.pipe([
 
 // selection
 
-const separateKeyValue = selectString => selectString.split(':');
+// TODO svizzle
+const splitByColon = selectString => selectString.split(':');
 
-export const detectTypes = ([key, value]) => {
-  if (value.match(/.+\.\..+/)) return [key, value, 'within'];
-  if (value.match(/.+,.+/)) return [key, value, 'include'];
+export const detectType = ([key, value]) => {
+  if (key.startsWith('-')) {
+    return [key.substring(1), value, 'exclude']
+  }
+  if (key.startsWith('!')) {
+    return [key.substring(1), value, 'ignore']
+  }
+  if (value.match(/.+\.\..+/)) {
+    return [key, value, 'within'];
+  }
+  if (value.match(/.+,.+/)) {
+    return [key, value, 'include']
+  }
+
   return [key, value, 'include'];
 };
 
-const isList = str => str.match(/.+,.+/);
+const isListString = str => str.match(/.+,.+/);
 
-export const convertWithin = ([key, value, type]) => [
+// TODO svizzle
+const parseNumbersList = _.pipe([splitByComma, _.mapWith(stringToNumber)]);
+
+const parseNumericList = _.pipe([
+  splitByTwoDots,
+  _.mapWith(
+    _.condition(
+      isListString,
+      parseNumbersList,  // bounds
+      stringToNumber  // range
+    )
+  ),
+]);
+
+export const convertNumericList = ([key, value, type]) => [
   key,
   {
     type,
-    value: _.pipe([
-      splitByTwoDots,
-      _.mapWith(
-        _.condition(
-          isList,
-          _.pipe([splitByComma, _.mapWith(stringToNumber)]),
-          stringToNumber
-        )
-      ),
-    ])(value),
+    value: parseNumericList(value),
   },
 ];
 
-export const convertInclude = ([key, value, type]) => [
+const convertIfNullString = _.condition(_.is(nullString), _.always(null), _.identity);
+const parseStringList = _.pipe([
+  splitByComma,
+  _.mapWith(_.pipe([
+    convertPlusToSpace,
+    convertIfNullString,
+  ]))
+]);
+export const convertStringList = ([key, value, type]) => [
   key,
   {
     type,
-    value: _.pipe([splitByComma, _.mapWith(convertPlusToSpace)])(value),
+    value: parseStringList(value),
   },
 ];
 
 const handleTypes = _.pipe([
-  _.when(([, , type]) => type === 'within', convertWithin),
-  _.when(([, , type]) => type === 'include', convertInclude),
+  _.when(([, , type]) => type === 'exclude', convertStringList),
+  _.when(([, , type]) => type === 'ignore', convertStringList),
+  _.when(([, , type]) => type === 'include', convertStringList),
+  _.when(([, , type]) => type === 'within', convertNumericList),
 ]);
 
-const parseSelection = _.pipe([separateKeyValue, detectTypes, handleTypes]);
+const parseSelection = _.pipe([splitByColon, detectType, handleTypes]);
 
 export const parseSelectionUrl = _.pipe([
   extractParenContents,

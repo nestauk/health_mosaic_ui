@@ -7,9 +7,9 @@ import {
   makeRuleset,
   parseQueryUrl,
   parseSelectionUrl,
-  detectTypes,
-  convertWithin,
-  convertInclude,
+  detectType,
+  convertNumericList,
+  convertStringList,
 } from './urlParser.ts';
 
 test('extractParenContents', () => {
@@ -238,42 +238,35 @@ test('parseQueryUrl', () => {
   expect(parseQueryUrl(urlString)).toEqual(expected);
 });
 
-test('detectTypes', () => {
-  const types = [['key1', 'one,two and a,three'], ['key2', '10..20']];
+test('detectType', () => {
+  const types = [
+    ['key1', 'one,two and a,three'],
+    ['key2', '10..20'],
+    ['key3', '1,2..3,4']
+  ];
 
   const expected = [
     ['key1', 'one,two and a,three', 'include'],
     ['key2', '10..20', 'within'],
+    ['key3', '1,2..3,4', 'within'],
   ];
 
-  expect(types.map(v => detectTypes(v))).toEqual(expected);
+  expect(types.map(v => detectType(v))).toEqual(expected);
 });
 
-test('convertWithin', () => {
-  const input = ['key1', '1..10', 'within'];
+test('convertNumericList', () => {
+  const inputs = [
+    ['key2', '10..20', 'within'],
+    ['key3', '1,2..3,4', 'within'],
+  ];
   const expected = [
-    'key1',
-    {
-      type: 'within',
-      value: [1, 10],
-    },
+    ['key2', {type: 'within', value: [10, 20]}],
+    ['key3', {type: 'within', value: [[1, 2], [3, 4]]}],
   ];
-  expect(convertWithin(input)).toEqual(expected);
+  expect(inputs.map(v => convertNumericList(v))).toEqual(expected);
 });
 
-test('convertWithin 2', () => {
-  const input = ['key1', '1, 2..3, 4', 'within'];
-  const expected = [
-    'key1',
-    {
-      type: 'within',
-      value: [[1, 2], [3, 4]],
-    },
-  ];
-  expect(convertWithin(input)).toEqual(expected);
-});
-
-test('convertInclude', () => {
+test('convertStringList', () => {
   const input = ['key1', 'one,two+and+a,three', 'include'];
   const expected = [
     'key1',
@@ -282,7 +275,7 @@ test('convertInclude', () => {
       value: ['one', 'two and a', 'three'],
     },
   ];
-  expect(convertInclude(input)).toEqual(expected);
+  expect(convertStringList(input)).toEqual(expected);
 });
 
 test('parseSelectionUrl', () => {

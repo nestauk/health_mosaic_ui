@@ -1,10 +1,18 @@
 <script>
-  import { arrayMaxBy } from '@svizzle/utils';
+  import { createEventDispatcher } from 'svelte';
   import { scaleLinear } from 'd3-scale';
+  import * as _ from 'lamb';
+  import { arrayMaxBy } from '@svizzle/utils';
+  import { makeStyle } from '@svizzle/dom';
 
+  const dispatch = createEventDispatcher();
   const maxByValue = arrayMaxBy('value');
 
+  export let focusedKey;
+  export let interactive = false;
   export let items;
+  export let keyToColor;
+  export let keyToLabel;
   export let labels;
   export let title;
 
@@ -14,9 +22,14 @@
   $: scale = scaleLinear().domain([0, max]).range([0, 100]);
   $: bars = items.map(item => ({
     ...item,
-    barStyle: { width: scale(item.value) },
+    label: labels
+      ? labels[item.key]
+      : (keyToLabel ? keyToLabel(item.key) : item.key),
+    barStyle: makeStyle({
+      'background-color': keyToColor ? keyToColor[item.key] : undefined,
+      width: `${scale(item.value)}%`
+    }),
   }));
-
 </script>
 
 <div class="container">
@@ -26,13 +39,20 @@
   </header>
   {/if}
   <main>
-    {#each bars as {barStyle, key, value} (key)}
-    <div class="item">
+    {#each bars as {barStyle, key, label, value} (key)}
+    <div
+      class="item"
+      class:clickable="{interactive}"
+      class:focused="{key === focusedKey}"
+      on:click="{ () => { interactive && dispatch('clicked', {id: key}) } }"
+      on:mouseenter="{ () => interactive && dispatch('entered', {id: key}) }"
+      on:mouseleave="{ () => interactive && dispatch('exited', {id: key}) }"
+    >
       <div class="labels">
-        <span>{labels ? labels[key] : key}</span>
+        <span>{label}</span>
         <span>{value}</span>
       </div>
-      <div class="bar" style="width: {barStyle.width}%"></div>
+      <div class="bar" style="{barStyle}"></div>
     </div>
     {/each}
   </main>
@@ -44,7 +64,7 @@
 
     width: 100%;
     height: 100%;
-    padding: 10px;
+    padding: 10px; /* FIXME use a variable to align with other content */
 
     header {
       width: 100%;
@@ -63,6 +83,16 @@
 
       .item {
         padding: 0.5em 0;
+
+        &:hover {
+          background-color: rgba(0, 0, 0, 0.02);
+        }
+        &.focused {
+          background-color: rgba(0, 0, 0, 0.05);
+        }
+        &.clickable {
+          cursor: pointer;
+        }
 
         .labels {
           line-height: 1em;

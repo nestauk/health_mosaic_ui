@@ -8,11 +8,15 @@
 
   $: selectionsArray = _.pairs(selections);
 
-  const filterCurrent = ({ type, value }, current, selection) => ({
-    key: selection,
-    type,
-    value: value.filter(v => v !== current)
-  })
+  const filterCurrent = ({ type, value }, current, selection) => {
+    const newValue = value.filter(v => v !== current);
+
+    return {
+      key: selection,
+      type,
+      value: newValue.length ? newValue : undefined
+    }
+  }
 </script>
 
 {#each selectionsArray as [ key, selection ]}

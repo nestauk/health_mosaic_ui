@@ -28,7 +28,8 @@ body {
   font-size: 14px;
   line-height: 1.5;
   color: #333;
-  background: #fafafa;
+  background-color: white;
+  /* FIXME use css vars and use this in canvas the cleanup draw call */
 }
 
 h1,

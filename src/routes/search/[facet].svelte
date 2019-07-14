@@ -5,9 +5,22 @@
   import { screenStore, currentTab } from '../../stores/search.ts';
 
   import { SEARCH } from './_layout.svelte';
-  import { volume_geo, map_geo } from './facets';
+  import {
+    map_geo,
+    volume_countries,
+    volume_funders,
+    volume_geo,
+    volume_terms
+  } from './facets';
 
-  const facets = {volume_geo, map_geo};
+  const facets = {
+    map_geo,
+    volume_countries,
+    volume_funders,
+    volume_geo,
+    volume_terms
+  };
+
   const { checkDirty, transitionComplete } = getContext(SEARCH);
   const { page } = stores();
 

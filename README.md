@@ -33,9 +33,24 @@ For local development:
 
 - navigate to `http://localhost:3000`, then click on "search" or navigate directly to `http://localhost:3000/search`
 
+## Test
+
+To run all tests:
+
+`npm run test`
+
+To run tests in a specific file:
+
+`npm run test -- path/to/a/file.test.js`
+
+For example:
+
+`npm run test -- src/util/array.test.js`
+
+
 ## Statecharts
 
-There are some commands that you can run to copy the state machine configurations to your clipboard allowing you to visit the [xstate visualiser](https://statecharts.github.io/xstate-viz/) and paste the configuration into the window and see a preview of that machine.
+There are some commands that you can run to copy the state machine configurations to your clipboard allowing you to visit the [xstate visualiser](https://xstate.js.org/viz/) and paste the configuration into the window and see a preview of that machine.
 
 To copy the `screen_machine` configuration to your clipboard run the following command:
 
@@ -48,3 +63,25 @@ To copy the `search_machine` configuration to your clipboard run the following c
 ```bash
 npm run copy:search
 ```
+
+## ElasticSearch introspection
+
+Use the `BASE_URL` you find in the `src/config.js`, with the VPN enabled if you get any permission error.
+
+- version: at [`BASE_URL`](https://search-health-scanner-5cs7g52446h7qscocqmiky5dn4.eu-west-2.es.amazonaws.com/) we read:
+
+```js
+  "version" : {
+    "number" : "6.4.2",
+  },
+```
+- indices aliases: [`BASE_URL/_aliases`](https://search-health-scanner-5cs7g52446h7qscocqmiky5dn4.eu-west-2.es.amazonaws.com/_aliases)
+
+## Schema
+
+- [null mappings](https://github.com/nestauk/nesta/blob/dev/nesta/production/schemas/tier_1/field_null_mappings/health_scanner.json)
+- [fields aliases](https://github.com/nestauk/nesta/blob/dev/nesta/production/schemas/tier_1/aliases/health_scanner.json)
+- field types:
+   - [Companies](https://github.com/nestauk/nesta/blob/dev/nesta/production/orms/crunchbase_es_config.json)
+   - [Meetup groups](https://github.com/nestauk/nesta/blob/dev/nesta/production/orms/meetup_es_config.json)
+   - [Research projects](https://github.com/nestauk/nesta/blob/dev/nesta/production/orms/nih_es_config.json)

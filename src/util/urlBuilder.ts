@@ -48,13 +48,33 @@ export const uiQueryToUrlString = _.pipe([
 
 // selections
 
+export const ignoreToString = ([name, { value }]) =>
+  `(!${name}:${value.join(',').replace(/\s/g, '+')})`;
+
+export const nullString = '__none__';
+export const excludeToString = ([name, { value }]) => {
+  const valueString =
+    value
+    .map(v => _.isNull(v) ? nullString : v)
+    .join(',')
+    .replace(/\s/g, '+');
+
+  return `(-${name}:${valueString})`;
+}
+
 export const includeToString = ([name, { value }]) =>
   `(${name}:${value.join(',').replace(/\s/g, '+')})`;
 
+/*
+[1,2] => 1..2
+[[1, 2], [3, 4]] => 1,2..3,4
+*/
 export const withinToString = ([name, { value }]) =>
   `(${name}:${value[0]}..${value[1]})`;
 
 export const selectionToStringArray = _.pipe([
+  _.when(([, { type }]) => type === 'exclude', excludeToString),
+  _.when(([, { type }]) => type === 'ignore', ignoreToString),
   _.when(([, { type }]) => type === 'include', includeToString),
   _.when(([, { type }]) => type === 'within', withinToString),
 ]);

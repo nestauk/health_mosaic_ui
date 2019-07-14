@@ -8,13 +8,8 @@
   import BarchartV from '../../../components/BarchartV.svelte';
   import { WorldMapWithHistogramScaleHTML } from '../../../components/WorldMapWithHistogramScale';
   import { screenStore, currentTab } from '../../../stores/search.ts';
-  import { makeIsIncluded } from '../../../util/array';
-  import {
-    countByCity,
-    countByCountryId,
-    getKey,
-    getValue,
-  } from '../../../util/domain';
+  import { countByCity, countByCountryId } from '../../../util/domain';
+  import { getKey, getValue } from '../../../util/object.any';
   import { SEARCH } from '../_layout.svelte';
 
   const { select } = getContext(SEARCH);
@@ -24,7 +19,7 @@
   $: items = $screenStore[$currentTab].results.data;
   $: itemsByCountryId = countByCountryId(items); // {key: country_id, value: number}[]
   $: selections = $screenStore[$currentTab].selections;
-  $: selectedCountries = selections.country_id && selections.country_id.value || [];
+  $: selectedCountries = (selections.country_id && selections.country_id.value) || [];
   $: selectedItems = $screenStore[$currentTab].selected;
   $: selectedItemsByCountry = countByCountryId(selectedItems); // {key: country_id, value: number}[]
   $: selectedItemsByCity = countByCity(selectedItems);

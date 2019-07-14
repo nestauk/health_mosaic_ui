@@ -1,0 +1,331 @@
+<script>
+  // FIXME difference color schemes for each facet type (map, network, ...)
+  import { getContext } from 'svelte';
+  import { extent } from 'd3-array';
+  import { schemeSet3 } from 'd3-scale-chromatic';
+  import isEqual from 'just-compare';
+  import * as _ from 'lamb';
+  import { toggleItem } from '@svizzle/utils';
+
+  import BarchartV from '../../../components/BarchartV.svelte';
+  import Switch from '../../../components/Switch.svelte';
+  import { ForceWithDistributionsDiv } from '../../../components/ForceWithDistributions/';
+  import { screenStore, currentTab } from '../../../stores/search.ts';
+  import {
+    exactAmountBins,
+    exactAmountBinsInIterval,
+    sortValueDescKeyAsc,
+    trimBins
+  } from '../../../util/array';
+  import {
+    getNodeDegree,
+    getVolume,
+    makeFilterUndirectedNetwork,
+    makeLinksVolume,
+    makeNodesDegrees,
+    makeNodesVolume,
+    makeUndirectedNetworkWith,
+  } from '../../../util/network';
+  import { objectToValuesCountArray } from '../../../util/object';
+  import { SEARCH } from '../_layout.svelte';
+
+  const { select } = getContext(SEARCH);
+
+  const heroKey = 'terms'; // FIXME pass the key as prop to make it generic
+  const ignoredKey = 'ignoredTerms'; // FIXME pass the key as prop to make it generic
+  const accessor = _.getKey(heroKey);
+  const makeNetwork = makeUndirectedNetworkWith(accessor);
+  const filterNetwork = makeFilterUndirectedNetwork();
+  const makeFilteredNetwork = _.pipe([makeNetwork, filterNetwork]);
+
+  const colors = schemeSet3;
+
+  export let isDirty;
+
+  let focusedNodeId = null;
+  let linkKeyToVolumeColor;
+  let linkVolumeBins;
+  let linksVolume;
+  let network;
+  let nodesDegree;
+  let nodeKeyToVolumeColor;
+  let nodesVolume;
+  let nodeVolumeBins;
+
+  $: selections = $screenStore[$currentTab].selections;
+
+  // FIXME we're manually managing the network update
+  // to avoid updating whenever the global store changes
+
+  let previousSelectedItems;
+  let selectedItems;
+  $: {
+    const _selectedItems = $screenStore[$currentTab].selected;
+    if (!isEqual(previousSelectedItems, _selectedItems)) {
+      selectedItems = _selectedItems;
+      previousSelectedItems = _selectedItems;
+    }
+  }
+
+  let previousSkippedNodeIds;
+  let skippedNodeIds;
+  $: {
+    const _skippedNodeIds = (selections[ignoredKey] && selections[ignoredKey].value) || [];
+    if (!isEqual(previousSkippedNodeIds, _skippedNodeIds)) {
+      skippedNodeIds = _skippedNodeIds;
+      previousSkippedNodeIds = _skippedNodeIds;
+    }
+  }
+
+  let previousExcludedTerms;
+  let excludedTerms;
+  $: {
+    const _excludedTerms = (selections[heroKey] && selections[heroKey].value) || [];
+    if (!isEqual(previousExcludedTerms, _excludedTerms)) {
+      excludedTerms = _excludedTerms;
+      previousExcludedTerms = _excludedTerms;
+    }
+  }
+
+  // end of FIXME
+
+  $: {
+    if (selectedItems) {
+      network = makeFilteredNetwork(selectedItems);
+      nodesDegree = makeNodesDegrees(network);
+      nodesVolume = makeNodesVolume(network);
+      linksVolume = makeLinksVolume(network);
+      previousSelectedItems = selectedItems;
+    }
+  }
+
+  $: subNetwork = {
+    nodes: _.skip(network.nodes, skippedNodeIds),
+    links: _.fromPairs(
+      _.filter(_.pairs(network.links), ([id, link]) =>
+        !skippedNodeIds.includes(link.nodes[0]) &&
+        !skippedNodeIds.includes(link.nodes[1])
+      )
+    )
+  };
+  // $: subNodesDegree = makeNodesDegrees(subNetwork);
+  $: subNodesVolume = makeNodesVolume(subNetwork);
+  $: subLinksVolume = makeLinksVolume(subNetwork);
+
+  $: linksArray = _.values(network.links);
+  $: nodesArray = _.values(network.nodes);
+  $: volumeInterval = extent(linksArray.concat(nodesArray), getVolume);
+
+  $: {
+    // TODO svizzle
+    const {bins, start, end} = trimBins(
+      exactAmountBinsInIterval(
+        linksArray,
+        colors.length,
+        volumeInterval,
+        getVolume
+      )
+    );
+    const linkVolumeColors = _.slice(colors, start, end + 1);
+    const colorBinPairs = _.zip(bins, linkVolumeColors);
+    linkVolumeBins = _.map(
+      colorBinPairs,
+      ([bin, color]) => ({...bin, color})
+    );
+
+    linkKeyToVolumeColor = _.reduce(
+      colorBinPairs,
+      (obj, [{values}, color]) => {
+        values.forEach(({id: key}) => {
+          obj[key] = color;
+        })
+        return obj;
+      },
+      {}
+    );
+  };
+
+  $: {
+    const {bins, start, end} = trimBins(
+      exactAmountBinsInIterval(
+        nodesArray,
+        colors.length,
+        volumeInterval,
+        getVolume
+      )
+    );
+    const nodeVolumeColors = _.slice(colors, start, end + 1);
+    const colorBinPairs = _.zip(bins, nodeVolumeColors);
+    nodeVolumeBins = _.map(
+      colorBinPairs,
+      ([bin, color]) => ({...bin, color})
+    );
+    nodeKeyToVolumeColor = _.reduce(
+      colorBinPairs,
+      (obj, [{values}, color]) => {
+        values.forEach(({id: key}) => {
+          obj[key] = color;
+        })
+        return obj;
+      },
+      {}
+    ); // TODO util?
+  };
+
+  $: nodeDegreeBins = exactAmountBins(
+    nodesArray,
+    colors.length,
+    getNodeDegree
+  );
+
+  const nodeEntered = ({detail: {id}}) => {
+    focusedNodeId = id;
+  };
+  const nodeExited = ({detail: {id}}) => {
+    focusedNodeId = null;
+  };
+
+  let clickTask = 'ignore';
+  const toggleClickTask = ({detail: value}) => {
+    clickTask = value;
+  };
+
+  const nodeClicked = ({detail: {id}}) => {
+    clickTask === 'ignore'
+      ? select({
+        key: ignoredKey,
+        type: 'ignore',
+        value: toggleItem(skippedNodeIds, id)
+      }, $currentTab)
+      : select({
+        key: heroKey,
+        type: 'exclude',
+        value: toggleItem(excludedTerms, id)
+      }, $currentTab)
+  };
+</script>
+
+<div class="container" class:dirty="{isDirty}">
+  <div class="col col1-2">
+    <BarchartV
+      focusedKey="{focusedNodeId}"
+      interactive="{true}"
+      items="{subNodesVolume}"
+      keyToColor="{nodeKeyToVolumeColor}"
+      on:clicked="{nodeClicked}"
+      on:entered="{nodeEntered}"
+      on:exited="{nodeExited}"
+      title="Nodes volume"
+    />
+  </div>
+  <div class="col col3-9">
+    <header>
+      <span class="title">Network</span>
+      <div class="control">
+        <Switch
+          current="{'ignore'}"
+          on:toggle="{toggleClickTask}"
+          values="{['ignore', 'exclude']}"
+        />
+      </div>
+    </header>
+    <ForceWithDistributionsDiv
+      colors={schemeSet3}
+      {focusedNodeId}
+      {linkKeyToVolumeColor}
+      {linkVolumeBins}
+      network={subNetwork}
+      {nodeDegreeBins}
+      {nodeKeyToVolumeColor}
+      {nodeVolumeBins}
+      on:nodeClick="{nodeClicked}"
+      on:entered="{nodeEntered}"
+      on:exited="{nodeExited}"
+      volumeAccessor="{getVolume}"
+      degreeAccessor="{getNodeDegree}"
+    />
+    <!-- title="Network" -->
+  </div>
+  <div class="col col10-12">
+    <BarchartV
+      items="{subLinksVolume}"
+      keyToColor="{linkKeyToVolumeColor}"
+      title="Links volume"
+    />
+  </div>
+</div>
+
+<style lang="less">
+  .container {
+    height: 100%;
+    width: 100%;
+    display: flex;
+
+    flex: 1;
+    height: 100%;
+    max-height: 100%;
+
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    grid-template-rows: 100%;
+
+    .col {
+      height: 100%;
+      max-height: 100%;
+
+      header {
+        height: 2em;
+        display: flex;
+        align-items: center;
+        /* justify-content: flex-end; */
+        justify-content: space-between;
+        padding: 0 10px;
+
+        span {
+          font-size: 1.17em; /* FIXME use vars, this is same as an h3 */
+        }
+
+        .control {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        }
+      }
+
+      &.col1-2 {
+        grid-column: 1 / span 2;
+      }
+      &.col1-12 {
+        grid-column: 1 / span 12;
+      }
+      &.col3-4 {
+        grid-column: 3 / span 2;
+      }
+      &.col3-8 {
+        grid-column: 3 / span 6;
+      }
+      &.col3-9 {
+        grid-column: 3 / span 7;
+      }
+      &.col3-10 {
+        grid-column: 3 / span 8;
+      }
+      &.col5-6 {
+        grid-column: 5 / span 2;
+      }
+      /* &.col5-12 {
+        grid-column: 5 / span 8;
+      } */
+      &.col10-12 {
+        grid-column: 10 / span 3;
+      }
+      &.col11-12 {
+        grid-column: 11 / span 2;
+      }
+    }
+
+    &.dirty {
+      background-color: #fdfcef;
+    }
+  }
+</style>

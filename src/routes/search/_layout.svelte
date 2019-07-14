@@ -10,9 +10,7 @@
   import Nav from '../../components/Nav.svelte';
   import QueryBuilder from '../../components/QueryBuilder.svelte';
   import RouterLink from '../../components/RouterLink.svelte';
-
-  import { project_title } from '../../config.js';
-
+  import { project_title, searchRouteName } from '../../config.js';
   import { screenMachine } from '../../services/screen_service.ts';
   import {
     screenStore,
@@ -20,7 +18,6 @@
     currentTab,
   } from '../../stores/search.ts';
 
-  import { searchRouteName } from '../../config';
   const { page } = stores();
 
   onMount(() => {
@@ -55,7 +52,7 @@
       screenMachine.send({
         type: 'SELECTION_UPDATED',
         tabId,
-        selection: selection.value ? selection : {},
+        selection,
         route: $page.path
       }),
   });
@@ -96,8 +93,11 @@
 
   const facetTabs = [
     {id: '', label: 'List'},
+    {id: 'volume_geo', label: 'Volume by Country'},
     {id: 'map_geo', label: 'Locations'},
-    {id: 'volume_geo', label: 'Volume by Geo'},
+    {id: 'volume_terms', label: 'Volume by Term'},
+    {id: 'volume_countries', label: 'Volume by Mentioned Countries'},
+    {id: 'volume_funders', label: 'Volume by Funder'},
   ];
 
   const onFacetTabClick = id => () => {

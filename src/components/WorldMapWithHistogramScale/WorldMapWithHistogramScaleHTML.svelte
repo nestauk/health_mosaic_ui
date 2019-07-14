@@ -21,12 +21,12 @@
   export let selectedKeys = [];
 
   let bbox;
-  let width = 0;
   let height = 0;
   let pointer;
   let svg;
   let target;
   let tooltip;
+  let width = 0;
 
   $: itemsByKey = _.index(items, keyAccessor);
   $: histogramWidth = Math.min(300, width / 5);
@@ -47,10 +47,10 @@
     y: height - histogramHeight - histogramMargin
   };
 
-  const onTarget = ({detail: key}) => {
+  const enteredNode = ({detail: key}) => {
     target = key;
   };
-  const offTarget = () => {
+  const exitedNode = () => {
     target = null;
   };
   const toggleTarget = ({detail: id}) =>
@@ -136,8 +136,8 @@
           {items}
           key="iso_a2"
           {keyToColor}
-          on:enterTarget="{onTarget}"
-          on:exitTarget="{offTarget}"
+          on:entered="{enteredNode}"
+          on:exited="{exitedNode}"
           on:clickTarget="{toggleTarget}"
           on:deselectAll
           {selectedKeys}
@@ -149,7 +149,6 @@
             height="{histogramHeight}"
             {bins}
             {colors}
-            {keyAccessor}
             {selectedKeys}
             {valueAccessor}
             width="{histogramWidth}"
@@ -228,7 +227,6 @@
               font-style: italic;
             }
           }
-
         }
       }
     }

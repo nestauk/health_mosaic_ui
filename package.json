@@ -17,7 +17,7 @@
     "data:geo:lookup": "mkdirp data/geo && node -r esm bin/lookup.js",
     "reinstall:npm": "npm run cleanall && npm i",
     "reinstall:yarn": "yarn cleanall && yarn",
-    "lambda:dev": "NODE_ENV=development netlify-lambda serve dist/lambda",
+    "lambda:serve": "NODE_ENV=development netlify-lambda serve dist/lambda",
     "lambda:build": "rollup -c rollup-lambda.config.js && netlify-lambda build dist/lambda",
     "copy:screen": "TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\"}' ts-node bin/screen_machine.ts",
     "copy:search": "TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\"}' ts-node bin/search_machine.ts"
@@ -25,6 +25,7 @@
   "dependencies": {
     "@svizzle/dom": "^0.2.0",
     "@svizzle/geo": "^0.2.0",
+    "@svizzle/geometry": "^0.1.0",
     "@svizzle/utils": "^0.2.0",
     "@turf/bbox": "^6.0.1",
     "apollo-boost": "^0.4.3",
@@ -32,6 +33,8 @@
     "apollo-server-lambda": "^2.6.7",
     "compression": "^1.7.1",
     "d3-array": "^2.2.0",
+    "d3-color": "^1.2.8",
+    "d3-force": "^2.0.1",
     "d3-format": "^1.3.2",
     "d3-geo": "^1.11.3",
     "d3-geo-projection": "^2.7.0",

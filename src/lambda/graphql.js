@@ -198,12 +198,14 @@ const typeDefs = gql`
     currency: String
     end: String
     funders: [String]
+    id: String
     is_duplicate: Boolean
     is_health_related: Boolean
     location: Geopoint
     name: String
     novelty: Float
     region: String
+    score: Float
     sdg_labels: [String]
     start: String
     state: String

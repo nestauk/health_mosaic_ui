@@ -62,8 +62,8 @@
       d="{geopath(feature)}"
       fill="{hasColor(feature) || 'white'}"
       on:click="{clickedTarget(feature)}"
-      on:mouseenter="{() => {dispatch('enterTarget', feature.properties[key])}}"
-      on:mouseleave="{() => {dispatch('exitTarget', feature.properties[key])}}"
+      on:mouseenter="{() => {dispatch('entered', feature.properties[key])}}"
+      on:mouseleave="{() => {dispatch('exited', feature.properties[key])}}"
       stroke-dasharray="{feature.properties.color ? 'none' : '2 2'}"
     />
   </g>

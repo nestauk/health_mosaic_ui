@@ -15,6 +15,7 @@ export const QUERY_ALL = gql`
       currency
       end
       funders
+      id
       is_duplicate
       is_health_related
       location {
@@ -24,6 +25,7 @@ export const QUERY_ALL = gql`
       name
       novelty
       region
+      score
       sdg_labels
       start
       state
@@ -52,6 +54,7 @@ export const QUERY_CB = gql`
       currency
       end
       funders
+      id
       is_duplicate
       is_health_related
       location {
@@ -61,6 +64,7 @@ export const QUERY_CB = gql`
       name
       novelty
       region
+      score
       sdg_labels
       start
       state
@@ -89,6 +93,7 @@ export const QUERY_MU = gql`
       currency
       end
       funders
+      id
       is_duplicate
       is_health_related
       location {
@@ -98,6 +103,7 @@ export const QUERY_MU = gql`
       name
       novelty
       region
+      score
       sdg_labels
       start
       state
@@ -126,6 +132,7 @@ export const QUERY_NIH = gql`
       currency
       end
       funders
+      id
       is_duplicate
       is_health_related
       location {
@@ -135,6 +142,7 @@ export const QUERY_NIH = gql`
       name
       novelty
       region
+      score
       sdg_labels
       start
       state

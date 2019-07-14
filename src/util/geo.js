@@ -1,5 +1,9 @@
 import * as _ from 'lamb';
 
+import {countries} from '../../data/geo/iso_a2_to_name_by_type.json';
+
+export const countryLabel = geoId => countries[geoId];
+
 export const createColoredFeatures = (colorMap, key) =>
   _.pipe([
     _.getKey('features'),

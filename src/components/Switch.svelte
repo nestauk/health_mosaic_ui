@@ -3,8 +3,8 @@
 
   const dispatch = createEventDispatcher();
 
-	export let values;
-	export let current;
+  export let current;
+  export let values;
 
 	$: toggle = current;
 
@@ -12,7 +12,7 @@
 		toggle = toggle === values[0] ? values[1] : values[0];
 	}
 
-$: dispatch('toggle', toggle);
+  $: dispatch('toggle', toggle);
 
 </script>
 
@@ -58,7 +58,7 @@ $: dispatch('toggle', toggle);
 }
 
 .c-toggle__wrapper {
-	font-size: var(--baseSize);
+	font-size: var(--baseSize); /* FIXME this var doesn't exist */
 	display: inline-block;
 	vertical-align: middle;
 	width: 4em;

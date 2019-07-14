@@ -3,3 +3,5 @@
 
 export const roundTo = precision => x => Number(x.toFixed(precision));
 export const toInt = roundTo(0);
+
+export const roundTo1 = roundTo(1);

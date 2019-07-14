@@ -149,6 +149,11 @@ export const fieldMapEntry = field =>
 
 export const makeResolvers = () => {
   let resolvers = '{\n';
+
+  resolvers += `
+  id: (parent) => parent._id,
+  score: (parent) => parent._score,`;
+
   for (const field in fieldMaps) {
     resolvers += `
   ${field}: (parent) => {

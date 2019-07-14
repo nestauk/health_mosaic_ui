@@ -1,4 +1,7 @@
-import { exactAmountBins } from './array';
+import {
+  exactAmountBins,
+  makeBiPermutations
+} from './array';
 
 test('makeExactAmountBins identity', () => {
   const array = [10, 10, 10, 2];
@@ -66,4 +69,32 @@ test('makeExactAmountBins accessor', () => {
     { range: [ 4.4, 5 ], values: [ {v: 10}, {v: 10}, {v: 10} ] }
   ];
   expect(bins5Maxed1).toEqual(expectedBins5Maxed1);
+});
+
+/* permutations */
+
+test('makeBiPermutations – of multiple values', () => {
+  const array = [
+    {foo: "a"},
+    {foo: "b"},
+    {bar: "c"},
+    {bar: "d"}
+  ];
+  const received = makeBiPermutations(array);
+  const expected = [
+    [{foo: "a"}, {foo: "b"}],
+    [{foo: "a"}, {bar: "c"}],
+    [{foo: "a"}, {bar: "d"}],
+    [{foo: "b"}, {bar: "c"}],
+    [{foo: "b"}, {bar: "d"}],
+    [{bar: "c"}, {bar: "d"}]
+  ];
+  expect(received).toEqual(expected);
+});
+
+test('makeBiPermutations – of a single value', () => {
+  const array = [{foo: "a"}];
+  const received = makeBiPermutations(array);
+  const expected = [];
+  expect(received).toEqual(expected);
 });

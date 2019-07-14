@@ -1,4 +1,5 @@
 export { default as HistogramSVG } from './HistogramSVG.svelte';
+export { default as HistogramDiv } from './HistogramDiv.svelte';
 
 export const textPadding = 5;
 export const maxfontSize = 10;

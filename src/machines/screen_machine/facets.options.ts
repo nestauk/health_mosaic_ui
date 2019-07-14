@@ -32,7 +32,6 @@ export const facets_options = {
       { screenStore },
       { selection: { key, type, value }, tabId }
     ) => {
-      console.log(key, type, value, tabId);
       screenStore.update(
         _.updatePath(
           `${tabId}.selections`,
