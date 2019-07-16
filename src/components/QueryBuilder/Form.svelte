@@ -1,40 +1,29 @@
 <script>
   import { createEventDispatcher } from 'svelte';
-  import { Sync } from '../Icons/'
 
-  export let formHeight = 0, isQueries, isDirty;
+  export let formHeight = 0, isDirty;
   const dispatch = createEventDispatcher();
   let tooltip;
 </script>
 
 <form on:submit|preventDefault style="position: static;">
-<span bind:offsetHeight="{formHeight}">
-  <div class="button">
-    <button
-      on:mouseenter={() => (tooltip = true)}
-      on:mouseleave={() => (tooltip = false)}
-      type="button"
-      on:click="{() => dispatch('newrule')}"
-    >
-      +
-    </button>
+  <span bind:offsetHeight="{formHeight}">
+    <div class="button">
+      <button
+        on:mouseenter={() => (tooltip = true)}
+        on:mouseleave={() => (tooltip = false)}
+        type="button"
+        on:click="{() => dispatch('newrule')}"
+      >
+        +
+      </button>
 
-    {#if tooltip}
-      <span>Add new query</span>
-    {/if}
-  </div>
-</span>
+      {#if tooltip}
+        <span>Add new query</span>
+      {/if}
+    </div>
+  </span>
   <slot />
-  {#if isQueries}
-    <span
-      class="reset-button"
-      class:active="{isDirty}"
-      on:click="{() => dispatch('reset')}"
-    >
-      <Sync  />
-    </span>
-    <button class="search-button" on:click="{() => dispatch('search')}">Search</button>
-  {/if}
 </form>
 
 <style>
@@ -93,23 +82,6 @@
     background: #333;
   }
 
-  .search-button, .reset-button {
-    position: absolute;
-    cursor: pointer;
-    right: 110px;
-    bottom: 20px;
-    transition: 0.2s;
-  }
 
-  .reset-button {
-    right: 67px;
-    width: 30px;
-    bottom: 16px;
-    opacity: 0.5;
-  }
-
-  .active {
-    opacity: 1;
-  }
 
 </style>

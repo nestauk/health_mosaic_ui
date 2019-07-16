@@ -1,5 +1,6 @@
 <script>
   import { stores } from '@sapper/app';
+  import { tick } from 'svelte';
   import compare from 'just-compare';
   import * as _ from 'lamb';
 
@@ -8,6 +9,8 @@
   import { Rules, Ruleset, RulesetQueries, RulesetLabels } from './QueryBuilder/Rules';
   import Selections from './Selections.svelte';
   import Switch from './Switch.svelte';
+  import { Sync } from './Icons/'
+
 
   import { screenMachine } from '../services/screen_service.ts';
   import {
@@ -38,9 +41,11 @@
   $: isError = searchMachine && searchMachine.state.matches('Search.NotEmpty.Dirty.Error');
   $: isDirty = searchMachine && searchMachine.state.matches('Search.NotEmpty.Dirty');
   $: tabs = Object.entries($screenStore);
-  $: isQueries = uiQuery[0] && uiQuery[0].terms[0].term;
+  $: isEmptyQuery = uiQuery[0] && uiQuery[0].terms[0].term;
+  $: hasPreviousQuery = $screenStore[$currentTab].results.prevQuery;
   $: selections = $screenStore[$currentTab] && $screenStore[$currentTab].selections;
   $: logic = $screenStore[$currentTab].logic;
+  $: if (!open && !isEmptyQuery) openDrawer();
 
 const stripEmpties = _.filterWith(_.allOf([
     _.getPath('values.length'),
@@ -190,6 +195,12 @@ const stripEmpties = _.filterWith(_.allOf([
     })
     checkDirty();
   }
+
+  const openDrawer = async () => {
+    await tick();
+    sendTab('TAB_VISIBILITY_TOGGLED', $currentTab);}
+
+
 </script>
 
 <div
@@ -197,13 +208,11 @@ const stripEmpties = _.filterWith(_.allOf([
   style="{open ? '' : `transform: translateY(-${formHeight + 50}px)`}"
 >
   <Form
-    {isQueries}
     bind:formHeight
     on:submit="{handleSend}"
     on:newrule="{newRuleset}"
     on:search="{handleSend}"
     on:reset="{handleReset}"
-    {isDirty}
   >
     <FormInput
       bind:this={input}
@@ -215,21 +224,41 @@ const stripEmpties = _.filterWith(_.allOf([
       on:select="{({ detail }) => sendRuleLabel('LABEL_CLICKED', detail)}"
       {labels}
     />
+    <div class="form-controls">
+      <Switch
+        on:toggle={toggleSearchLogic}
+        values={["AND", "OR"]}
+        current={logic}
+      />
 
-    <Switch
-      on:toggle={toggleSearchLogic}
-      values={["AND", "OR"]}
-      current={logic}
-      compact={!isQueries}
-    />
+      <FormDropdown
+        index={$screenStore[$currentTab].index}
+        indices="{ESIndices}"
+        on:indexchange={({ detail }) => changeIndex(detail)}
+      />
+      {#if isEmptyQuery}
+        <button class="search-button" on:click="{() => dispatch('search')}">Search</button>
+      {/if}
+      {#if hasPreviousQuery}
+        <span
+            class="reset-button"
+            class:active="{isDirty}"
+            on:click="{handleReset}"
+          >
+            <Sync  />
+        </span>
+      {/if}
+      {#if isEmptyQuery}
 
-    <FormDropdown
-      index={$screenStore[$currentTab].index}
-      indices="{ESIndices}"
-      on:indexchange={({ detail }) => changeIndex(detail)}
-      {isQueries}
-    />
-
+        <div
+          class="close-label"
+          on:click="{() => sendTab('TAB_VISIBILITY_TOGGLED', $currentTab)}"
+          style="{open ? 'transform: rotate(180deg) ' : ''}"
+        >
+          <img alt="close search" src="arrow.svg"/>
+        </div>
+      {/if}
+    </div>
     {#if uiQuery.length}
     <Rules>
       {#each uiQuery as { options, disabled, selected, terms, fields }, i}
@@ -268,15 +297,7 @@ const stripEmpties = _.filterWith(_.allOf([
     <Selections {selections} on:toggleselection={toggleSelection}/>
     {/if}
   </Form>
-  {#if isQueries}
-  <div
-    class="close-label"
-    on:click="{() => sendTab('TAB_VISIBILITY_TOGGLED', $currentTab)}"
-    style="{open ? 'transform: rotate(180deg) ' : ''}"
-  >
-    <img alt="close search" src="arrow.svg"/>
-  </div>
-  {/if}
+
 </div>
 
 <style lang="less">
@@ -296,17 +317,15 @@ const stripEmpties = _.filterWith(_.allOf([
   }
 
   .close-label {
-    position: absolute;
     padding: 5px 0;
-    cursor:pointer;
-    width: 30px;
-    height: 30px;
-    right: 30px;
-    bottom: 22px;
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
     transition: 0.2s;
 
     img {
-      margin-top: -5px;
+      width: 100%;
+      height: 100%;
     }
   }
 
@@ -325,6 +344,39 @@ const stripEmpties = _.filterWith(_.allOf([
 
     &.OR {
       color: #66c9ff;
+    }
+  }
+
+  .form-controls {
+    display: flex;
+    position: absolute;
+    bottom: 0;
+    right: 15px;
+    justify-content: flex-end;
+    align-items: center;
+    z-index: 2;
+
+    .search-button, .reset-button {
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .search-button {
+      margin-right:15px;
+      padding: 10px 15px;
+      height: 100%;
+      border-radius: 2px;
+    }
+
+    .reset-button {
+      margin-right:15px;
+      width: 30px;
+      transform: translateY(3px);
+      opacity: 0.5;
+    }
+
+    .active {
+      opacity: 1;
     }
   }
 

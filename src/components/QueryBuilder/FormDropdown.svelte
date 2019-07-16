@@ -3,13 +3,12 @@ import { createEventDispatcher } from 'svelte';
 import { capitalise } from '../../util/string'
 
 export let indices;
-export let isQueries;
 export let index;
 const dispatch = createEventDispatcher();
 
 </script>
 
-<div class:offset={isQueries}>
+<div >
   <select
     bind:value={index}
     on:change={() =>
@@ -23,15 +22,8 @@ const dispatch = createEventDispatcher();
 
 <style lang="less">
   div {
-    margin: 15px 0;
-    position: absolute;
-    bottom: 5px;
-    z-index: 2;
-    right: 30px;
-
-    &.offset {
-      right: 200px;
-    }
+    margin: 15px;
+    position: relative;
 
     &::after {
       content: ' ';

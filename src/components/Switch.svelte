@@ -2,7 +2,7 @@
   import { createEventDispatcher } from 'svelte';
 
   const dispatch = createEventDispatcher();
-  export let values, compact, current;
+  export let values, current;
 	$: toggle = current;
 
 	function toggleSelection() {
@@ -10,9 +10,10 @@
 	}
 
 $: dispatch('toggle', toggle);
+
 </script>
 
-<fieldset role="radiogroup" class:compact={compact}>
+<fieldset role="radiogroup" >
   <div class="c-toggle">
     <label for="one" class:active={toggle === values[0]}>{values[0]}</label>
     <span class="c-toggle__wrapper">
@@ -59,12 +60,11 @@ $: dispatch('toggle', toggle);
 	vertical-align: middle;
 	width: 4em;
 	height: 2em;
-	border-radius: 3.5em; /* = height */
+	border-radius: 3.5em;
 	border: 1px solid #ddd;
-	position: relative; // create positioning context for ::after
+	position: relative;
 }
 .c-toggle__switcher {
-	// the toggle
 	display: block;
 	position: absolute;
 	top: 0;
@@ -106,15 +106,8 @@ $: dispatch('toggle', toggle);
 
 fieldset {
 	border: none;
-  position: absolute;
-  right: 330px;
-  bottom: 22px;
-  z-index: 999;
 	user-select: none;
-
-  &.compact {
-    right: 170px;
-  }
+	margin: 15px;
 }
 
 </style>
