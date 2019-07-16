@@ -92,7 +92,7 @@ export const tabs_options = {
 
       const newPath = makeRouteUrl(path, urlQuery);
       //@ts-ignore
-      if (process.browser && newPath !== path) {
+      if (process.browser) {
         goto(newPath);
       }
     },
