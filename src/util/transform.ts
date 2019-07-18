@@ -47,7 +47,7 @@ export const isValidField = ({ disabled, status }) => {
 
 const transFormFields = (acc, { field, status }) => [
   ...acc,
-  ...fieldGroups[field].map(v => ({ title: v, status })),
+  { title: fieldGroups[field], status },
 ];
 
 const createValidFields = fields =>

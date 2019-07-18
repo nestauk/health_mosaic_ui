@@ -80,7 +80,7 @@ describe('dslBuilder', () => {
         ]
       )
     ).toBe(
-      'field:("hello world" OR "hello everyone") AND field2:("hello world" OR "hello everyone")'
+      'field:("hello world" AND "hello everyone") AND field2:("hello world" AND "hello everyone")'
     );
   });
 
@@ -97,7 +97,7 @@ describe('dslBuilder', () => {
         ]
       )
     ).toBe(
-      'field:(-"hello world" OR "hello everyone") AND field2:(-"hello world" OR "hello everyone")'
+      'field:(-"hello world" AND "hello everyone") AND field2:(-"hello world" AND "hello everyone")'
     );
   });
 
@@ -115,7 +115,7 @@ describe('dslBuilder', () => {
         ]
       )
     ).toBe(
-      'field:(-"hello world" OR "hello everyone") AND field2:(-"hello world" OR "hello everyone") AND NOT field3:(-"hello world" OR "hello everyone")'
+      'field:(-"hello world" AND "hello everyone") AND field2:(-"hello world" AND "hello everyone") AND NOT field3:(-"hello world" AND "hello everyone")'
     );
   });
 
@@ -132,7 +132,7 @@ describe('dslBuilder', () => {
           { title: 'field3', status: 'default' },
         ]
       )
-    ).toBe('"hello world" OR "hello everyone"');
+    ).toBe('"hello world" AND "hello everyone"');
   });
 
   test('create a valid query string from excluded and default fields', () => {
@@ -149,7 +149,7 @@ describe('dslBuilder', () => {
         ]
       )
     ).toBe(
-      '"hello world" OR "hello everyone" AND NOT field:("hello world" OR "hello everyone")'
+      '"hello world" AND "hello everyone" AND NOT field:("hello world" AND "hello everyone")'
     );
   });
 
@@ -168,7 +168,7 @@ describe('dslBuilder', () => {
         'OR'
       )
     ).toBe(
-      '"hello world" OR "hello everyone" OR NOT field:("hello world" OR "hello everyone")'
+      '"hello world" AND "hello everyone" OR NOT field:("hello world" AND "hello everyone")'
     );
   });
 });

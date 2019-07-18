@@ -211,8 +211,6 @@ const stripEmpties = _.filterWith(_.allOf([
     bind:formHeight
     on:submit="{handleSend}"
     on:newrule="{newRuleset}"
-    on:search="{handleSend}"
-    on:reset="{handleReset}"
   >
     <FormInput
       bind:this={input}
@@ -237,7 +235,7 @@ const stripEmpties = _.filterWith(_.allOf([
         on:indexchange={({ detail }) => changeIndex(detail)}
       />
       {#if isEmptyQuery}
-        <button class="search-button" on:click="{() => dispatch('search')}">Search</button>
+        <button class="search-button" on:click="{handleSend}">Search</button>
       {/if}
       {#if hasPreviousQuery}
         <span

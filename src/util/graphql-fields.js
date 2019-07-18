@@ -1,4 +1,5 @@
 import * as _ from 'lamb';
+import { fieldGroups } from '../config';
 
 const makeFieldExist = field => ({ exists: { field } });
 
@@ -158,56 +159,57 @@ export const makeResolvers = () => {
   return `${resolvers} \n}`;
 };
 
-const fieldBuilder = (q, status) => (acc, next) =>
-  acc +
-  (next.status === 'excluded' ? ` ${status} NOT ` : ` ${status} `) +
-  next.title +
-  `:(${q})`;
-
-const queryBuilder = (acc, next, i, arr) =>
-  acc +
-  (next.status === 'not' ? '-' : '') +
-  `"${next.query}"` +
-  (arr[i + 1] ? ' AND ' : '');
+const queryBuilder = query =>
+  (query.status === 'not' ? '-' : '') + `"${query.query}"`;
 
 const hasIncluded = arr =>
   _.filter(arr, ({ status }) => status === 'included').length > 0;
 
-const createFullQuery = (query, status) =>
-  _.pipe([
-    _.filterWith(v => v.status !== 'default'),
-    _.reduceWith(fieldBuilder(query, status), ''),
-  ]);
+const createNormalFieldQuery = query => ({ title, status }) =>
+  `${status === 'excluded' ? 'NOT ' : ''}${title}:(${query})`;
 
-export const dslBuilder = (query, fields, status = 'AND') => {
-  const q = _.reduce(query, queryBuilder, '');
-  let queryString = createFullQuery(q, status)(fields);
+const isNotPlace = ({ title }) => title !== 'place';
+const isPlace = ({ title }) => title === 'place';
 
-  queryString = hasIncluded(fields) ? queryString : `${q}  ${queryString}`;
-  return queryString
-    .trim()
-    .replace(/^AND|^OR |^OR NOT |^AND NOT/, '')
-    .replace(/\s{2,}/g, ' ')
-    .trim();
+const places = ['continent', 'country', 'state', 'city'];
+
+const createPlaceFieldQuery = query => {
+  const placeQuery = places
+    .map(v => `${v}:(${query})`)
+    .join(query.trim().startsWith('-') ? ' AND ' : ' OR ');
+  return `(${placeQuery})`;
 };
 
-export const queryMapper = queryObject =>
-  fieldMaps.name.map((v, i) =>
-    queryObject.map(q => ({
-      ...q,
-      fields: q.fields.map(f => ({ ...f, title: fieldMaps[f.title][i] })),
-    }))
-  );
+const makeFieldQuery = query =>
+  _.pipe([
+    _.filterWith(v => v.status !== 'default'),
+    _.filterWith(isNotPlace),
+    _.mapWith(createNormalFieldQuery(query)),
+  ]);
 
-export const mappedQueryBuilder = (mappedQuery, logic) =>
-  mappedQuery.reduce(
-    (acc, next, i) =>
-      `${acc} ${i ? 'OR ' : ''}` +
-      next.reduce(
-        (acc, { fields, values }, i2, arr2) =>
-          `(${acc} ${dslBuilder(values, fields, logic)})` +
-          (arr2[i2 + 1] ? ` ${logic}` : ''),
-        ''
-      ),
-    ''
-  ) + '';
+const createSingleQuery = ({ values, fields }) => {
+  const query = _.map(values, queryBuilder);
+  const joinedQueries = query.join(' AND ');
+
+  const places = fields.find(isPlace)
+    ? _.map(query, createPlaceFieldQuery).join(' AND ')
+    : '';
+
+  const fieldQuery = makeFieldQuery(query)(fields).join(' AND ');
+
+  let queryString =
+    hasIncluded(fields) && fieldQuery
+      ? fieldQuery
+      : joinedQueries + (fieldQuery.length ? ` AND ${fieldQuery}` : '');
+
+  queryString = places ? `( ${queryString} ) AND ( ${places} )` : queryString;
+  return `( ${queryString} )`;
+};
+
+export const mappedQueryBuilder = (queryObject, logic) =>
+  queryObject.map(createSingleQuery).join(` ${logic} `);
+
+export const mapFieldAlias = ({ title, status }) => ({
+  title: fieldGroups[title],
+  status,
+});

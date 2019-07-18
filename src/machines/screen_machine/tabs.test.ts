@@ -26,6 +26,7 @@ test('createTab: should create a tab', () => {
       selectionParams: undefined,
       ESIndex: undefined,
       isPageInit: undefined,
+      ESLogic: undefined,
     }
   );
   expect(get(idStore)).toEqual(1);
@@ -44,6 +45,7 @@ test('createTab: the id should be correctly incremented', () => {
       selectionParams: undefined,
       ESIndex: undefined,
       isPageInit: undefined,
+      ESLogic: undefined,
     }
   );
   createTab(
@@ -53,6 +55,7 @@ test('createTab: the id should be correctly incremented', () => {
       selectionParams: undefined,
       ESIndex: undefined,
       isPageInit: undefined,
+      ESLogic: undefined,
     }
   );
 
@@ -73,6 +76,7 @@ test('deleteTab: should delete tab data', () => {
       selectionParams: undefined,
       ESIndex: undefined,
       isPageInit: undefined,
+      ESLogic: undefined,
     }
   );
   deleteTab(
@@ -100,6 +104,7 @@ test('deleteTab: should delete the correct tab data', () => {
       selectionParams: undefined,
       ESIndex: undefined,
       isPageInit: undefined,
+      ESLogic: undefined,
     }
   );
   createTab(
@@ -109,6 +114,7 @@ test('deleteTab: should delete the correct tab data', () => {
       selectionParams: undefined,
       ESIndex: undefined,
       isPageInit: undefined,
+      ESLogic: undefined,
     }
   );
   uuid++;

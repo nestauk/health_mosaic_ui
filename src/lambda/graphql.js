@@ -11,7 +11,7 @@ import {
   MU_index,
   HS_index,
 } from '../../src/config';
-import { queryMapper, mappedQueryBuilder } from '../util/graphql-fields';
+import { mappedQueryBuilder } from '../util/graphql-fields';
 
 // queryObject -> queryMapper -> mappedQueryBuilder
 const sources = [
@@ -124,7 +124,7 @@ class HealthScanner extends RESTDataSource {
   }
 
   async getCB(queryObject, logic) {
-    const queryString = mappedQueryBuilder(queryMapper(queryObject), logic);
+    const queryString = mappedQueryBuilder(queryObject, logic);
 
     return this.post(`/${CB_index}/_search`, {
       query: {
@@ -138,7 +138,7 @@ class HealthScanner extends RESTDataSource {
   }
 
   async getMU(queryObject, logic) {
-    const queryString = mappedQueryBuilder(queryMapper(queryObject), logic);
+    const queryString = mappedQueryBuilder(queryObject, logic);
 
     return this.post(`/${MU_index}/_search`, {
       query: {
@@ -152,7 +152,7 @@ class HealthScanner extends RESTDataSource {
   }
 
   async getNIH(queryObject, logic) {
-    const queryString = mappedQueryBuilder(queryMapper(queryObject), logic);
+    const queryString = mappedQueryBuilder(queryObject, logic);
 
     return this.post(`/${NIH_index}/_search`, {
       query: {
@@ -166,7 +166,7 @@ class HealthScanner extends RESTDataSource {
   }
 
   async getAll(queryObject, logic) {
-    const queryString = mappedQueryBuilder(queryMapper(queryObject), logic);
+    const queryString = mappedQueryBuilder(queryObject, logic);
 
     return this.post(`/${HS_index}/_search`, {
       query: {

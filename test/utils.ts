@@ -68,6 +68,7 @@ export const createExpected = id => ({
     selected: [],
     selections: {},
     visible: true,
+    logic: 'AND',
   },
 });
 

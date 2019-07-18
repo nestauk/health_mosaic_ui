@@ -38,18 +38,18 @@ export const graphqlEndpoint = dev
 
 export const fieldGroups = {
   // subject
-  name: ['name'],
-  place: ['continent', 'country', 'state', 'city'],
+  name: 'name',
+  place: 'place',
 
   // content
-  body: ['body'],
-  categories: ['sdg_labels'],
-  cost: ['cost_ref'],
-  location: ['location'],
-  summary: ['summary'],
-  terms: ['terms'],
-  time: ['start', 'end'],
-  type: ['type'],
+  body: 'body',
+  categories: 'sdg_labels',
+  cost: 'cost_ref',
+  location: 'location',
+  summary: 'summary',
+  terms: 'terms',
+  //time: 'start', 'end',
+  type: 'type',
 };
 
 export const subjectAliases = ['name', 'place'];
