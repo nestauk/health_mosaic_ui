@@ -4,17 +4,21 @@ const dev = mode === 'development';
 export const BASE_URL =
   'https://search-health-scanner-5cs7g52446h7qscocqmiky5dn4.eu-west-2.es.amazonaws.com';
 
+export const NIH_type = 'paper';
+export const CB_type = 'company';
+export const MU_type = 'meetup';
+
 export const NIH_index = 'nih_v4';
 export const endpointNIH = `${BASE_URL}/${NIH_index}`;
 export const endpointNIHCount = `${endpointNIH}/_count`;
 export const endpointNIHSearch = `${endpointNIH}/_search`;
 
-export const CB_index = 'companies_v2';
+export const CB_index = 'companies_v3';
 export const endpointCB = `${BASE_URL}/${CB_index}`;
 export const endpointCBCount = `${endpointCB}/_count`;
 export const endpointCBSearch = `${endpointCB}/_search`;
 
-export const MU_index = 'meetup_v1';
+export const MU_index = 'meetup_v2';
 export const endpointMU = `${BASE_URL}/${MU_index}`;
 export const endpointMU_Count = `${endpointMU}/_count`;
 export const endpointMU_Search = `${endpointMU}/_search`;
@@ -67,8 +71,8 @@ export const requiredFields = {
   ],
   MU: [
     { field: 'coordinate_of_group', type: 'geo_point' },
-    { field: 'datetime_start_group', type: 'date' },
-    { field: 'id_iso2_group', type: 'keyword' },
+    { field: 'date_start_group', type: 'date' },
+    { field: 'id_iso2_country', type: 'keyword' },
     { field: 'name_of_group', type: 'text' },
     { field: 'placeName_city_group', type: 'keyword' },
     { field: 'terms_topics_group', type: 'text' },

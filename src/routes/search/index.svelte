@@ -7,6 +7,7 @@
   import { AddCircle, RemoveCircle } from '../../components/Icons/'
   import { screenStore, currentTab } from '../../stores/search.ts';
   import { SEARCH } from './_layout.svelte';
+  import { NIH_type, CB_type, MU_type } from '../../config';
 
   const { checkDirty } = getContext(SEARCH);
 
@@ -14,7 +15,7 @@
   let changed;
   let items = [];
 
-  $: selectedItems = $screenStore[$currentTab].selected || [];
+$: selectedItems = $screenStore[$currentTab].selected || [];
   $: {
     changed = selectedItems && !compare(previousSelectedItems, selectedItems);
     if (changed) {
@@ -49,11 +50,11 @@
   <Results dirty="{isDirty}" {changed}>
     {#each selectedItems as item, i}
 
-      {#if item.type === 'paper'}
+      {#if item.type === NIH_type}
         <Paper data={item} bind:this={items[i]}/>
-      {:else if item.type === 'meetup group'}
+      {:else if item.type === MU_type}
         <Event data={item} bind:this={items[i]}/>
-      {:else if item.type === 'company'}
+      {:else if item.type === CB_type}
         <Company data={item} bind:this={items[i]}/>
       {/if}
 

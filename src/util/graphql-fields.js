@@ -45,7 +45,7 @@ const fieldMaps = {
   ],
   country_id: [
     'id_iso2_country',
-    'id_iso2_group',
+    'id_iso2_country',
     'id_iso2_country'
   ],
   currency: [
@@ -85,7 +85,7 @@ const fieldMaps = {
   ],
   start: [
     'date_birth_organisation',
-    'datetime_start_group',
+    'date_start_group',
     'date_start_project',
   ],
   state: [

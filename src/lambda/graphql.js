@@ -41,7 +41,7 @@ const sources = [
   'terms_of_countryTags',
 
   //  country_id
-  'id_iso2_group',
+  'id_iso2_country',
   'id_iso2_country',
 
   // currency
@@ -87,7 +87,7 @@ const sources = [
 
   //  start
   'date_birth_organisation',
-  'datetime_start_group',
+  'date_start_group',
   'date_start_project',
 
   //  state_id
@@ -100,7 +100,7 @@ const sources = [
   //  terms
   'terms_mesh_description',
   'terms_mesh_abstract',
-
+  'terms_topics_group',
   //  title
   'title_of_project',
 
