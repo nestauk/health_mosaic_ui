@@ -4,12 +4,10 @@
   import compare from 'just-compare';
   import * as _ from 'lamb';
 
-  import { ESIndices } from '../config';
-  import { Form, FormInput, FormLabels, FormDropdown } from './QueryBuilder/Form';
+  import { Form, FormInput, FormLabels, FormDropdown, FormControls } from './QueryBuilder/Form';
   import { Rules, Ruleset, RulesetQueries, RulesetLabels } from './QueryBuilder/Rules';
   import Selections from './Selections.svelte';
-  import Switch from './Switch.svelte';
-  import { Sync } from './Icons/'
+
 
 
   import { screenMachine } from '../services/screen_service.ts';
@@ -47,7 +45,7 @@
   $: logic = $screenStore[$currentTab].logic;
   $: if (!open && !isEmptyQuery) openDrawer();
 
-const stripEmpties = _.filterWith(_.allOf([
+  const stripEmpties = _.filterWith(_.allOf([
     _.getPath('values.length'),
     _.getPath('values.0.query.length')
   ]));
@@ -222,43 +220,26 @@ const stripEmpties = _.filterWith(_.allOf([
       on:select="{({ detail }) => sendRuleLabel('LABEL_CLICKED', detail)}"
       {labels}
     />
-    <div class="form-controls">
-      <Switch
-        on:toggle={toggleSearchLogic}
-        values={["AND", "OR"]}
-        current={logic}
-      />
 
-      <FormDropdown
-        index={$screenStore[$currentTab].index}
-        indices="{ESIndices}"
-        on:indexchange={({ detail }) => changeIndex(detail)}
-      />
-      {#if isEmptyQuery}
-        <button class="search-button" on:click="{handleSend}">Search</button>
-      {/if}
-      {#if hasPreviousQuery}
-        <span
-            class="reset-button"
-            class:active="{isDirty}"
-            on:click="{handleReset}"
-          >
-            <Sync  />
-        </span>
-      {/if}
-      {#if isEmptyQuery}
+    <FormControls
+      on:toggle={toggleSearchLogic}
+      on:indexchange={({ detail }) => changeIndex(detail)}
+      on:send={handleSend}
+      on:reset={handleReset}
+      on:toggledrawer={() => sendTab('TAB_VISIBILITY_TOGGLED', $currentTab)}
+      index={$screenStore[$currentTab].index}
+      {logic}
+      {isEmptyQuery}
+      {hasPreviousQuery}
+      {isDirty}
+      {open}
+    />
 
-        <div
-          class="close-label"
-          on:click="{() => sendTab('TAB_VISIBILITY_TOGGLED', $currentTab)}"
-          style="{open ? 'transform: rotate(180deg) ' : ''}"
-        >
-          <img alt="close search" src="arrow.svg"/>
-        </div>
-      {/if}
-    </div>
     {#if uiQuery.length}
-    <Rules>
+    <Rules
+      {isEmptyQuery}
+      selectionsActive={!!Object.keys(selections).length}
+    >
       {#each uiQuery as { options, disabled, selected, terms, fields }, i}
         <Ruleset
           {terms}
@@ -314,19 +295,6 @@ const stripEmpties = _.filterWith(_.allOf([
     .drawerTransition();
   }
 
-  .close-label {
-    padding: 5px 0;
-    cursor: pointer;
-    width: 40px;
-    height: 40px;
-    transition: 0.2s;
-
-    img {
-      width: 100%;
-      height: 100%;
-    }
-  }
-
   .status {
     height: 20px;
     padding: 20px 5px;
@@ -345,37 +313,6 @@ const stripEmpties = _.filterWith(_.allOf([
     }
   }
 
-  .form-controls {
-    display: flex;
-    position: absolute;
-    bottom: 0;
-    right: 15px;
-    justify-content: flex-end;
-    align-items: center;
-    z-index: 2;
 
-    .search-button, .reset-button {
-      cursor: pointer;
-      transition: 0.2s;
-    }
-
-    .search-button {
-      margin-right:15px;
-      padding: 10px 15px;
-      height: 100%;
-      border-radius: 2px;
-    }
-
-    .reset-button {
-      margin-right:15px;
-      width: 30px;
-      transform: translateY(3px);
-      opacity: 0.5;
-    }
-
-    .active {
-      opacity: 1;
-    }
-  }
 
 </style>

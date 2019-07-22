@@ -1,6 +1,7 @@
 <script>
   import { createEventDispatcher } from 'svelte';
   import * as _ from 'lamb';
+  import arrowForward from 'ionicons/dist/ionicons/svg/ios-arrow-forward.svg';
 
   export let selections;
   const dispatch = createEventDispatcher();
@@ -15,6 +16,10 @@
 </script>
 
 {#each selectionsArray as [ key, selection ]}
+<div class="container">
+  <div class="icon left">
+    <img src={arrowForward} >
+  </div>
   <ul>
   <span on:click={() => dispatch('toggleselection',  {key, type:selection.type, value: undefined}) }>{key}</span>
     {#each selection.value as item}
@@ -25,21 +30,54 @@
       </li>
     {/each}
   </ul>
+  <div class="icon right">
+    <img src={arrowForward} >
+  </div>
+</div>
+
 {/each}
 
 <style lang="less">
+  .container {
+    width: calc(100% - 500px);
+    position: relative;
+    padding: 0 30px;
+  }
+
+  .icon {
+    position: absolute;
+    top: 0px;
+    position: absolute;
+    bottom: 0;
+    margin: auto;
+    display: flex;
+    align-items: center;
+
+    &.left {
+      transform: rotate(180deg);
+      left: 0;
+    }
+
+    &.right {
+      left: unset;
+      right: 0;
+    }
+
+    img {
+      height: 50%;
+    }
+  }
+
   ul {
-    display: inline-flex;
-    display: inline-flex;
+    display: flex;
     padding: 0;
-    transform: translateY(40px);
-    list-style: none;
     color: #333;
     padding: 10px;
-    margin-bottom: 20px;
+    margin-bottom: 0px;
     list-style: none;
     border-radius: 30px;
     font-size: 0.9em;
+    overflow-x: scroll;
 
     span {
       padding: 4px 10px;

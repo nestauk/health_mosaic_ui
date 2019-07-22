@@ -43,7 +43,6 @@
     display: flex;
     flex-wrap: wrap;
     position: static;
-    margin-bottom: 30px;
   }
 
   button {
