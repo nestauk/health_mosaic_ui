@@ -49,5 +49,6 @@
     border-radius: 1.7rem;
     padding: 0 12px;
     transition: 0.2s;
+    flex-shrink: 0;
   }
 </style>

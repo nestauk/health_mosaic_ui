@@ -1,19 +1,26 @@
-<ul class="rules-container">
+<script>
+  export let selectionsActive = false;
+</script>
+
+<ul class="rules-container" class:compact={!selectionsActive}>
   <slot></slot>
 </ul>
 
 
-<style>
+<style lang="less">
   .rules-container {
     display: flex;
-    flex-wrap: wrap;
     transition: 0.2s 0.2s;
     transform-origin: 0 100%;
     transform: translateY(30px);
-    flex-basis: 100%;
+    width: 100%;
+    padding-bottom: 20px;
+    overflow-x: scroll;
+    list-style: none;
+
+    &.compact {
+      width: calc(100% - 500px);
+    }
   }
 
-  ul {
-    list-style: none;
-  }
 </style>

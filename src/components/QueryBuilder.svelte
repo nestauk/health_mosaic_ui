@@ -258,7 +258,7 @@ const stripEmpties = _.filterWith(_.allOf([
       {/if}
     </div>
     {#if uiQuery.length}
-    <Rules>
+    <Rules selectionsActive={!!Object.keys(selections).length}>
       {#each uiQuery as { options, disabled, selected, terms, fields }, i}
         <Ruleset
           {terms}

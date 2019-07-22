@@ -29,17 +29,17 @@
 
 <style lang="less">
   ul {
-    display: inline-flex;
-    display: inline-flex;
+    display: flex;
     padding: 0;
     transform: translateY(40px);
-    list-style: none;
     color: #333;
     padding: 10px;
     margin-bottom: 20px;
     list-style: none;
     border-radius: 30px;
     font-size: 0.9em;
+    width: calc(100% - 500px);
+    overflow-x: scroll;
 
     span {
       padding: 4px 10px;
