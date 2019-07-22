@@ -2,7 +2,10 @@
   import { createEventDispatcher } from 'svelte';
 
   const dispatch = createEventDispatcher();
-  export let values, current;
+
+	export let values;
+	export let current;
+
 	$: toggle = current;
 
 	function toggleSelection() {

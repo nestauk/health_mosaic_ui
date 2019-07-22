@@ -9,10 +9,7 @@ const countBy = key =>
   _.pipe([
     _.countBy(_.getKey(key)),
     objectToKeyValueArray,
-    _.sortWith([
-      _.sorterDesc(getValue),
-      getKey,
-    ]),
+    _.sortWith([_.sorterDesc(getValue), getKey]),
   ]);
 
 export const countByCity = countBy('city');

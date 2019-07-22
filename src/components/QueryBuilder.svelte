@@ -19,7 +19,9 @@
   } from '../stores/search.ts'
 
   const { page } = stores();
-  let formHeight, input;
+
+  let formHeight;
+  let input;
 
   $: searchMachine = $screenMachine.context.searchMachines[$currentTab];
   $: uiQuery = $screenStore[$currentTab] && $screenStore[$currentTab].uiQuery;

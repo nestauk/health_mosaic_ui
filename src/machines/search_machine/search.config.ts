@@ -1,4 +1,3 @@
-
 export const search_config = {
   id: 'search',
   type: 'parallel',

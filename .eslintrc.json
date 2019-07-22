@@ -53,7 +53,7 @@
     "prettier",
     "prettier/@typescript-eslint"
   ],
-  "plugins": ["@typescript-eslint", "import", "svelte3", "jsdoc"],
+  "plugins": ["@typescript-eslint", "import", "svelte3"],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "project": "./tsconfig.json",

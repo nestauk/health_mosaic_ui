@@ -1,7 +1,9 @@
 <script>
   import { createEventDispatcher } from 'svelte';
 
-  export let formHeight = 0, isDirty;
+  export let formHeight = 0;
+  export let isDirty;
+
   const dispatch = createEventDispatcher();
   let tooltip;
 </script>

@@ -13,7 +13,8 @@
   }
 
   export let current;
-  let inputValue = '', input;
+  let inputValue = '';
+  let input;
 
   $: inputValue = queryToString(current);
 </script>

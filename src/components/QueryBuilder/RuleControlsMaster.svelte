@@ -1,8 +1,9 @@
 <script>
   import { createEventDispatcher } from 'svelte';
-
   import { Selector, Dots } from '../Icons'
-  export let selected, options;
+
+  export let selected;
+  export let options;
 
   const dispatch = createEventDispatcher();
 </script>

@@ -1,7 +1,9 @@
 <script>
   import arrowForward from 'ionicons/dist/ionicons/svg/ios-arrow-forward.svg';
+
   export let selectionsActive = false;
   export let isEmptyQuery;
+
   let width;
 
 </script>

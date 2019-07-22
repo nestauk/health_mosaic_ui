@@ -5,7 +5,8 @@
   import { memoMachineConfig, memoMachineOptions } from '../machines/memo.ts';
   import { createBoundsStore, createMemoStore } from '../stores'
   import { createMachina } from '../util/xstateHelper.ts';
-  import {  onMount, tick } from 'svelte';
+  import { onMount, tick } from 'svelte';
+
   let editState;
 
   $: {

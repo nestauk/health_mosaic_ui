@@ -1,5 +1,7 @@
 <script>
-  export let status, disabled;
+  export let status;
+  export let disabled;
+
   import { createEventDispatcher } from 'svelte';
   const dispatch = createEventDispatcher();
 </script>

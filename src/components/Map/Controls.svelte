@@ -2,7 +2,9 @@
   import { createEventDispatcher } from 'svelte';
   import { Pin, Edit, Delete, Save, Undo } from '../Icons';
 
-  export let pins, currentPin, state;
+  export let pins;
+  export let currentPin;
+  export let state;
 
   const dispatch = createEventDispatcher();
 

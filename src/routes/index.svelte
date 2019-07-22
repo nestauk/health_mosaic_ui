@@ -14,20 +14,6 @@
     A search widget to enable users to make complex search queries with a
     relatively simple interface. Currently shows results as a simple list.
   </p>
-
-  <!-- <h2><a href="map">map</a></h2>
-  <p>
-    An experimental and incomplete map editor designed to allow users to capure
-    a snapshot of a map (and in the future its data) and annotate it for future
-    use. Eventually users will be able to snapshot many maps (and maybe other
-    visualisations too) and save them for use in custom reports.
-  </p>
-
-  <h2><a href="present">present</a></h2>
-  <p>
-    A partner to the map editor above, this route is an initial attempt at
-    presenting a set of maps and their accompanying notes.
-  </p> -->
 </div>
 
 <style>

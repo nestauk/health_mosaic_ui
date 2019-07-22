@@ -1,7 +1,10 @@
 <script>
   import { createEventDispatcher } from 'svelte';
 
-  export let title, description, editing;
+  export let title;
+  export let description;
+  export let editing;
+
   let active = true;
   const dispatch = createEventDispatcher();
 

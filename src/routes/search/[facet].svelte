@@ -5,9 +5,9 @@
   import { screenStore, currentTab } from '../../stores/search.ts';
 
   import { SEARCH } from './_layout.svelte';
-  import { volume_geo } from './facets';
+  import { volume_geo, map_geo } from './facets';
 
-  const facets = {volume_geo};
+  const facets = {volume_geo, map_geo};
   const { checkDirty, transitionComplete } = getContext(SEARCH);
   const { page } = stores();
 

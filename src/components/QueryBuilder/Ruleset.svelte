@@ -6,7 +6,10 @@
 
   const dispatch = createEventDispatcher();
 
-  export let disabled, terms, selected, options;
+  export let disabled;
+  export let terms;
+  export let selected;
+  export let options;
 </script>
 
 {#if terms[0] && terms[0].term.length}

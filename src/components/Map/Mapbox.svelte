@@ -10,15 +10,19 @@
     setContext,
   } from 'svelte';
 
-  export let apiKey,
-    styleURL,
-    bounds,
-    map,
-    interactive = true;
+  export let apiKey;
+  export let bounds;
+  export let interactive = true;
+  export let map;
+  export let padding = 30;
+  export let pitchWithRotate = true;
+  export let renderWorldCopies = true;
+  export let styleURL;
 
   let container,
-    mapboxgl,
-    loaded = false;
+    loaded = false,
+    mapboxgl;
+
 
   setContext(MAPBOX, {
     getMap: () => map,
@@ -28,19 +32,18 @@
 
   const getBounds = () => map.getBounds().toArray();
 
-  $: map && map.fitBounds(bounds, {}, { source: 'auto' });
+  $: map && map.fitBounds(bounds, { padding }, { source: 'auto' });
 
-  function txstart(mbEvent) {
+  const createEvent = svEvent => mbEvent => {
     if (mbEvent.source !== 'auto') {
-      dispatch('txstart');
+      dispatch(svEvent, getBounds());
     }
   }
 
-  function txend(mbEvent) {
-    if (mbEvent.source !== 'auto') {
-      dispatch('txend', getBounds());
-    }
-  }
+  const txstart = createEvent('txstart');
+  const txend = createEvent('txend');
+  const zoomstart = createEvent('zoomstart');
+  const zoomend = createEvent('zoomend');
 
   onMount(async () => {
     mapboxgl = await import('mapbox-gl');
@@ -52,9 +55,14 @@
       container,
       style: styleURL,
       bounds: bounds,
+      renderWorldCopies,
+      pitchWithRotate,
+      maxZoom: 15
     }).on('load', () => {
       map.on('movestart', txstart);
       map.on('moveend', txend);
+      map.on('zoomstart', zoomstart);
+      map.on('zoomend', zoomend);
       loaded = true;
     });
   });
@@ -64,6 +72,8 @@
 
     map.off('movestart', txstart);
     map.off('moveend', txend);
+    map.off('zoomstart', zoomstart);
+    map.off('zoomend', zoomend);
 
     map.remove();
   });

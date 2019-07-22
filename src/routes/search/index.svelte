@@ -15,7 +15,7 @@
   let changed;
   let items = [];
 
-$: selectedItems = $screenStore[$currentTab].selected || [];
+  $: selectedItems = $screenStore[$currentTab].selected || [];
   $: {
     changed = selectedItems && !compare(previousSelectedItems, selectedItems);
     if (changed) {

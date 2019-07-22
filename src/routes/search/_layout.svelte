@@ -52,7 +52,12 @@
     checkDirty: () =>
       searchMachine && searchMachine.state.matches('Search.NotEmpty.Dirty'),
     select: (selection, tabId) =>
-      screenMachine.send({type: 'SELECTION_UPDATED', tabId, selection, route: $page.path})
+      screenMachine.send({
+        type: 'SELECTION_UPDATED',
+        tabId,
+        selection: selection.value ? selection : {},
+        route: $page.path
+      }),
   });
 
   $: uiQuery = $screenStore[$currentTab].uiQuery;
@@ -91,10 +96,8 @@
 
   const facetTabs = [
     {id: '', label: 'List'},
+    {id: 'map_geo', label: 'Locations'},
     {id: 'volume_geo', label: 'Volume by Geo'},
-    {id: 'facet1', label: 'facet 1'},
-    {id: 'facet2', label: 'facet 2'},
-    {id: 'facet3', label: 'facet 3'},
   ];
 
   const onFacetTabClick = id => () => {

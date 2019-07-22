@@ -55,6 +55,13 @@ function transformLess() {
   };
 }
 
+const onwarn = (message, warn) => {
+  if (/xstate/.test(message)) return;
+  if (/d3/.test(message)) return;
+  if (/Histogram/.test(message)) return;
+  warn(message);
+};
+
 export default {
   client: {
     treeshake: {
@@ -62,10 +69,7 @@ export default {
     },
     input: config.client.input(),
     output: config.client.output(),
-    onwarn(message, warn) {
-      if (/xstate/.test(message)) return;
-      warn(message);
-    },
+    onwarn,
     plugins: [
       copy({
         'node_modules/mapbox-gl/dist/mapbox-gl.css': 'static/mapbox-gl.css',
@@ -126,10 +130,7 @@ export default {
     },
     input: config.server.input(),
     output: config.server.output(),
-    onwarn(message, warn) {
-      if (/xstate/.test(message)) return;
-      warn(message);
-    },
+    onwarn,
     plugins: [
       replace({
         'process.browser': false,

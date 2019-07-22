@@ -3,7 +3,7 @@ import { newRuleset } from './query';
 import {
   splitByComma,
   splitByTwoDots,
-  castToInt,
+  stringToNumber,
   convertPlusToSpace,
 } from './transform';
 
@@ -78,16 +78,27 @@ export const parseQueryUrl = _.pipe([
 const separateKeyValue = selectString => selectString.split(':');
 
 export const detectTypes = ([key, value]) => {
-  if (value.match(/.+,.+/)) return [key, value, 'include'];
   if (value.match(/.+\.\..+/)) return [key, value, 'within'];
+  if (value.match(/.+,.+/)) return [key, value, 'include'];
   return [key, value, 'include'];
 };
+
+const isList = str => str.match(/.+,.+/);
 
 export const convertWithin = ([key, value, type]) => [
   key,
   {
     type,
-    value: _.pipe([splitByTwoDots, _.mapWith(castToInt)])(value),
+    value: _.pipe([
+      splitByTwoDots,
+      _.mapWith(
+        _.condition(
+          isList,
+          _.pipe([splitByComma, _.mapWith(stringToNumber)]),
+          stringToNumber
+        )
+      ),
+    ])(value),
   },
 ];
 

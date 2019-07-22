@@ -2,7 +2,9 @@
   import QueryControls from './QueryControls.svelte';
   import { createEventDispatcher } from 'svelte';
 
-  export let labels, rulesetDisabled;
+  export let labels;
+  export let rulesetDisabled;
+
   const dispatch = createEventDispatcher();
   const isntStatusDefault = object => object.status !== 'default';
 

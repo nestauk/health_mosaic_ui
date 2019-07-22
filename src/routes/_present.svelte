@@ -18,11 +18,11 @@
     }
   );
 
-  let container,
-    noteHeadings = [],
-    headerPosition = 0,
-    headerScale = 0.6,
-    transformPercent = 0;
+  let container;
+  let noteHeadings = [];
+  let headerPosition = 0;
+  let headerScale = 0.6;
+  let transformPercent = 0;
 
   $: nextPin = $memo.currentPin + 1;
   $: prevPin = $memo.currentPin - 1;

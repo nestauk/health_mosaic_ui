@@ -261,6 +261,18 @@ test('convertWithin', () => {
   expect(convertWithin(input)).toEqual(expected);
 });
 
+test('convertWithin 2', () => {
+  const input = ['key1', '1, 2..3, 4', 'within'];
+  const expected = [
+    'key1',
+    {
+      type: 'within',
+      value: [[1, 2], [3, 4]],
+    },
+  ];
+  expect(convertWithin(input)).toEqual(expected);
+});
+
 test('convertInclude', () => {
   const input = ['key1', 'one,two+and+a,three', 'include'];
   const expected = [
@@ -289,6 +301,32 @@ test('parseSelectionUrl', () => {
     prop_three: {
       type: 'include',
       value: ['some_value'],
+    },
+  };
+
+  expect(parseSelectionUrl(selectionUrl)).toEqual(expected);
+});
+
+test('parseSelectionUrl 2', () => {
+  const selectionUrl =
+    '(prop_one:ONE,TWO)(prop_two:10..20)(prop_three:some_value)(prop_four:1,2..3,4)';
+
+  const expected = {
+    prop_one: {
+      type: 'include',
+      value: ['ONE', 'TWO'],
+    },
+    prop_two: {
+      type: 'within',
+      value: [10, 20],
+    },
+    prop_three: {
+      type: 'include',
+      value: ['some_value'],
+    },
+    prop_four: {
+      type: 'within',
+      value: [[1, 2], [3, 4]],
     },
   };
 

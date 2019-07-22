@@ -30,8 +30,13 @@
   $: selectedItemsByCity = countByCity(selectedItems);
 
   // TODO utils?
-  const updateSelections = ({detail: selection}) => select(selection, $currentTab);
-  const deselectCountries = () => select({key: 'country_id', value: undefined}, $currentTab);
+  const updateSelections = ({ detail: selection }) =>
+    select( selection, $currentTab );
+
+  const deselectCountries = () => select(
+    { key: 'country_id', value: undefined },
+    $currentTab
+  );
 </script>
 
 <div class="container" class:dirty="{isDirty}">

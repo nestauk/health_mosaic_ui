@@ -16,6 +16,7 @@ export const isNot = x => _.not(_.is(x));
 export const splitByComma = makeSplitBy(',');
 export const splitByTwoDots = makeSplitBy('..');
 export const castToInt = str => parseInt(str, 10);
+export const stringToNumber = str => +str;
 export const convertPlusToSpace = str => str.replace(/\+/g, ' ');
 const removeUndefinedAt1 = _.filterWith(x => !!x[1]);
 const addQueryMark = q => (q ? '?' + q : '');
