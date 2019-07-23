@@ -222,7 +222,9 @@ const stripEmpties = _.filterWith(_.allOf([
       on:select="{({ detail }) => sendRuleLabel('LABEL_CLICKED', detail)}"
       {labels}
     />
-    <div class="form-controls">
+    <div
+      class="form-controls"
+      style="bottom: {!!Object.keys(selections).length ? '11px' : !isEmptyQuery ? '0px' :'30px'}">
       <Switch
         on:toggle={toggleSearchLogic}
         values={["AND", "OR"]}
@@ -258,7 +260,10 @@ const stripEmpties = _.filterWith(_.allOf([
       {/if}
     </div>
     {#if uiQuery.length}
-    <Rules selectionsActive={!!Object.keys(selections).length}>
+    <Rules
+      selectionsActive={!!Object.keys(selections).length}
+      {isEmptyQuery}
+    >
       {#each uiQuery as { options, disabled, selected, terms, fields }, i}
         <Ruleset
           {terms}
@@ -348,7 +353,7 @@ const stripEmpties = _.filterWith(_.allOf([
   .form-controls {
     display: flex;
     position: absolute;
-    bottom: 0;
+    bottom: 30px;
     right: 15px;
     justify-content: flex-end;
     align-items: center;

@@ -1,6 +1,7 @@
 <script>
   import arrowForward from 'ionicons/dist/ionicons/svg/ios-arrow-forward.svg';
   export let selectionsActive = false;
+  export let isEmptyQuery;
   let width;
 
 </script>
@@ -8,18 +9,22 @@
 <svelte:window bind:innerWidth={width}/>
 
 <div class="container">
-  <div class="icon left">
-    <img src={arrowForward} >
-  </div>
+  {#if isEmptyQuery}
+    <div class="icon left">
+      <img src={arrowForward} >
+    </div>
+  {/if}
   <ul
     class="rules-container"
     style="width:{selectionsActive ? '100%' : `${width - 600}px`}"
   >
     <slot></slot>
   </ul>
-  <div class="icon right" style="right:{selectionsActive ? -30 : 470 }px">
-    <img src={arrowForward} >
-</div>
+  {#if isEmptyQuery}
+    <div class="icon right" style="right:{selectionsActive ? -30 : 470 }px">
+      <img src={arrowForward} >
+    </div>
+  {/if}
 </div>
 
 <style lang="less">
