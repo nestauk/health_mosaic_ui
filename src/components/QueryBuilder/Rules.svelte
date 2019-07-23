@@ -60,7 +60,6 @@
     transform-origin: 0 100%;
     transform: translateY(30px);
     width: 100%;
-    padding-bottom: 20px;
     overflow-x: scroll;
     list-style: none;
 
