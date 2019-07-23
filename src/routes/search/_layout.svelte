@@ -11,6 +11,8 @@
   import QueryBuilder from '../../components/QueryBuilder.svelte';
   import RouterLink from '../../components/RouterLink.svelte';
 
+  import { project_title } from '../../config.js';
+
   import { screenMachine } from '../../services/screen_service.ts';
   import {
     screenStore,
@@ -99,11 +101,23 @@
     sendRouteChanged(id);
   }
 
+  const renderTitle = (query = '', type = '') => {
+    let typeTitle;
+    if (!type) {
+      typeTitle = '';
+    } else {
+      typeTitle = type.charAt(0).toUpperCase() + type.substring(1);
+    }
+
+    return query ? `- ${typeTitle} ${query}` : '';
+  }
+
   $: selectedFacet = $page.params.facet || '';
+  $: queryTitle = renderTitle($page.query.q, $page.query.i);
 </script>
 
 <svelte:head>
-  <title>Search</title>
+  <title>{project_title} {queryTitle}</title>
 </svelte:head>
 
 <Nav

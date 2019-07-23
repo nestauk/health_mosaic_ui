@@ -1,9 +1,13 @@
+<script>
+  import { project_title } from '../config.js';
+</script>
+
 <svelte:head>
-  <title>Health Innovation Scanner</title>
+  <title>{project_title}</title>
 </svelte:head>
 
 <div class="container">
-  <h1>Health Innovation Scanner</h1>
+  <h1>{project_title}</h1>
 
   <h2><a href="search">search</a></h2>
   <p>
