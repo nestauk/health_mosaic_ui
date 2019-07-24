@@ -31,10 +31,9 @@
   ul {
     display: flex;
     padding: 0;
-    transform: translateY(40px);
     color: #333;
     padding: 10px;
-    margin-bottom: 20px;
+    margin-bottom: 0px;
     list-style: none;
     border-radius: 30px;
     font-size: 0.9em;

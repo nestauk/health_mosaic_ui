@@ -32,7 +32,7 @@
     height: 30px;
     position: absolute;
     height: 30px;
-    top: 40px;
+    top: 0px;
     position: absolute;
     bottom: 0;
     margin: auto;
@@ -53,16 +53,15 @@
   .container {
     position: relative;
     width: 100%;
+    margin-top: 30px;
   }
   .rules-container {
     display: flex;
     transition: 0.2s 0.2s;
     transform-origin: 0 100%;
-    transform: translateY(30px);
     width: 100%;
     overflow-x: scroll;
     list-style: none;
-
     /* &.compact {
       width: calc(100% - 500px);
     } */

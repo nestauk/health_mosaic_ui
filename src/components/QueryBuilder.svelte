@@ -224,7 +224,7 @@ const stripEmpties = _.filterWith(_.allOf([
     />
     <div
       class="form-controls"
-      style="bottom: {!!Object.keys(selections).length ? '11px' : !isEmptyQuery ? '0px' :'20px'}">
+      style="bottom: {!!Object.keys(selections).length ? '0px' : !isEmptyQuery ? '0px' :'12px'}">
       <Switch
         on:toggle={toggleSearchLogic}
         values={["AND", "OR"]}
