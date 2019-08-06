@@ -11,7 +11,7 @@ import {
   MU_index,
   HS_index,
 } from '../../src/config';
-import { mappedQueryBuilder } from '../util/graphql-fields';
+import { mappedQueryBuilder, makeAggregation } from '../util/graphql-fields';
 
 // queryObject -> queryMapper -> mappedQueryBuilder
 const sources = [
@@ -178,6 +178,14 @@ class HealthScanner extends RESTDataSource {
       // _source: sources,
     });
   }
+
+  async getAggregations(aggregation) {
+    const es_aggregations = makeAggregation(aggregation);
+
+    return this.post(`/${HS_index}/_search`, {
+      aggregations: es_aggregations,
+    });
+  }
 }
 
 const typeDefs = gql`
@@ -214,23 +222,48 @@ const typeDefs = gql`
     type: String
     url: String
   }
+
   input ESQuery {
     title: String
     status: String
   }
+
   input ESValue {
     query: String
     status: String
   }
+
   input QueryObject {
     fields: [ESQuery]
     values: [ESValue]
   }
+
+  type Bucket {
+    key: String
+    string_key: String
+    count: Int
+  }
+
+  type Aggregation {
+    name: String
+    buckets: [Bucket]
+  }
+
+  input AggregationInput {
+    name: String
+    type: String
+    field: String
+    size: Int
+    interval: String
+    path: String
+  }
+
   type Query {
     CB(query: [QueryObject], logic: String): [Item]
     MU(query: [QueryObject], logic: String): [Item]
     NIH(query: [QueryObject], logic: String): [Item]
     All(query: [QueryObject], logic: String): [Item]
+    Aggregation(query: [AggregationInput]): [Aggregation]
   }
 `;
 
@@ -259,6 +292,19 @@ const resolvers = {
       const data = await dataSources.HealthScanner.getAll(query, logic);
       return data.hits.hits;
     },
+    Aggregation: async (_source, { query }, { dataSources }) => {
+      const data = await dataSources.HealthScanner.getAggregations(query);
+      return Object.entries(data.aggregations).map(([name, { buckets }]) => ({
+        name,
+        buckets,
+      }));
+    },
+  },
+  Aggregation: {
+    buckets: parent => parent.buckets,
+  },
+  Bucket: {
+    count: parent => parent.doc_count,
   },
   Item: {
     ...itemResolvers,

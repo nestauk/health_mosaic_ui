@@ -148,9 +148,23 @@ export const QUERY_NIH = gql`
   }
 `;
 
+export const QUERY_AGGREGATIONS = gql`
+  query Aggregation($query: [AggregationInput]) {
+    Aggregation(query: $query) {
+      name
+      buckets {
+        key
+        string_key
+        count
+      }
+    }
+  }
+`;
+
 export const endpointQueries = {
   research: QUERY_NIH,
   companies: QUERY_CB,
   social: QUERY_MU,
   all: QUERY_ALL,
+  aggregation: QUERY_AGGREGATIONS,
 };

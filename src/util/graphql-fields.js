@@ -213,3 +213,23 @@ export const mapFieldAlias = ({ title, status }) => ({
   title: fieldGroups[title],
   status,
 });
+
+export const makeAggregation = aggregation =>
+  aggregation.reduce((acc, { name, path, field, type, size, ...rest }) => {
+    return path
+      ? {
+          ...acc,
+          [name]: {
+            nested: {
+              path,
+            },
+            aggregations: {
+              [name]: { [type]: { field, size, ...rest } },
+            },
+          },
+        }
+      : {
+          ...acc,
+          [name]: { [type]: { field, size, ...rest } },
+        };
+  }, {});

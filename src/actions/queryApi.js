@@ -42,6 +42,31 @@ export async function query(query, endpoint = 'all', logic, id) {
   return { results, id };
 }
 
+export async function aggregationQuery(aggregations) {
+  // const queryString = JSON.stringify(query, null, 0);
+  // const cachedQuery = cache[logic][endpoint].get(queryString);
+
+  // if (cachedQuery) {
+  //   return { results: cachedQuery, id };
+  // }
+
+  const client = new ApolloClient({
+    /* eslint-disable-next-line no-undef */
+    uri: REPLACE_GRAPHQL_ENDPOINT,
+  });
+  console.log(aggregations);
+  const results = await client.query({
+    query: endpointQueries.aggregation,
+    variables: {
+      query: aggregations,
+    },
+  });
+  console.log(results);
+  // cache[logic][endpoint].set(queryString, results);
+
+  return { results };
+}
+
 // TODO: Errors are weird with gql, needs more research
 
 // class SearchError extends Error {
