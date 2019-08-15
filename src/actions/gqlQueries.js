@@ -7,16 +7,19 @@ export const QUERY_ALL = gql`
       city
       continent
       continent_id
-      cost
       cost_ref
       countries_ids
       country
       country_id
-      currency
       end
       funders
+      funding {
+        cost_ref
+        end_date
+        start_date
+        year
+      }
       id
-      is_duplicate
       is_health_related
       location {
         lon
@@ -46,16 +49,19 @@ export const QUERY_CB = gql`
       city
       continent
       continent_id
-      cost
       cost_ref
       countries_ids
       country
       country_id
-      currency
       end
       funders
+      funding {
+        cost_ref
+        end_date
+        start_date
+        year
+      }
       id
-      is_duplicate
       is_health_related
       location {
         lon
@@ -85,16 +91,19 @@ export const QUERY_MU = gql`
       city
       continent
       continent_id
-      cost
       cost_ref
       countries_ids
       country
       country_id
-      currency
       end
       funders
+      funding {
+        cost_ref
+        end_date
+        start_date
+        year
+      }
       id
-      is_duplicate
       is_health_related
       location {
         lon
@@ -124,16 +133,19 @@ export const QUERY_NIH = gql`
       city
       continent
       continent_id
-      cost
       cost_ref
       countries_ids
       country
       country_id
-      currency
       end
       funders
+      funding {
+        cost_ref
+        end_date
+        start_date
+        year
+      }
       id
-      is_duplicate
       is_health_related
       location {
         lon

@@ -15,96 +15,86 @@ import { mappedQueryBuilder } from '../util/graphql-fields';
 
 // queryObject -> queryMapper -> mappedQueryBuilder
 const sources = [
-  //  body
+  // body
   'textBody_descriptive_project',
   'textBody_descriptive_organisation',
   'textBody_abstract_project',
 
-  //  city
+  // city
   'placeName_city_group',
   'placeName_city_organisation',
 
-  //  continent_id
+  // continent_id
   'id_continent_organisation',
   'id_continent_group',
   'id_of_continent',
 
-  //  cost
+  // cost_ref
   'cost_of_funding',
   'cost_total_project',
 
-  //  cost_ref
-  'cost_of_funding',
-  'cost_total_project',
-
-  //  countries_ids
+  // countries_ids
   'terms_of_countryTags',
 
-  //  country_id
-  'id_iso2_country',
+  // country_id
   'id_iso2_country',
 
-  // currency
-  'currency_of_funding',
-  'currency_total_cost',
-
-  //  end
+  // end
   'date_death_organisation',
   'date_end_project',
 
-  //  funders
+  // funders
   'terms_of_funders',
 
-  //  is_duplicate
-  'booleanFlag_duplicate_abstract',
+  // funding
+  'json_funding_project',
 
-  //  is_health_related
+  // is_health_related
   'booleanFlag_health_organisation',
 
-  //  location
+  // location
   'coordinate_of_city',
   'coordinate_of_group',
   'coordinate_of_organisation',
 
-  //  name
+  // name
   'name_of_organisation',
   'name_of_group',
   'title_of_organisation',
 
-  //  novelty
+  // novelty
   'cost_of_funding',
   'count_member_group',
-  'cost_total_project',
+  'rank_rhodonite_abstract',
 
-  //  region
-
+  // region
   'placeName_region_organisation',
 
-  //  sdg_labels
+  // sdg_labels
   '_terms_sdg_summary',
   '_terms_sdg_description',
-  '_terms_sdg_abstract',
+  'terms_sdg_abstract',
 
-  //  start
+  // start
   'date_birth_organisation',
   'date_start_group',
   'date_start_project',
 
-  //  state_id
+  // state_id
   'id_state_organisation',
 
-  //  summary
+  // summary
   'textBody_summary_organisation',
   'textBody_abstract_project',
 
-  //  terms
+  // terms
   'terms_mesh_description',
   'terms_mesh_abstract',
   'terms_topics_group',
-  //  title
+  // title
   'title_of_project',
 
-  //  url
+  // url
   'url_of_organisation',
   'url_of_group',
   'type_of_entity',
@@ -185,21 +175,25 @@ const typeDefs = gql`
     lat: Float
     lon: Float
   }
+  type FundingRound {
+    cost_ref: Float
+    end_date: String
+    start_date: String
+    year: String
+  }
   type Item {
     body: String
     city: String
     continent: String
     continent_id: String
-    cost: Float
     cost_ref: Float
     countries_ids: [String]
     country: String
     country_id: String
-    currency: String
     end: String
     funders: [String]
+    funding: [FundingRound]
     id: String
-    is_duplicate: Boolean
     is_health_related: Boolean
     location: Geopoint
     name: String
@@ -289,10 +283,10 @@ const resolvers = {
           parent._source._terms_sdg_description &&
           parent._source._terms_sdg_description.sort(compare)
         );
-      if (parent._source.hasOwnProperty('_terms_sdg_abstract'))
+      if (parent._source.hasOwnProperty('terms_sdg_abstract'))
         return (
-          parent._source._terms_sdg_abstract &&
-          parent._source._terms_sdg_abstract.sort(compare)
+          parent._source.terms_sdg_abstract &&
+          parent._source.terms_sdg_abstract.sort(compare)
         );
     },
     terms: parent => {
