@@ -178,19 +178,19 @@
     .drawerTransition();
 
     &.noQuery {
-      padding-top: 12.3rem;
+      padding-top: 11.3rem;
     }
     &.foldedWithNoSelections {
-      padding-top: 9rem;
+      padding-top: 8rem;
     }
     &.foldedWithSelections {
-      padding-top: 13.4rem;
+      padding-top: 12.4rem;
     }
     &.withNoSelections {
       padding-top: 16.8rem;
     }
     &.withSelections {
-      padding-top: 21rem;
+      padding-top: 20rem;
     }
 
     .tabs {
@@ -231,7 +231,6 @@
       flex: 1;
       height: 100%;
       max-height: 100%;
-      padding: 1em 1em 0 1em;
     }
   }
 </style>

@@ -8,7 +8,7 @@
   import BarchartV from '../../../components/BarchartV.svelte';
   import { WorldMapWithHistogramScaleHTML } from '../../../components/WorldMapWithHistogramScale';
   import { screenStore, currentTab } from '../../../stores/search.ts';
-  import { countByCity, countByCountryId } from '../../../util/domain';
+  import { countByCountryId } from '../../../util/domain';
   import { getKey, getValue } from '../../../util/object.any';
   import { SEARCH } from '../_layout.svelte';
 
@@ -20,7 +20,6 @@
   $: selectedCountries = (selections.country_id && selections.country_id.value) || [];
   $: selectedItems = $screenStore[$currentTab].selected;
   $: selectedItemsByCountryId = countByCountryId(selectedItems); // {key: country_id, value: number}[]
-  $: selectedItemsByCity = countByCity(selectedItems);
 
   // TODO utils?
   const updateSelections = ({ detail: selection }) =>
@@ -33,14 +32,7 @@
 </script>
 
 <div class="container" class:dirty="{isDirty}">
-  <div class="col col1-2">
-    <BarchartV
-      title="Amount by country"
-      items={selectedItemsByCountryId}
-      labels={countries}
-    />
-  </div>
-  <div class="col col3-10">
+  <div class="col col1">
     <WorldMapWithHistogramScaleHTML
       colors={schemeSet3}
       items={selectedItemsByCountryId}
@@ -52,10 +44,11 @@
       valueAccessor="{getValue}"
     />
   </div>
-  <div class="col col11-12">
+  <div class="col col2">
     <BarchartV
-      title="Amount by city"
-      items={selectedItemsByCity}
+      title="Amount by country"
+      items={selectedItemsByCountryId}
+      labels={countries}
     />
   </div>
 </div>
@@ -65,7 +58,7 @@
     /* padding-top: 16rem; */
     height: 100%;
     width: 100%;
-    display: flex;
+    padding: 1em 1em 1em 1em;
 
     flex: 1;
     height: 100%;
@@ -79,21 +72,11 @@
       height: 100%;
       max-height: 100%;
 
-      &.col1-2 {
-        grid-column: 1 / span 2;
+      &.col1 {
+        grid-column: 1 / span 10;
       }
-      &.col3-10 {
-        grid-column: 3 / span 8;
-      }
-      &.col11-12 {
+      &.col2 {
         grid-column: 11 / span 2;
-      }
-
-      &.col3-4 {
-        grid-column: 3 / span 2;
-      }
-      &.col5-12 {
-        grid-column: 5 / span 8;
       }
     }
 

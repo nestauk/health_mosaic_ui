@@ -221,7 +221,7 @@
 </script>
 
 <div class="container" class:dirty="{isDirty}">
-  <div class="col col1-2">
+  <div class="col col1">
     <BarchartV
       focusedKey="{focusedNodeId}"
       interactive="{true}"
@@ -234,7 +234,7 @@
       title="Nodes volume"
     />
   </div>
-  <div class="col col3-9">
+  <div class="col col2">
     <header>
       <span class="title">Network</span>
       <div class="control">
@@ -262,7 +262,7 @@
     />
     <!-- title="Network" -->
   </div>
-  <div class="col col10-12">
+  <div class="col col3">
     <BarchartV
       items="{subLinksVolume}"
       keyToColor="{linkKeyToVolumeColor}"
@@ -276,7 +276,7 @@
   .container {
     height: 100%;
     width: 100%;
-    display: flex;
+    padding: 1em 1em 1em 1em;
 
     flex: 1;
     height: 100%;
@@ -309,35 +309,14 @@
         }
       }
 
-      &.col1-2 {
+      &.col1 {
         grid-column: 1 / span 2;
       }
-      &.col1-12 {
-        grid-column: 1 / span 12;
-      }
-      &.col3-4 {
-        grid-column: 3 / span 2;
-      }
-      &.col3-8 {
-        grid-column: 3 / span 6;
-      }
-      &.col3-9 {
+      &.col2 {
         grid-column: 3 / span 7;
       }
-      &.col3-10 {
-        grid-column: 3 / span 8;
-      }
-      &.col5-6 {
-        grid-column: 5 / span 2;
-      }
-      /* &.col5-12 {
-        grid-column: 5 / span 8;
-      } */
-      &.col10-12 {
+      &.col3 {
         grid-column: 10 / span 3;
-      }
-      &.col11-12 {
-        grid-column: 11 / span 2;
       }
     }
 

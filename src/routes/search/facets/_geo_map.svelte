@@ -4,12 +4,18 @@
   import { MAPBOXGL_STYLEURL, MAPBOXGL_ACCESSTOKEN } from '../../../config.js';
   import { makeGeoJson } from '../../../util/geo.js';
 
+  import BarchartV from '../../../components/BarchartV.svelte';
   import { screenStore, currentTab } from '../../../stores/search.ts';
+  import { countByCity } from '../../../util/domain';
   import { SEARCH } from '../_layout.svelte';
 
   const { select } = getContext(SEARCH);
 
-  $: geoJson = makeGeoJson($screenStore[$currentTab].selected);
+  export let isDirty;
+
+  $: selectedItems = $screenStore[$currentTab].selected;
+  $: selectedItemsByCity = countByCity(selectedItems);
+  $: geoJson = makeGeoJson(selectedItems);
   $: bounds = $screenStore[$currentTab].selections.location &&
     $screenStore[$currentTab].selections.location.value;
 
@@ -76,38 +82,68 @@
     { key: 'location', type: 'within', value: detail },
     $currentTab
   );
-
 </script>
 
-<div>
-  <Mapbox
-    bounds="{ bounds || [[-180,-90], [180, 90]]}"
-    renderWorldCopies={false}
-    apiKey="{MAPBOXGL_ACCESSTOKEN}"
-    styleURL="{MAPBOXGL_STYLEURL}"
-    pitchWithRotate={false}
-    on:zoomend={selectBounds}
-    on:txend={selectBounds}
-  >
-    <Source
-      data="{geoJson}"
-      source="{source}"
-      sourceId="entities"
+<div class="container" class:dirty="{isDirty}">
+  <div class="col col1">
+    <Mapbox
+      bounds="{ bounds || [[-180,-90], [180, 90]]}"
+      renderWorldCopies={false}
+      apiKey="{MAPBOXGL_ACCESSTOKEN}"
+      styleURL="{MAPBOXGL_STYLEURL}"
+      pitchWithRotate={false}
+      on:zoomend={selectBounds}
+      on:txend={selectBounds}
     >
-      <Layer layer="{unclusteredPoint}"/>
-      <Layer
-        layer="{cluster}"
-        on:clusterclick={selectBounds}
-      />
-      <Layer layer="{clusterCount}"/>
-    </Source>
-  </Mapbox>
+      <Source
+        data="{geoJson}"
+        source="{source}"
+        sourceId="entities"
+      >
+        <Layer layer="{unclusteredPoint}"/>
+        <Layer
+          layer="{cluster}"
+          on:clusterclick={selectBounds}
+        />
+        <Layer layer="{clusterCount}"/>
+      </Source>
+    </Mapbox>
+  </div>
+  <div class="col col2">
+    <BarchartV
+      title="Amount by city"
+      items={selectedItemsByCity}
+    />
+  </div>
 </div>
 
-<style>
-  div {
-    width: 100%;
+<style lang="less">
+  .container {
     height: 100%;
+    width: 100%;
     transform-origin: 0 0;
+    padding: 0 1em 0 0;
+
+    max-height: 100%;
+
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    grid-template-rows: 100%;
+
+    .col {
+      height: 100%;
+      max-height: 100%;
+
+      &.col1 {
+        grid-column: 1 / span 10;
+      }
+      &.col2 {
+        grid-column: 11 / span 2;
+      }
+    }
+
+    &.dirty {
+      border: 1px solid red;
+    }
   }
 </style>

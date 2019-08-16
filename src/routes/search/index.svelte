@@ -66,6 +66,7 @@
 <style lang="less">
   .content {
     height: 100%;
+    padding: 1em 1em 1em 1em;
 
     .header {
       padding: 0.5em;
