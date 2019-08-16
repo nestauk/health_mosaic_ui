@@ -16,12 +16,10 @@
 
   export let isDirty;
 
-  $: items = $screenStore[$currentTab].results.data;
-  $: itemsByCountryId = countByCountryId(items); // {key: country_id, value: number}[]
   $: selections = $screenStore[$currentTab].selections;
   $: selectedCountries = (selections.country_id && selections.country_id.value) || [];
   $: selectedItems = $screenStore[$currentTab].selected;
-  $: selectedItemsByCountry = countByCountryId(selectedItems); // {key: country_id, value: number}[]
+  $: selectedItemsByCountryId = countByCountryId(selectedItems); // {key: country_id, value: number}[]
   $: selectedItemsByCity = countByCity(selectedItems);
 
   // TODO utils?
@@ -38,14 +36,14 @@
   <div class="col col1-2">
     <BarchartV
       title="Amount by country"
-      items={selectedItemsByCountry}
+      items={selectedItemsByCountryId}
       labels={countries}
     />
   </div>
   <div class="col col3-10">
     <WorldMapWithHistogramScaleHTML
       colors={schemeSet3}
-      items={itemsByCountryId}
+      items={selectedItemsByCountryId}
       keyAccessor="{getKey}"
       on:selected="{updateSelections}"
       on:deselectAll="{deselectCountries}"
