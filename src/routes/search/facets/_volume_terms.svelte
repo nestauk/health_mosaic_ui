@@ -41,6 +41,7 @@
   const colors = schemeSet3;
 
   export let isDirty;
+  export let shouldResize;
 
   let focusedNodeId = null;
   let linkKeyToVolumeColor;
@@ -231,6 +232,7 @@
     </header>
     <ForceWithDistributionsDiv
       colors={schemeSet3}
+      degreeAccessor="{getNodeDegree}"
       {focusedNodeId}
       {linkKeyToVolumeColor}
       {linkVolumeBins}
@@ -241,8 +243,8 @@
       on:nodeClick="{nodeClicked}"
       on:entered="{nodeEntered}"
       on:exited="{nodeExited}"
+      {shouldResize}
       volumeAccessor="{getVolume}"
-      degreeAccessor="{getNodeDegree}"
     />
     <!-- title="Network" -->
   </div>

@@ -19,6 +19,7 @@
   export let nodeDegreeBins;
   export let nodeKeyToVolumeColor;
   export let nodeVolumeBins;
+  export let shouldResize;
   export let title;
   export let volumeAccessor;
 
@@ -32,10 +33,14 @@
   let width = 0;
 
   const getSensorOrigin = () => {
-    bbox = sensor.getBoundingClientRect();
+    if (sensor) {
+      bbox = sensor.getBoundingClientRect();
+    }
   };
 
   onMount(getSensorOrigin);
+
+  $: $shouldResize && getSensorOrigin();
 
   const enteredNode = ({detail: {id, items}}) => {
     target = {id, items, count: items.length};
@@ -78,6 +83,10 @@
     };
   };
 
+  const mouseleft = event => {
+    tooltip = null;
+  }
+
   const nodeClick = () => {
     target && dispatch('nodeClick', {id: target.id});
   };
@@ -112,6 +121,8 @@
         on:entered="{enteredNode}"
         on:exited="{exitedNode}"
         on:click="{nodeClick}"
+        on:mouseout="{mouseleft}"
+        {shouldResize}
       />
       <div class="histogram degree">
         <HistogramDiv

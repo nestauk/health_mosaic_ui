@@ -17,6 +17,7 @@
     idStore,
     currentTab,
   } from '../../stores/search.ts';
+  import { shouldResizeStore } from '../../stores/';
 
   const { page } = stores();
 
@@ -42,6 +43,13 @@
     isPageInit: true
   });
 
+  const transitionended = () => {
+    shouldResizeStore.set(true);
+  }
+  const transitionstarted = () => {
+    shouldResizeStore.set(false);
+  }
+
   setContext(SEARCH, {
     transitionComplete:
       () => screenMachine.send({ type: 'ROUTE_CHANGE_COMPLETED' }),
@@ -55,6 +63,7 @@
         selection,
         route: $page.path
       }),
+    shouldResize: shouldResizeStore
   });
 
   $: uiQuery = $screenStore[$currentTab].uiQuery;
@@ -143,6 +152,8 @@
   class:foldedWithSelections="{!hasNoQuery && !visible && withSelections}"
   class:withNoSelections="{!hasNoQuery && visible && !withSelections}"
   class:withSelections="{!hasNoQuery && visible && withSelections}"
+  on:transitionend="{transitionended}"
+  on:transitionstart="{transitionstarted}"
 >
   <div class="tabs">
     <ul>

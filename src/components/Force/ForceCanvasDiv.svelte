@@ -45,11 +45,13 @@
   export let linkKeyToVolumeColor;
   export let network;
   export let nodeKeyToVolumeColor;
+  export let shouldResize;
 
   let bbox;
   let canvas;
   let container;
   let context;
+  let focusedNodeIdChanged;
   let frame;
   let height = 0;
   let hoveredNodeLabel;
@@ -60,7 +62,9 @@
   let width = 0;
 
   const getSensorOrigin = () => {
-    bbox = canvas.getBoundingClientRect();
+    if (canvas) {
+      bbox = canvas.getBoundingClientRect();
+    }
   };
 
   onMount(() => {
@@ -77,6 +81,7 @@
     };
   });
 
+  $: $shouldResize && getSensorOrigin();
   $: viewCenter = {x: width / 2, y: height / 2};
   $: maxRadius = Math.min(viewCenter.x, viewCenter.y);
   $: sortedNodes = getNodesSortedDescByVolume(network);
@@ -130,10 +135,7 @@
     scaleLinear()
     .domain(nodeDegreeExtent)
     .range([maxRadius - maxNodeRadius, 0])
-  $: getRingRadius = _.pipe([
-    getNodeDegree,
-    ringRadiusScale
-  ]);
+  $: getRingRadius = _.pipe([getNodeDegree, ringRadiusScale]);
 
   // links
   $: linksArray = _.values(network.links);
@@ -211,7 +213,7 @@
 
   // FIXME temp, TODO add option `ignoreRadius` to svizzle's makeLinkVector
   const skipRadius = _.skipKeys(['radius']);
-  $: linksLayout = (frame > 0) && _.map(links, link => {
+  $: linksLayout = links && nodesLayoutIndex && _.map(links, link => {
     const linkVector = makeLinkVector({
       source: skipRadius(nodesLayoutIndex[link.source.id]),
       target: skipRadius(nodesLayoutIndex[link.target.id]),
@@ -222,6 +224,7 @@
 
   /* all set up, draw */
   $: frame && drawCanvas();
+  $: focusedNodeIdChanged && drawCanvas();
 
   /* interaction */
 
@@ -246,11 +249,13 @@
         node
         && _.has(nodesLayoutIndex, node.id)
         && context.isPointInPath(nodesLayoutIndex[node.id].path, x, y)
-        && node.id;
+        && node.id
+        || null;
 
       if (!nextFocusedNodeId && focusedNodeId) {
         dispatch('exited', {id: focusedNodeId});
       }
+      focusedNodeIdChanged = nextFocusedNodeId !== focusedNodeId;
       focusedNodeId = nextFocusedNodeId || null;
     }
   }
@@ -274,7 +279,7 @@
   };
 
   const drawAllLinks = () => {
-    if (context && width) {
+    if (context && linksLayout) {
       context.save();
 
       linksLayout.forEach(link => {
@@ -292,7 +297,7 @@
   };
 
   const drawNodes = () => {
-    if (width && context) {
+    if (context && nodesLayout) {
       context.save();
 
       nodesLayout.forEach(node => {
@@ -314,7 +319,7 @@
   };
 
   const drawNodesLabels = () => {
-    if (width && context) {
+    if (context && nodesLayout) {
       context.save();
       context.textBaseline = 'middle';
       context.textAlign = 'center';
@@ -344,15 +349,13 @@
   };
 </script>
 
-<!-- FIXME when we animate the padding of the force container
-we don't get notified hence we don't call getSensorOrigin
-so that hovering nodes doesn't work after we expand/collape the drawer -->
 <svelte:window on:resize={getSensorOrigin} />
 
 <div
   bind:clientWidth="{width}"
   bind:clientHeight="{height}"
   class="container"
+  on:mouseout
 >
   <canvas
     bind:this="{canvas}"

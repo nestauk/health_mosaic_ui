@@ -21,7 +21,11 @@
     volume_terms
   };
 
-  const { checkDirty, transitionComplete } = getContext(SEARCH);
+  const {
+    checkDirty,
+    shouldResize,
+    transitionComplete
+  } = getContext(SEARCH);
   const { page } = stores();
 
   $: isDirty = $screenStore && checkDirty();
@@ -31,4 +35,5 @@
 <svelte:component
   this={facets[$page.params.facet]}
   {isDirty}
+  {shouldResize}
 />
