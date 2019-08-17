@@ -6,7 +6,9 @@
 
   import { countries } from '../../../../data/geo/iso_a2_to_name_by_type.json';
   import BarchartV from '../../../components/BarchartV.svelte';
+  import Fallback from '../../../components/Fallback.svelte';
   import { WorldMapWithHistogramScaleHTML } from '../../../components/WorldMapWithHistogramScale';
+
   import { screenStore, currentTab } from '../../../stores/search.ts';
   import { countByCountryId } from '../../../util/domain';
   import { getKey, getValue } from '../../../util/object.any';
@@ -32,6 +34,7 @@
 </script>
 
 <div class="container" class:dirty="{isDirty}">
+  {#if selectedItems.length}
   <div class="col col1">
     <WorldMapWithHistogramScaleHTML
       colors={schemeSet3}
@@ -51,6 +54,11 @@
       labels={countries}
     />
   </div>
+  {:else}
+  <div class="col fullwidth">
+    <Fallback message="No results" />
+  </div>
+  {/if}
 </div>
 
 <style lang="less">
@@ -77,6 +85,9 @@
       }
       &.col2 {
         grid-column: 11 / span 2;
+      }
+      &.fullwidth {
+        grid-column: 1 / span 12;
       }
     }
 

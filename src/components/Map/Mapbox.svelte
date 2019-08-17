@@ -10,6 +10,9 @@
     setContext,
   } from 'svelte';
 
+  import Fallback from '../Fallback.svelte';
+  import MapboxUnsupported from './MapboxUnsupported.svelte';
+
   export let apiKey;
   export let bounds;
   export let interactive = true;
@@ -19,10 +22,10 @@
   export let renderWorldCopies = true;
   export let styleURL;
 
-  let container,
-    loaded = false,
-    mapboxgl;
-
+  let container;
+  let isMapboxGLSupported = true;
+  let loaded = false;
+  let mapboxgl;
 
   setContext(MAPBOX, {
     getMap: () => map,
@@ -50,21 +53,25 @@
     mapboxgl = mapboxgl.default;
     mapboxgl.accessToken = apiKey;
 
-    map = new mapboxgl.Map({
-      interactive,
-      container,
-      style: styleURL,
-      bounds: bounds,
-      renderWorldCopies,
-      pitchWithRotate,
-      maxZoom: 15
-    }).on('load', () => {
-      map.on('movestart', txstart);
-      map.on('moveend', txend);
-      map.on('zoomstart', zoomstart);
-      map.on('zoomend', zoomend);
-      loaded = true;
-    });
+    isMapboxGLSupported = mapboxgl.supported();
+
+    if (isMapboxGLSupported) {
+      map = new mapboxgl.Map({
+        interactive,
+        container,
+        style: styleURL,
+        bounds: bounds,
+        renderWorldCopies,
+        pitchWithRotate,
+        maxZoom: 15
+      }).on('load', () => {
+        map.on('movestart', txstart);
+        map.on('moveend', txend);
+        map.on('zoomstart', zoomstart);
+        map.on('zoomend', zoomend);
+        loaded = true;
+      });
+    }
   });
 
   onDestroy(() => {
@@ -84,8 +91,12 @@
 </svelte:head>
 
 <div bind:this="{container}" class="container">
-  {#if loaded}
-  <slot></slot>
+  {#if !isMapboxGLSupported}
+    <Fallback>
+      <MapboxUnsupported/>
+    </Fallback>
+  {:else if loaded}
+    <slot></slot>
   {/if}
 </div>
 

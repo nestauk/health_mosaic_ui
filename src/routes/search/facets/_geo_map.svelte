@@ -1,11 +1,13 @@
 <script>
   import { getContext } from 'svelte';
-  import { Mapbox, Layer, Source } from '../../../components/Map';
-  import { MAPBOXGL_STYLEURL, MAPBOXGL_ACCESSTOKEN } from '../../../config.js';
-  import { makeGeoJson } from '../../../util/geo.js';
 
+  import { MAPBOXGL_STYLEURL, MAPBOXGL_ACCESSTOKEN } from '../../../config.js';
   import BarchartV from '../../../components/BarchartV.svelte';
+  import Fallback from '../../../components/Fallback.svelte';
+  import { Mapbox, Layer, Source, MapboxUnsupported } from '../../../components/Map/';
+
   import { screenStore, currentTab } from '../../../stores/search.ts';
+  import { makeGeoJson } from '../../../util/geo.js';
   import { countByCity } from '../../../util/domain';
   import { SEARCH } from '../_layout.svelte';
 
@@ -114,6 +116,11 @@
       title="Amount by city"
       items={selectedItemsByCity}
     />
+    {#if !selectedItems.length}
+    <div class="col overlay">
+      <Fallback message="No results" />
+    </div>
+    {/if}
   </div>
 </div>
 
@@ -139,6 +146,16 @@
       }
       &.col2 {
         grid-column: 11 / span 2;
+        position: relative;
+
+        .overlay {
+          position: absolute;
+          top: 0;
+          left: 0;
+          height: 100%;
+          width: 100%;
+          pointer-events: none;
+        }
       }
     }
 

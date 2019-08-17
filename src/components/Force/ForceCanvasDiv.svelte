@@ -12,7 +12,7 @@
   import { extent } from 'd3-array';
   import { color as d3Color } from 'd3-color';
   import { scaleLinear, scalePow } from 'd3-scale';
-  import { makeLinkVector, vectorLength2D } from '@svizzle/geometry';
+  import { makeLinkVector } from '@svizzle/geometry';
   import { getObjSize } from '@svizzle/utils';
 
   // FIXME to make this component generic,

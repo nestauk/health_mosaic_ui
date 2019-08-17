@@ -3,8 +3,10 @@
   import * as _ from 'lamb';
   import compare from 'just-compare';
 
-  import { Results, Paper, Event, Company } from '../../components/Results';
+  import Fallback from '../../components/Fallback.svelte'
   import { AddCircle, RemoveCircle } from '../../components/Icons/'
+  import { Results, Paper, Event, Company } from '../../components/Results';
+
   import { screenStore, currentTab } from '../../stores/search.ts';
   import { SEARCH } from './_layout.svelte';
   import { NIH_type, CB_type, MU_type } from '../../config';
@@ -29,7 +31,7 @@
 </script>
 
 <div class="content">
-  {#if selectedItems}
+  {#if selectedItems.length}
   <div class="header">
     <p>Showing: {selectedItems.length} items</p>
     <div class="buttons">
@@ -60,6 +62,8 @@
 
     {/each}
   </Results>
+  {:else}
+  <Fallback message="No results" />
   {/if}
 </div>
 

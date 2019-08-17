@@ -8,8 +8,10 @@
   import { toggleItem } from '@svizzle/utils';
 
   import BarchartV from '../../../components/BarchartV.svelte';
-  import Switch from '../../../components/Switch.svelte';
+  import Fallback from '../../../components/Fallback.svelte';
   import { ForceWithDistributionsDiv } from '../../../components/ForceWithDistributions/';
+  import Switch from '../../../components/Switch.svelte';
+
   import { screenStore, currentTab } from '../../../stores/search.ts';
   import {
     exactAmountBins,
@@ -211,6 +213,7 @@
 </script>
 
 <div class="container" class:dirty="{isDirty}">
+  {#if selectedItems.length}
   <div class="col col1">
     <BarchartV
       focusedKey="{focusedNodeId}"
@@ -259,6 +262,11 @@
       title="Links volume"
     />
   </div>
+  {:else}
+  <div class="col fullwidth">
+    <Fallback message="No results" />
+  </div>
+  {/if}
 </div>
 
 <style lang="less">
@@ -306,6 +314,9 @@
       }
       &.col3 {
         grid-column: 10 / span 3;
+      }
+      &.fullwidth {
+        grid-column: 1 / span 12;
       }
     }
 
