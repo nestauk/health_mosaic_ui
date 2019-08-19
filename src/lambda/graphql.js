@@ -97,6 +97,7 @@ const sources = [
   // url
   'url_of_organisation',
   'url_of_group',
+  'url_crunchBase_organisation',
   'type_of_entity',
 ];
 
@@ -193,6 +194,7 @@ const typeDefs = gql`
     end: String
     funders: [String]
     funding: [FundingRound]
+    es_id: String
     id: String
     is_health_related: Boolean
     location: Geopoint
@@ -209,6 +211,7 @@ const typeDefs = gql`
     title: String
     type: String
     url: String
+    url_source: String
   }
   input ESQuery {
     title: String

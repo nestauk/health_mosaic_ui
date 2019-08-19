@@ -38,6 +38,7 @@ const fieldMaps = {
   ],
   funders: ['terms_of_funders'],
   funding: ['json_funding_project'],
+  id: ['id_of_project'],
   is_health_related: ['booleanFlag_health_organisation'],
   location: [
     'coordinate_of_city',
@@ -60,6 +61,7 @@ const fieldMaps = {
     '_terms_sdg_description',
     'terms_sdg_abstract',
   ],
+
   start: [
     'date_birth_organisation',
     'date_start_group',
@@ -84,6 +86,7 @@ const fieldMaps = {
     'url_of_organisation',
     'url_of_group'
   ],
+  url_source: ['url_crunchBase_organisation'],
   type: ['type_of_entity']
 };
 
@@ -103,7 +106,7 @@ export const makeRequiredFields = requiredFields => ({
   bool: {
     should: Object.keys(requiredFields).map(index => ({
       bool: {
-        must: requiredFields[index].map(makeFieldMatch)
+        must: requiredFields[index].map(makeFieldMatch),
       },
     })),
   },
@@ -119,7 +122,7 @@ export const makeResolvers = () => {
   let resolvers = '{\n';
 
   resolvers += `
-  id: (parent) => parent._id,
+  es_id: (parent) => parent._id,
   score: (parent) => parent._score,`;
 
   for (const field in fieldMaps) {

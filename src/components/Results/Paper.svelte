@@ -3,8 +3,11 @@
   import { AddCircle, RemoveCircle } from '../Icons/'
   import { countries } from '../../../data/geo/iso_a2_to_name_by_type.json';
 
+  import Tooltip from '../Tooltip.svelte';
+
   export let data;
   let show = false;
+  let hover = false;
 
   export function close() {
     show = false;
@@ -22,6 +25,7 @@
     countries_ids,
     country,
     end,
+    id,
     name,
     sdg_labels,
     start,
@@ -30,8 +34,8 @@
     terms,
     title,
     type,
-    url,
   } = data)
+
   $: remainingValues = [
     ['Received', 'USD ' + format('.2s')(cost_ref)],
     ['Terms', terms && terms.join(' • ')],
@@ -79,6 +83,19 @@
     <p class="place">
       {place.join(', ')}
     </p>
+    <div class="icon">
+      <span on:mouseenter={() => hover = true} on:mouseleave={() => hover = false}>
+        <a
+          target="_blank"
+          href="http://grantome.com/grant/NIH/{id}"
+        >
+          <img src="/logo_nih.png"/>
+        </a>
+        {#if hover}
+          <Tooltip offset="{-5}" text="The National Institute for Health"/>
+        {/if}
+      </span>
+    </div>
   </div>
 </article>
 
@@ -107,6 +124,19 @@
       text-align: right;
       max-width: 20em;
       overflow-wrap: break-word;
+      .icon {
+        display: flex;
+        justify-content: flex-end;
+        span {
+          width: 28px;
+          transform: translateY(5px);
+          margin-left: 10px;
+          img {
+            width: 100%;
+            transform: translateY(2px);
+          }
+        }
+      }
     }
 
     h2 {

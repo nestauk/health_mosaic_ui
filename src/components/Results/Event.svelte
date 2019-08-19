@@ -3,8 +3,11 @@
   import { AddCircle, RemoveCircle, Link } from '../Icons/'
   import { countries } from '../../../data/geo/iso_a2_to_name_by_type.json';
 
+  import Tooltip from '../Tooltip.svelte';
+
   export let data;
   let show = false;
+  let hover = false;
 
   export function close() {
     show = false;
@@ -90,13 +93,19 @@
     </p>
     {#if url}
     <div class="icon">
-      <span>
+      <span
+        on:mouseenter={() => hover = true}
+        on:mouseleave={() => hover = false}
+      >
         <a
           target="_blank"
           href="{url}"
         >
-          <Link color='#aaa'/>
+          <img src="/logo_meetup.svg"/>
         </a>
+        {#if hover}
+          <Tooltip offset="{-5}" text="Meetup"/>
+        {/if}
       </span>
     </div>
     {/if}
@@ -105,7 +114,6 @@
 
 <style lang="less">
   article {
-    width: 100%;
     margin-bottom: 3em;
 
     display: flex;

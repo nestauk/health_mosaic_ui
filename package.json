@@ -28,7 +28,7 @@
     "@svizzle/geometry": "^0.1.0",
     "@svizzle/utils": "^0.2.0",
     "@turf/bbox": "^6.0.1",
-    "apollo-boost": "^0.4.3",
+    "apollo-boost": "^0.4.4",
     "apollo-datasource-rest": "^0.5.0",
     "apollo-server-lambda": "^2.6.7",
     "compression": "^1.7.1",

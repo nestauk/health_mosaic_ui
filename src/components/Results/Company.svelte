@@ -3,8 +3,11 @@
   import { Link, AddCircle, RemoveCircle } from '../Icons/'
   import { countries } from '../../../data/geo/iso_a2_to_name_by_type.json';
 
+  import Tooltip from '../Tooltip.svelte';
+
   export let data;
   let show = false;
+  let hover = false;
 
   export function close() {
     show = false;
@@ -32,6 +35,7 @@
     title,
     type,
     url,
+    url_source
   } = data)
 
   $: remainingValues = [
@@ -91,6 +95,20 @@
     </p>
     {#if url}
     <div class="icon">
+      <span
+        on:mouseenter={() => hover = true}
+        on:mouseleave={() => hover = false}
+      >
+        <a
+          target="_blank"
+          href="{url_source}"
+        >
+          <img src="/logo_cb.jpg"/>
+        </a>
+        {#if hover}
+          <Tooltip offset="{-5}" text="Crunchbase"/>
+        {/if}
+      </span>
       <span>
         <a
           target="_blank"
@@ -137,6 +155,11 @@
         span {
           width: 28px;
           transform: translateY(5px);
+          margin-left: 10px;
+          img {
+            width: 100%;
+            transform: translateY(2px);
+          }
         }
       }
     }

@@ -80,6 +80,7 @@ export const QUERY_CB = gql`
       title
       type
       url
+      url_source
     }
   }
 `;
