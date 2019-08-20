@@ -82,31 +82,8 @@
 <style lang="less">
   .content {
     height: 100%;
-    padding: 1em 1em 1em 1em;
-
-    .header {
-      padding: 0.5em;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid lightgrey;
-
-      .buttons {
-        width: 56px;
-        display: grid;
-        height: 25px;
-        grid-template-columns: 1fr 1fr;
-
-        span {
-          opacity: 0.6;
-          cursor: pointer;
-
-          &:hover {
-            opacity: 1;
-          }
-        }
-      }
-    }
+    display: flex;
+    flex-direction: column;
 
     ul {
       display: flex;

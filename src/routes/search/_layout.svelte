@@ -8,7 +8,7 @@
   import { isIterableEmpty, isObjNotEmpty } from '@svizzle/utils';
 
   import Nav from '../../components/Nav.svelte';
-  import QueryBuilder from '../../components/QueryBuilder.svelte';
+  import Sidebar from '../../components/Sidebar.svelte';
   import RouterLink from '../../components/RouterLink.svelte';
   import { project_title, searchRouteName } from '../../config.js';
   import { screenMachine } from '../../services/screen_service.ts';
@@ -132,7 +132,7 @@
   <title>{project_title} {queryTitle}</title>
 </svelte:head>
 
-<Nav
+<!-- <Nav
   {isLoading}
   {isError}
   {tabs}
@@ -141,9 +141,9 @@
   on:changetab="{({detail}) => sendTab('TAB_SELECTED', detail)}"
   on:deletetab="{({detail}) => sendTab('TAB_DELETED', detail)}"
   on:textchange={sendTabRenamed}
-/>
+/> -->
 
-<QueryBuilder />
+<Sidebar />
 
 <div
   class="facets"
@@ -155,7 +155,7 @@
   on:transitionend="{transitionended}"
   on:transitionstart="{transitionstarted}"
 >
-  <div class="tabs">
+  <!-- <div class="tabs">
     <ul>
       {#each facetTabs as {id, label}}
       <li
@@ -171,7 +171,7 @@
       </li>
       {/each}
     </ul>
-  </div>
+  </div> -->
   <div class="content">
     <slot></slot>
   </div>
@@ -181,62 +181,12 @@
   @import '../../styles/mixins.less';
 
   .facets {
-    padding-top: 16rem;
+    padding-left: var(--sidebar-width);
     height: 100%;
     width: 100%;
     display: flex;
 
     .drawerTransition();
-
-    &.noQuery {
-      padding-top: 11.3rem;
-    }
-    &.foldedWithNoSelections {
-      padding-top: 8rem;
-    }
-    &.foldedWithSelections {
-      padding-top: 12.4rem;
-    }
-    &.withNoSelections {
-      padding-top: 16.8rem;
-    }
-    &.withSelections {
-      padding-top: 20rem;
-    }
-
-    .tabs {
-      flex: 0 0 200px;
-      height: 100%;
-      border-right: 1px solid #dcdcdc;
-      box-shadow: 0.1em 0.1em 1em #efefef;
-
-      ul {
-        width: 200px;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-
-        li {
-          border-bottom: 1px solid #ccc;
-          user-select: none;
-
-          &:hover {
-            background: #f5f5f5;
-          }
-
-          &.selected {
-            background: #ececec;
-          }
-
-          div {
-            width: 100%;
-            height: 100%;
-            display: block;
-            padding: 20px;
-          }
-        }
-      }
-    }
 
     .content {
       flex: 1;

@@ -67,7 +67,8 @@ code {
 }
 
 :root {
-  --color-type-company: rgb(56,136,203); /* logo_cb.svg */
-  --color-type-event: rgb(237,28,64); /* logo_meetup.svg */
-  --color-type-paper: rgb(101,102,106); /* logo_nih.png */
+  --color-type-company: rgb(56, 136, 203); /* logo_cb.svg */
+  --color-type-event: rgb(237, 28, 64); /* logo_meetup.svg */
+  --color-type-paper: rgb(101, 102, 106); /* logo_nih.png */
+  --sidebar-width: 25rem;
 }
