@@ -1,10 +1,13 @@
 <script>
-  import { SearchContainer } from './Search';
+  import { SearchContainer, Ruleset, RulesetQueries } from './Search';
   export let val;
 </script>
 
 <div>
   <SearchContainer>
+    <Ruleset>
+      <RulesetQueries />
+    </Ruleset>
 
   </SearchContainer>
 </div>

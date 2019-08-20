@@ -37,9 +37,9 @@
       background: none;
       font-size: 16px;
       padding: 5px 10px;
-      background: #eff3f6;
-      background-image: linear-gradient(-180deg,#fafbfc,#eff3f6 90%);
-      border: 1px solid #cececf;
+      background: var(--button-bg);
+      background-image: var(--button-bg-image);
+      border: var(--button-border);
       border-right: none;
       overflow: hidden;
 
@@ -55,8 +55,8 @@
         border-right: solid 1px #cececf;
       }
       &:hover {
-        background-color: #e6ebf1;
-        background-image: linear-gradient(-180deg,#f0f3f6,#e6ebf1 90%);
+        background-color:var(--button-hover-bg);
+        background-image: var(--button-hover-bg-image);
       }
       &.selected {
         background: #333!important;
