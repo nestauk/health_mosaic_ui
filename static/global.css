@@ -68,17 +68,17 @@ code {
 
 :root {
   /* colors */
-  --color-rjwf-darker-blue: rgb(15,51,102);
-  --color-rjwf-lighter-blue: rgb(89,122,156);
+  --color-rjwf-darker-blue: rgb(15, 51, 102);
+  --color-rjwf-lighter-blue: rgb(89, 122, 156);
   --color-blue-dark-pastel: rgb(106, 146, 187);
   --color-light-blue: rgb(210, 237, 253);
   /* --color-text: #384c58; */
   /* --color-text: #30526b; */
 
   /* theme: colors */
-  --color-type-company: rgb(56,136,203); /* logo_cb.svg */
-  --color-type-event: rgb(237,28,64); /* logo_meetup.svg */
-  --color-type-paper: rgb(101,102,106); /* logo_nih.png */
+  --color-type-company: rgb(56, 136, 203); /* logo_cb.svg */
+  --color-type-event: rgb(237, 28, 64); /* logo_meetup.svg */
+  --color-type-paper: rgb(101, 102, 106); /* logo_nih.png */
   --color-text: var(--color-rjwf-darker-blue);
   --color-text-highlight-bkg: var(--color-light-blue);
   --color-text-highlight-bkg-hover: var(--color-blue-dark-pastel);
@@ -89,12 +89,22 @@ code {
   /* theme: sizes */
   --size-bars-padding: 12px;
   --size-header-height: 70px;
-  --size-header-innerheight: calc(var(--size-header-height) - 2 * var(--size-bars-padding));
+  --size-header-innerheight: calc(
+    var(--size-header-height) - 2 * var(--size-bars-padding)
+  );
   --size-footer-height: 50px;
-  --size-footer-innerheight: calc(var(--size-footer-height) - 2 * var(--size-bars-padding));
-  --size-main-height: calc(100% - var(--size-header-height) - var(--size-footer-height));
+  --size-footer-innerheight: calc(
+    var(--size-footer-height) - 2 * var(--size-bars-padding)
+  );
+  --size-main-height: calc(
+    100% - var(--size-header-height) - var(--size-footer-height)
+  );
 
   /* z-index */
   --z-index-menu: 100;
   /* TODO centralize all `z-index`s in here when it makes sense */
+  --color-type-company: rgb(56, 136, 203); /* logo_cb.svg */
+  --color-type-event: rgb(237, 28, 64); /* logo_meetup.svg */
+  --color-type-paper: rgb(101, 102, 106); /* logo_nih.png */
+  --sidebar-width: 25rem;
 }
