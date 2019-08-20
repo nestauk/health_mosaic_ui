@@ -199,8 +199,6 @@
   const openDrawer = async () => {
     await tick();
     sendTab('TAB_VISIBILITY_TOGGLED', $currentTab);}
-
-
 </script>
 
 <div

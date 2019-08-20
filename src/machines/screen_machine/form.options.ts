@@ -14,15 +14,65 @@ import { makeRouteUrl, toggleBoolean, removeEmpty } from '../../util/transform';
 import {
   toggleLabelBinaryUpdater,
   toggleLabelTernaryUpdater,
-  hideTabLabelOptions,
   deselectRule,
   parseQuery,
-  hideTabRuleOptions,
   toggleTerm,
 } from './utils';
 
+const toArray = x => [x];
+
+const setDefaultRuleset = ruleset => _.setPathIn(ruleset, 'disabled', false);
+
+const fieldUpdater = ({ content, subject }) => {
+  return {
+    content: _.map(content, c => ({ ...c, status: 'default' })),
+    subject: _.map(subject, c => ({ ...c, status: 'default' })),
+  };
+};
+const setDefaultFields = ruleset =>
+  _.updatePathIn(ruleset, 'fields', fieldUpdater);
+
+const reduceQueries = rulesets =>
+  _.pipe([
+    _.reduceWith(
+      (acc, next) => ({
+        ...acc,
+        isEditing: true,
+        terms: acc.terms.concat(next.terms),
+      }),
+      { ..._.head(rulesets), terms: [] }
+    ),
+  ])(rulesets);
+
 export const form_options = {
   actions: {
+    activateSimpleSearch: ({ screenStore }, { tabId }) => {
+      const updater = _.pipe([
+        reduceQueries,
+        setDefaultRuleset,
+        setDefaultFields,
+        toArray,
+      ]);
+      const copyRule = _.pipe([_.updatePath(`${tabId}.uiQuery`, updater)]);
+
+      screenStore.update(copyRule);
+    },
+    editRuleset: ({ screenStore }, { tabId, ruleIndex = 0 }) => {
+      const labelEditStatus = _.updatePath(
+        `${tabId}.uiQuery.${ruleIndex}.isEditing`,
+        toggleBoolean
+      );
+
+      screenStore.update(labelEditStatus);
+
+      const updater = _.pipe([
+        _.filterWith(rule => rule.terms.length && rule.terms[0].term.length),
+      ]);
+
+      const newRule = _.updatePath(`${tabId}.uiQuery`, updater);
+
+      screenStore.update(newRule);
+    },
     toggleLabelBinary: (
       { screenStore },
       { tabId, ruleIndex, section, labelIndex }
@@ -36,7 +86,7 @@ export const form_options = {
     },
     toggleLabelTernary: (
       { screenStore },
-      { tabId, ruleIndex, section, labelIndex }
+      { tabId, ruleIndex, section, labelIndex, status }
     ) => {
       const path = `${tabId}.uiQuery.${ruleIndex}.fields.${section}.${labelIndex}.status`;
       screenStore.update(toggleLabelTernaryUpdater(path));
@@ -52,21 +102,6 @@ export const form_options = {
 
       screenStore.update(disableLabelStatus);
     },
-    showLabelOptions: (
-      { screenStore },
-      { tabId, ruleIndex, section, labelIndex }
-    ) => {
-      const showLabelOption = _.setPath(
-        `${tabId}.uiQuery.${ruleIndex}.fields.${section}.${labelIndex}.options`,
-        true
-      );
-
-      screenStore.update(_.pipe([hideTabLabelOptions(tabId), showLabelOption]));
-    },
-    hideLabelOptions: ({ screenStore }, { tabId }) => {
-      screenStore.update(hideTabLabelOptions(tabId));
-    },
-
     deleteLabel: (
       { screenStore },
       { tabId, ruleIndex, section, labelIndex }
@@ -99,17 +134,6 @@ export const form_options = {
 
       screenStore.update(parseText);
     },
-    showRuleOptions: ({ screenStore }, { tabId, ruleIndex }) => {
-      const showRuleOptions = _.setPath(
-        `${tabId}.uiQuery.${ruleIndex}.options`,
-        true
-      );
-
-      screenStore.update(_.pipe([hideTabRuleOptions(tabId), showRuleOptions]));
-    },
-    hideRuleOptions: ({ screenStore }, { tabId }) => {
-      screenStore.update(hideTabRuleOptions(tabId));
-    },
     disableRule: ({ screenStore }, { tabId, ruleIndex }) => {
       const toggleRule = _.updatePath(
         `${tabId}.uiQuery.${ruleIndex}.disabled`,
@@ -126,44 +150,33 @@ export const form_options = {
     deleteRule: ({ screenStore }, { tabId, ruleIndex }) => {
       const uiQuery = get(screenStore)[tabId].uiQuery;
       const currentSelection = uiQuery.findIndex(({ selected }) => selected);
+      console.log(uiQuery);
 
-      if (uiQuery.length > 1) {
-        const deleteRule = _.updatePath(
-          `${tabId}.uiQuery`,
-          _.filterWith((_, i) => i !== ruleIndex)
-        );
+      if (uiQuery.length <= 1) return;
 
-        const newIndex =
-          currentSelection === ruleIndex
-            ? 0
-            : currentSelection > ruleIndex
-            ? currentSelection - 1
-            : currentSelection;
+      const deleteRule = _.updatePath(
+        `${tabId}.uiQuery`,
+        _.filterWith((_, i) => i !== ruleIndex)
+      );
 
-        const hideOptions = _.updatePath(
-          `${tabId}.uiQuery`,
-          _.mapWith(deselectRule)
-        );
+      const newIndex =
+        currentSelection === ruleIndex
+          ? 0
+          : currentSelection > ruleIndex
+          ? currentSelection - 1
+          : currentSelection;
 
-        const updateSelected = _.setPath(
-          `${tabId}.uiQuery.${newIndex}.selected`,
-          true
-        );
+      const hideOptions = _.updatePath(
+        `${tabId}.uiQuery`,
+        _.mapWith(deselectRule)
+      );
 
-        screenStore.update(_.pipe([deleteRule, hideOptions, updateSelected]));
-      } else {
-        const blankRule = _.setPath(`${tabId}.uiQuery.0`, {
-          terms: [newTerm()],
-          fields: {
-            subject: newField(subjectAliases),
-            content: newField(contentAliases),
-          },
-          options: false,
-          disabled: false,
-          selected: true,
-        });
-        screenStore.update(blankRule);
-      }
+      const updateSelected = _.setPath(
+        `${tabId}.uiQuery.${newIndex}.selected`,
+        true
+      );
+
+      screenStore.update(_.pipe([deleteRule, hideOptions, updateSelected]));
     },
     toggleTermStatus: ({ screenStore }, { tabId, ruleIndex, termIndex }) => {
       const toggleTermStatus = _.updatePath(
@@ -173,7 +186,10 @@ export const form_options = {
       screenStore.update(toggleTermStatus);
     },
     createRuleset: ({ screenStore }, { tabId }) => {
-      const updater = rules => _.appendTo(rules, newRuleset());
+      const updater = _.pipe([
+        _.filterWith(rule => rule.terms.length && rule.terms[0].term.length),
+        _.append(newRuleset()),
+      ]);
       const newRule = _.updatePath(`${tabId}.uiQuery`, updater);
 
       screenStore.update(newRule);

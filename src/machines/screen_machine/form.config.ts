@@ -1,24 +1,22 @@
 export const form_config = {
   id: 'Form',
-  initial: 'Idle',
+  initial: 'Simple',
   on: {
     TAB_DELETED: {
-      target: 'Form.Idle',
+      target: 'Form.Simple',
     },
     TAB_CREATED: {
-      target: 'Form.Idle',
+      target: 'Form.Simple',
     },
     TAB_SELECTED: {
-      target: 'Form.Idle',
+      target: 'Form.Simple',
     },
     TAB_RENAMED: {
-      target: 'Form.Idle',
+      target: 'Form.Simple',
     },
+    // I don't know if this is needed
     TAB_VISIBILITY_TOGGLED: {
       actions: ['toggleTabVisibility'],
-    },
-    LABEL_CLICKED: {
-      actions: ['toggleLabelTernary'],
     },
     TERM_CLICKED: {
       actions: ['toggleTermStatus'],
@@ -32,53 +30,36 @@ export const form_config = {
     STORE_RESET: {
       actions: ['resetStore'],
     },
-    LOGIC_TOGGLED: {
-      actions: ['toggleSearchLogic'],
+    TEXT_CHANGED: {
+      actions: ['updateCurrentRuleText'],
+    },
+    RULE_SELECTED: {
+      actions: ['selectRule'],
     },
   },
   states: {
-    Idle: {
+    Simple: {
       on: {
-        TEXT_CHANGED: {
-          actions: ['updateCurrentRuleText'],
-        },
-        RULESET_CREATED: {
-          actions: ['createRuleset', 'selectRule'],
-        },
-        RULE_SELECTED: {
-          actions: ['selectRule'],
-        },
-        LABEL_OPTIONS_SELECTED: {
-          target: 'LabelOptionsShowing',
-        },
-        RULE_OPTIONS_SELECTED: {
-          target: 'RuleOptionsShowing',
+        CHANGE_SEARCH_MODE: {
+          target: 'Complex',
         },
       },
     },
-    LabelOptionsShowing: {
-      onEntry: ['showLabelOptions'],
+    Complex: {
       on: {
-        LABEL_DISABLED: {
-          actions: ['disableLabel'],
+        RULE_EDITED: {
+          actions: ['editRuleset'],
         },
-        LABEL_TOGGLED: {
-          actions: ['toggleLabelBinary'],
+        CHANGE_SEARCH_MODE: {
+          target: 'Simple',
+          actions: ['activateSimpleSearch'],
         },
-        LABEL_DELETED: {
-          actions: ['deleteLabel'],
-          target: 'Idle',
+        LABEL_CLICKED: {
+          actions: ['toggleLabelTernary'],
         },
-        LABEL_OPTIONS_DISMISSED: {
-          target: 'Idle',
+        LOGIC_TOGGLED: {
+          actions: ['toggleSearchLogic'],
         },
-      },
-
-      onExit: ['hideLabelOptions'],
-    },
-    RuleOptionsShowing: {
-      onEntry: ['showRuleOptions'],
-      on: {
         RULE_DISABLED: {
           actions: ['disableRule'],
         },
@@ -87,14 +68,20 @@ export const form_config = {
         },
         RULE_DELETED: {
           actions: ['deleteRule'],
-          target: 'Idle',
         },
-        RULE_OPTIONS_DISMISSED: {
-          target: 'Idle',
+        LABEL_TOGGLED: {
+          actions: ['toggleLabelBinary'],
+        },
+        LABEL_DISABLED: {
+          actions: ['disableLabel'],
+        },
+        LABEL_DELETED: {
+          actions: ['deleteLabel'],
+        },
+        RULESET_CREATED: {
+          actions: ['createRuleset', 'selectRule'],
         },
       },
-
-      onExit: ['hideRuleOptions'],
     },
   },
 };
