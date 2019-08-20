@@ -1,9 +1,12 @@
 <script>
+  import { SearchContainer } from './Search';
   export let val;
 </script>
 
 <div>
-  <!-- CONTENT -->
+  <SearchContainer>
+
+  </SearchContainer>
 </div>
 
 <style>
