@@ -97,7 +97,7 @@ export const form_options = {
     },
     toggleLabelTernary: (
       { screenStore },
-      { tabId, ruleIndex, section, labelIndex, status }
+      { tabId, ruleIndex, section, labelIndex }
     ) => {
       const path = `${tabId}.uiQuery.${ruleIndex}.fields.${section}.${labelIndex}.status`;
       screenStore.update(toggleLabelTernaryUpdater(path));
@@ -161,6 +161,7 @@ export const form_options = {
     deleteRule: ({ screenStore }, { tabId, ruleIndex }) => {
       const uiQuery = get(screenStore)[tabId].uiQuery;
       const currentSelection = uiQuery.findIndex(({ selected }) => selected);
+      console.log(uiQuery);
 
       if (uiQuery.length <= 1) return;
 

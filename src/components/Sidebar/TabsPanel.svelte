@@ -70,9 +70,11 @@
     function toggleChecked(e) {
       if (e.target.checked) {
         tab_status.push(parseInt(id, 10));
+        tab_status = tab_status;
       } else {
         let el = tab_status.findIndex(_id =>_id === parseInt(id, 10));
         tab_status.splice(el, 1);
+        tab_status = tab_status;
       }
 
     }
@@ -133,7 +135,12 @@
         {#if isLoading}
           <Spinner />
         {/if}
-        <input on:click|stopPropagation use:registerTabs={id} type="checkbox"/>
+        <input
+          title="Select tab"
+          on:click|stopPropagation
+          use:registerTabs={id}
+          type="checkbox"
+        />
       </li>
     {/each}
 
@@ -141,11 +148,20 @@
   <div
     class="close-container"
   >
-    <span on:click={newTab} class="icon">
+    <span
+      title="New tab"
+      on:click={newTab}
+      class="icon"
+    >
       <PlusCircleIcon size={1.5}/>
     </span>
     {#if tabs.length > 1}
-    <span on:click={() => deleteTabs(activeTab)} class="icon">
+    <span
+      title="Delete selected tab(s)"
+      class:no-tabs={tab_status.length === 0}
+      on:click={() => deleteTabs(activeTab)}
+      class="icon"
+    >
       <Trash2Icon size={1.5}/>
     </span>
     {/if}
@@ -232,6 +248,10 @@
     justify-content: center;
     align-items: center;
     opacity: 1;
+
+    &.no-tabs {
+      opacity: 0.5;
+    }
 
     &:hover {
       opacity: 1;

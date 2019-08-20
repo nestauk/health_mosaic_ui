@@ -97,6 +97,7 @@
     text-align: justify;
     color: var(--color-text);
     overflow-y: auto;
+    grid-column: 2;
   }
   .copy {
     max-width: 800px;

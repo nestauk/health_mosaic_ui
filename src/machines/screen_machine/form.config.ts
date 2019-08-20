@@ -37,20 +37,23 @@ export const form_config = {
     RULE_SELECTED: {
       actions: ['selectRule'],
     },
-    CHANGE_SEARCH_COMPLEX: {
-      target: 'Form.Complex',
-    },
-    CHANGE_SEARCH_SIMPLE: {
-      target: 'Form.Simple',
-      actions: ['activateSimpleSearch'],
-    },
   },
   states: {
-    Simple: {},
+    Simple: {
+      on: {
+        CHANGE_SEARCH_MODE: {
+          target: 'Complex',
+        },
+      },
+    },
     Complex: {
       on: {
         RULE_EDITED: {
           actions: ['editRuleset'],
+        },
+        CHANGE_SEARCH_MODE: {
+          target: 'Simple',
+          actions: ['activateSimpleSearch'],
         },
         LABEL_CLICKED: {
           actions: ['toggleLabelTernary'],

@@ -97,7 +97,8 @@ code {
   --color-type-paper: rgb(101, 102, 106); /* logo_nih.png */
   --color-ui-border: lightgrey;
   --color-ui-shadow: darkgrey;
-
+  --color-excluded: hsla(202, 31%, 42%, 1);
+  --color-excluded-border: hsla(202, 31%, 42%, 1);
   --gradient-button-background: linear-gradient(-180deg, #fafbfc, #eff3f6 90%);
   --gradient-button-background-hover: linear-gradient(
     -180deg,

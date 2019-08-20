@@ -2,6 +2,7 @@
   import { createEventDispatcher } from 'svelte';
   import * as _ from 'lamb';
   import arrowForward from 'ionicons/dist/ionicons/svg/ios-arrow-forward.svg';
+  import { XCircleIcon } from 'svelte-feather-icons';
 
   const dispatch = createEventDispatcher();
 
@@ -29,12 +30,13 @@
         <span
           on:click={() => dispatch('toggleselection',  {key, type:selection.type, value: undefined}) }
         >
-          x
+          <XCircleIcon />
         </span>
       </div>
       <ul>
         {#each selection.value as item}
           <li
+            title="Remove selection"
             on:click={() => dispatch('toggleselection',  filterCurrent(selection, item, key))}
           >
             {item}
@@ -63,19 +65,20 @@
     }
 
     span {
-      border-radius: 2rem;
       display: block;
-      width: 1.3em;
-      height: 1.3em;
-      background: #eee;
+      width: 1.2em;
+      height: 1.2em;
       font-size: 1rem;
       display: flex;
       justify-content: center;
       align-items: center;
-      padding: 0 0px 2px 0px;
+      padding: 0;
+      transform: translateY(1px);
+      opacity: 0.6;
+      cursor: pointer;
 
       &:hover {
-        background: #ccc;
+        opacity: 1;
       }
     }
   }

@@ -66,17 +66,18 @@
   position: relative;
 }
 .c-toggle__switcher {
-  display: block;
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 100%;
-  width: 50%;
-  height: 100%;
-  border-radius: 50%;
-  transition: all 0.2s ease-out;
-  z-index: 2;
-  background: #fa99ff;
+	display: block;
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 100%;
+	width: 50%;
+	height: 100%;
+	border-radius: 50%;
+	border: 1px solid #bbb;
+	transition: all 0.2s ease-out;
+	z-index: 2;
+  background: #ccc;
 }
 
 .c-toggle__background {
@@ -94,9 +95,8 @@
 }
 
 #two:checked ~ .c-toggle__switcher {
-  right: 0;
-  left: 50%;
-  background: #66c9ff;
+	right: 0;
+	left: 50%;
 }
 
 #two:checked ~ .c-toggle__background {
@@ -104,9 +104,9 @@
 }
 
 fieldset {
-  border: none;
-  user-select: none;
-  width: 12em;
+	border: none;
+	user-select: none;
+	width: 12em;
   padding: 0;
 }
 

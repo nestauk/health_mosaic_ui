@@ -166,7 +166,6 @@
   }
 
   const changeTab = detail => {
-    console.log($page.path);
     sendTab('TAB_SELECTED', detail);
     screenMachine.send({
       type: 'ROUTE_CHANGED'

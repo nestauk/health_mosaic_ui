@@ -10,8 +10,15 @@
   import { screenStore, currentTab } from '../../../stores/search.ts';
   import { SEARCH } from '../_layout.svelte';
   import { NIH_type, CB_type, MU_type } from '../../../config';
+  import { countByTypeAsKeyValue } from '../../../util/domain';
 
   const { checkDirty } = getContext(SEARCH);
+
+  const labels = {
+    [CB_type]: 'Companies',
+    [MU_type]: 'Social',
+    [NIH_type]: 'Research',
+  };
 
   let previousSelectedItems;
   let changed;
@@ -24,6 +31,12 @@
       previousSelectedItems = selectedItems;
     }
   }
+
+  $: volumes = _.map(
+    countByTypeAsKeyValue(selectedItems),
+    ({key, value}) => ({key, text: `${labels[key]} (${value})`})
+  );
+
   $: isDirty = $screenStore && checkDirty();
 
   const openAll = () => items.forEach(v => v.open())
@@ -43,9 +56,9 @@
         </span>
       </div>
     <ul>
-      <li class="paper">Research</li>
-      <li class="company">Companies</li>
-      <li class="event">Social</li>
+      {#each volumes as {key, text}}
+      <li class="{key}">{text}</li>
+      {/each}
     </ul>
   </div>
 
@@ -97,6 +110,8 @@
     ul {
       display: flex;
       list-style: none;
+      padding: 0;
+      margin: 0;
 
       li {
         margin-left: 2.4em;
@@ -116,7 +131,7 @@
           background: var(--color-type-company);
         }
 
-        &.event::before {
+        &.meetup::before {
           background: var(--color-type-event);
         }
 
