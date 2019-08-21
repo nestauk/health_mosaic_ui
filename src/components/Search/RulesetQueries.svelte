@@ -27,14 +27,24 @@
 
   $: pills = _pills && _pills.filter(v => v !== null);
   $: isEditing = $rulesets.get(key);
-  $: inputCoords = pills[pills.length - 1] && calculateInputLocation(pills[pills.length - 1]);
 
-  $: textQuery = queries.map(({ query, status }) => (status === 'exclude' ? '-' : '') + query, "").join(', ');
+  $: inputCoords = pills[pills.length - 1] &&
+      calculateInputLocation(pills[pills.length - 1]);
 
-  const calculateInputLocation = lastPill => {
+  $: textQuery = queries.map(({ query, status }) =>
+      (status === 'exclude' ? '-' : '') + query, "").join(', ');
+
+  const calculateInputLocation = (lastPill, inputSize = 20) => {
     const el = lastPill.getBoundingClientRect();
     const container = pillContainer.getBoundingClientRect();
-    return { top: el.top - container.top, right: el.right - container.left };
+    const inputFits = container.width - (el.right - container.left) > inputSize;
+
+    return {
+      top: inputFits ?
+        el.top - container.top :
+        (el.top - container.top) + el.height,
+      right: inputFits ? el.right - container.left : 0
+    };
   }
 
   const handleKeyup = event => {
@@ -52,6 +62,7 @@
 
   const handleKeydown = event => {
     if (event.key === 'Backspace' && event.target.value.length === 0) {
+      console.log('hi')
       event.preventDefault();
       const { query, status } = queries[queries.length-1];
       event.target.value = `${status === 'exclude' ? '-' : ''}${query}`;
@@ -67,6 +78,27 @@
   }
 
   const removeQuery = i => queries = queries.filter((_pills, _i) => i !== _i)
+
+  const fitContent = node => {
+      const fakeInput = document.createElement('span');
+      fakeInput.style.opacity = 0;
+      fakeInput.style.position = 'absolute';
+      node.parentNode.insertBefore(fakeInput, node.nextSibling);
+
+      function resizeInput(event) {
+        const key = event.key === 'Backspace' ? '' : event.key;
+        fakeInput.innerText = event.target.value + key;
+        const { width } = fakeInput.getBoundingClientRect();
+        node.style.width = `${width + 15}px`;
+        inputCoords = calculateInputLocation(pills[pills.length - 1], width + 10);
+      }
+
+    node.addEventListener('keydown', resizeInput);
+
+    return {
+      destroy: () => node.removeEventListener('keydown', resizeInput);
+    }
+  }
 
 </script>
 
@@ -98,8 +130,10 @@
         <input
           bind:this={input}
           style="transform: translate({inputCoords.right}px, {inputCoords.top}px)"
+          use:fitContent
           on:keyup={handleKeyup}
           on:keydown={handleKeydown}
+
         />
       {/if}
     </div>
@@ -116,6 +150,8 @@
     .query-labels {
       border: 1px solid transparent;
       position: relative;
+      width: 100%;
+      margin-right: 20px;
     }
 
     &.editing {
@@ -124,8 +160,6 @@
         border-radius: 3px;
         box-shadow: inset 0 1px 2px rgba(27,31,35,.075);
         background: #fff;
-        width: 100%;
-        margin-right: 20px;
       }
     }
 
@@ -208,7 +242,7 @@
     outline: none;
     width: 130px;
     background: none;
-    padding: 2px 2px 2px 5px;
+    margin: 0px 8px 0px 11px;
     border: 1px solid transparent;
     border-radius: 3px;
     font-size: 14px;
