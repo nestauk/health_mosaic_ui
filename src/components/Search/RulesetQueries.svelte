@@ -145,10 +145,10 @@
       flex-wrap: wrap;
 
       li {
-        padding: 1px 4px;
+        padding: 1px 6px;
         border: 1px solid #ccc;
         margin: 3px;
-        border-radius: 3px;
+        border-radius: 5px ~"/" 10px;
         font-size: 14px;
 
         &.include {
