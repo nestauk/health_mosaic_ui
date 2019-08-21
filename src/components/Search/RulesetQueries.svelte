@@ -1,7 +1,36 @@
 <script>
+  // import { createEventDispatcher } from 'svelte';
+  import { getContext } from 'svelte';
+  import { RULESETS } from './SearchContainer.svelte';
   import { Edit } from '../Icons';
+
   export let isEditing = true;
-  export let queries = [{ query: 'Heart', status: 'include' }, { query: 'Disease', status: 'exclude' }];
+  export let queries = [
+    { query: 'Heart', status: 'include' },
+    { query: 'Disease', status: 'exclude' },
+    { query: 'Heart', status: 'include' },
+    { query: 'Disease', status: 'exclude' },
+    { query: 'Heart', status: 'include' },
+    { query: 'Disease', status: 'exclude' },
+    { query: 'Heart', status: 'include' },
+    { query: 'Disease', status: 'exclude' }
+  ];
+
+  // const dispatch = createEventDispatcher();
+
+  const { rulesets, register, setEditState } = getContext(RULESETS);
+
+  const key = {};
+
+  let editing = false;
+
+  register(key);
+
+  $: isEditing = $rulesets.get(key);
+  $: console.log(isEditing);
+  // const handle_edit = () => {
+
+  // }
 
   $: textQuery = queries.map(({ query, status }) => (status === 'exclude' ? '-' : '') + query, "").join(', ');
 </script>
@@ -15,12 +44,12 @@
         {/each}
       </ul>
     </div>
-    <button on:click={() => isEditing = true}><Edit /></button>
+    <button on:click={() => setEditState(key)}><Edit /></button>
   </div>
 {:else}
   <div class="edit">
     <input value={textQuery}/>
-    <button on:click={() => isEditing = false}>x</button>
+    <!-- <button on:click={() => dispatch('edit', false)}>x</button> -->
   </div>
 {/if}
 
@@ -52,6 +81,7 @@
       padding: 3px 5px;
       margin: 0;
       list-style: none;
+      flex-wrap: wrap;
 
       li {
         padding: 3px 9px;

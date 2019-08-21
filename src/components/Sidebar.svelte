@@ -8,6 +8,12 @@
     <Ruleset>
       <RulesetQueries />
     </Ruleset>
+    <Ruleset>
+      <RulesetQueries />
+    </Ruleset>
+    <Ruleset>
+      <RulesetQueries />
+    </Ruleset>
 
   </SearchContainer>
 </div>

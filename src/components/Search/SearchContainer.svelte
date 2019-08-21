@@ -1,10 +1,27 @@
+<script context="module">
+  export const RULESETS = {};
+</script>
+
 <script>
-  import { createEventDispatcher } from 'svelte';
+  import { setContext, createEventDispatcher } from 'svelte';
+  import { writable } from 'svelte/store';
   import { Sync } from '../Icons';
   import MultiToggle from '../MultiToggle.svelte';
 
+  const rulesets = writable(new Map());
   const dispatch = createEventDispatcher();
   const search_indices= ['Research', 'Companies', 'Events'];
+
+  setContext(RULESETS, {
+    rulesets,
+    register: key => $rulesets = $rulesets.set(key, false) ,
+    setEditState: key => {
+      const _rulesets = $rulesets.forEach((edit_state, _key, map) =>
+        _key === key ? map.set(_key, true) : map.set(_key, false));
+
+      $rulesets = $rulesets;
+    }
+  })
 </script>
 
 <div class="container">
