@@ -22,27 +22,30 @@
   let _pills = [];
   let backspacing = false;
   let input;
+  let padbottom = false;
 
   register(key);
 
   $: pills = _pills && _pills.filter(v => v !== null);
   $: isEditing = $rulesets.get(key);
 
-  $: inputCoords = pills[pills.length - 1] &&
-      calculateInputLocation(pills[pills.length - 1]);
+  $: inputCoords = calculateInputLocation(pills[pills.length - 1]);
 
   $: textQuery = queries.map(({ query, status }) =>
       (status === 'exclude' ? '-' : '') + query, "").join(', ');
 
   const calculateInputLocation = (lastPill, inputSize = 20) => {
+    if (!lastPill) return { top: 6, right: 0 };
+
     const el = lastPill.getBoundingClientRect();
     const container = pillContainer.getBoundingClientRect();
     const inputFits = container.width - (el.right - container.left) > inputSize;
+    padbottom = !inputFits;
 
     return {
       top: inputFits ?
         el.top - container.top :
-        (el.top - container.top) + el.height,
+        (el.top - container.top) + el.height + 8,
       right: inputFits ? el.right - container.left : 0
     };
   }
@@ -62,7 +65,7 @@
 
   const handleKeydown = event => {
     if (event.key === 'Backspace' && event.target.value.length === 0) {
-      console.log('hi')
+      if (!queries[queries.length-1]) return;
       event.preventDefault();
       const { query, status } = queries[queries.length-1];
       event.target.value = `${status === 'exclude' ? '-' : ''}${query}`;
@@ -80,23 +83,24 @@
   const removeQuery = i => queries = queries.filter((_pills, _i) => i !== _i)
 
   const fitContent = node => {
-      const fakeInput = document.createElement('span');
-      fakeInput.style.opacity = 0;
-      fakeInput.style.position = 'absolute';
-      node.parentNode.insertBefore(fakeInput, node.nextSibling);
+    const fakeInput = document.createElement('span');
+    fakeInput.style.opacity = 0;
+    fakeInput.style.position = 'absolute';
+    node.parentNode.insertBefore(fakeInput, node.nextSibling);
 
-      function resizeInput(event) {
-        const key = event.key === 'Backspace' ? '' : event.key;
-        fakeInput.innerText = event.target.value + key;
-        const { width } = fakeInput.getBoundingClientRect();
-        node.style.width = `${width + 15}px`;
-        inputCoords = calculateInputLocation(pills[pills.length - 1], width + 10);
-      }
+    function resizeInput(event) {
+      const key = event.key === 'Backspace' ? '' : event.key;
+      fakeInput.innerText = event.target.value + key;
+      const { width } = fakeInput.getBoundingClientRect();
+      node.style.width = `${width + 15}px`;
+      inputCoords = calculateInputLocation(pills[pills.length - 1], width + 10);
+      console.log(inputCoords);
+    }
 
     node.addEventListener('keydown', resizeInput);
 
     return {
-      destroy: () => node.removeEventListener('keydown', resizeInput);
+      destroy: () => node.removeEventListener('keydown', resizeInput)
     }
   }
 
@@ -110,7 +114,7 @@
       class="query-labels"
       bind:this={pillContainer}
     >
-      <ul>
+      <ul class:padbottom>
         {#each queries as { query, status }, i}
           <li
             class={status}
@@ -133,7 +137,6 @@
           use:fitContent
           on:keyup={handleKeyup}
           on:keydown={handleKeydown}
-
         />
       {/if}
     </div>
@@ -152,6 +155,7 @@
       position: relative;
       width: 100%;
       margin-right: 20px;
+      min-height: 37px;
     }
 
     &.editing {
@@ -186,6 +190,10 @@
       margin: 0;
       list-style: none;
       flex-wrap: wrap;
+
+      &.padbottom {
+        margin-bottom: 30px;
+      }
 
       li {
         padding: 1px 6px;
@@ -242,7 +250,7 @@
     outline: none;
     width: 130px;
     background: none;
-    margin: 0px 8px 0px 11px;
+    margin: 1px 8px 0px 11px;
     border: 1px solid transparent;
     border-radius: 3px;
     font-size: 14px;
