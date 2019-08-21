@@ -71,6 +71,7 @@ code {
   --color-type-event: rgb(237, 28, 64); /* logo_meetup.svg */
   --color-type-paper: rgb(101, 102, 106); /* logo_nih.png */
   --sidebar-width: 25rem;
+  --sidebar-width: 20rem;
   --button-bg: #eff3f6;
   --button-bg-image: linear-gradient(-180deg, #fafbfc, #eff3f6 90%);
   --button-hover-bg: #e6ebf1;
