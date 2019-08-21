@@ -65,6 +65,9 @@
     await tick();
     input.focus();
   }
+
+  const removeQuery = i => queries = queries.filter((_pills, _i) => i !== _i)
+
 </script>
 
   <div
@@ -82,6 +85,12 @@
             bind:this={_pills[i]}
           >
             {query}
+            <span
+              class="close"
+              on:click={() => removeQuery(i)}
+            >
+                x
+            </span>
           </li>
         {/each}
       </ul>
@@ -150,6 +159,11 @@
         margin: 3px;
         border-radius: 5px ~"/" 10px;
         font-size: 14px;
+
+        .close {
+          margin-left: 5px;
+          cursor: pointer;
+        }
 
         &.include {
           color: green;
