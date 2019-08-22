@@ -96,6 +96,7 @@
     "stylelint": "^10.1.0",
     "stylelint-config-recommended": "^2.2.0",
     "svelte": "^3.6.4",
+    "svelte-feather-icons": "^2.0.0",
     "ts-jest": "^24.0.2",
     "ts-lib": "^0.0.5",
     "ts-node": "^8.3.0",

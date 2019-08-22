@@ -55,22 +55,22 @@
   .field-container {
     margin-bottom: 30px;
 
-    &.isEditing {
+    /* &.isEditing {
 
       ul {
-        flex-direction: column;
       }
-    }
+    } */
 
     ul {
-      margin: 0 0 0 10px;
+      margin: 0 10px;
       padding: 0;
       display: flex;
+        flex-direction: column;
 
       li {
         display: flex;
 
-        label {
+        /* label {
           &.included {
             color: #fff;
             font-weight: 500;
@@ -81,7 +81,7 @@
             color: #fff;
             font-weight: 500;
           }
-        }
+        } */
 
         input {
           position: relative;
