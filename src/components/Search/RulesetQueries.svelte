@@ -1,6 +1,9 @@
+
+
 <script>
-  import { getContext, tick } from 'svelte';
+  import { setContext, getContext, tick } from 'svelte';
   import { RULESETS } from './SearchContainer.svelte';
+  import { RULESET } from './Ruleset.svelte';
   import { Edit } from '../Icons';
 
   export let isEditing = true;
@@ -13,9 +16,8 @@
     { query: 'Disease', status: 'exclude' },
   ];
 
-  const { rulesets, register, setEditState } = getContext(RULESETS);
-
-  const key = {};
+  const key = getContext(RULESET);
+  const { rulesets, setEditState } = getContext(RULESETS);
 
   let editing = false;
   let pillContainer;
@@ -24,7 +26,6 @@
   let input;
   let padbottom = false;
 
-  register(key);
 
   $: pills = _pills && _pills.filter(v => v !== null);
   $: isEditing = $rulesets.get(key);
@@ -94,7 +95,6 @@
       const { width } = fakeInput.getBoundingClientRect();
       node.style.width = `${width + 15}px`;
       inputCoords = calculateInputLocation(pills[pills.length - 1], width + 10);
-      console.log(inputCoords);
     }
 
     node.addEventListener('keydown', resizeInput);
@@ -161,7 +161,7 @@
     &.editing {
       .query-labels {
         border: 1px solid #d1d5da;
-        border-radius: 3px;
+        border-radius: 17px;
         box-shadow: inset 0 1px 2px rgba(27,31,35,.075);
         background: #fff;
       }
@@ -196,10 +196,9 @@
       }
 
       li {
-        padding: 1px 6px;
-        border: 1px solid #ccc;
+        padding: 2px 10px;
         margin: 3px;
-        border-radius: 5px ~"/" 10px;
+        border-radius: 14px;
         font-size: 14px;
 
         .close {
@@ -208,13 +207,15 @@
         }
 
         &.include {
-          color: green;
-          border-color: green;
+          color: #fff;
+          font-weight: 500;
+          background-color: #8cc1c1;
         }
 
         &.exclude {
-          color: red;
-          border-color: red;
+          background-color: #f77c66;
+          color: #fff;
+          font-weight: 500;
         }
       }
     }

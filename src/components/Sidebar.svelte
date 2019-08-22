@@ -1,5 +1,5 @@
 <script>
-  import { SearchContainer, Ruleset, RulesetQueries } from './Search';
+  import { SearchContainer, Ruleset, RulesetQueries, RulesetFields } from './Search';
   export let val;
 </script>
 
@@ -7,12 +7,15 @@
   <SearchContainer>
     <Ruleset>
       <RulesetQueries />
+      <RulesetFields />
     </Ruleset>
     <Ruleset>
       <RulesetQueries />
+      <RulesetFields />
     </Ruleset>
     <Ruleset>
       <RulesetQueries />
+      <RulesetFields />
     </Ruleset>
 
   </SearchContainer>
