@@ -131,7 +131,7 @@
     .subject {
       flex: 1;
       order: 1;
-      border-right: 3px solid orange;
+      border-right: 3px solid var(--color-type-event);
       padding: 0.5em 1em;
       text-align: right;
       max-width: 20em;

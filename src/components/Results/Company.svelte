@@ -143,7 +143,7 @@
       flex: 1;
       min-width: 12em;
       order: 1;
-      border-right: 3px solid limegreen;
+      border-right: 3px solid var(--color-type-company);
       padding: 0.5em 1em;
       text-align: right;
       max-width: 20em;

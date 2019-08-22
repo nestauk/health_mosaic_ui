@@ -119,7 +119,7 @@
     .subject {
       flex: 1;
       order: 1;
-      border-right: 3px solid #2f98f3;
+      border-right: 3px solid var(--color-type-paper);
       padding: 0.5em 1em;
       text-align: right;
       max-width: 20em;

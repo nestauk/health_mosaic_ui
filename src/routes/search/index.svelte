@@ -110,21 +110,20 @@
           width: 10px;
           height: 10px;
           border-radius: 5px;
-          background: limegreen;
           left: -20px;
           top: 7px
         }
 
-        &.paper::before {
-          background: #2f98f3;
+        &.company::before {
+          background: var(--color-type-company);
         }
 
         &.event::before {
-          background: orange;
+          background: var(--color-type-event);
         }
 
         &.paper::before {
-          background: #2f98f3;
+          background: var(--color-type-paper);
         }
       }
     }
