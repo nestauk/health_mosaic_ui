@@ -10,7 +10,7 @@
   import { WorldMapWithHistogramScaleHTML } from '../../../components/WorldMapWithHistogramScale';
 
   import { screenStore, currentTab } from '../../../stores/search.ts';
-  import { countByCountryId } from '../../../util/domain';
+  import { countByCountryIdAsKeyValue } from '../../../util/domain';
   import { getKey, getValue } from '../../../util/object.any';
   import { SEARCH } from '../_layout.svelte';
 
@@ -21,7 +21,7 @@
   $: selections = $screenStore[$currentTab].selections;
   $: selectedCountries = (selections.country_id && selections.country_id.value) || [];
   $: selectedItems = $screenStore[$currentTab].selected;
-  $: selectedItemsByCountryId = countByCountryId(selectedItems); // {key: country_id, value: number}[]
+  $: selectedItemsByCountryId = countByCountryIdAsKeyValue(selectedItems); // {key: country_id, value: number}[]
 
   // TODO utils?
   const updateSelections = ({ detail: selection }) =>

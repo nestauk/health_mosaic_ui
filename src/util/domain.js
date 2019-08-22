@@ -11,7 +11,7 @@ import { getKey, getValue } from './object.any';
 import { getId } from './object.string';
 
 // TODO svizzle
-const countBy = key =>
+const countByAsKeyValue = key =>
   _.pipe([
     _.countBy(_.getKey(key)),
     objectToKeyValueArray,
@@ -25,8 +25,9 @@ export const noneLabel = 'none';
 
 export const getLabel = _.getKey('label');
 
-export const countByCity = countBy('city');
-export const countByCountryId = countBy('country_id');
+export const countByCityAsKeyValue = countByAsKeyValue('city');
+export const countByCountryIdAsKeyValue = countByAsKeyValue('country_id');
+export const countByTypeAsKeyValue = countByAsKeyValue('type');
 
 export const termsIsNotNull = _.pipe([_.getKey('terms'), isNotNull]);
 export const getIdsByTerms = arr => _.reduce(arr, (acc, item) => {

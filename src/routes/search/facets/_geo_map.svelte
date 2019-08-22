@@ -8,7 +8,7 @@
 
   import { screenStore, currentTab } from '../../../stores/search.ts';
   import { makeGeoJson } from '../../../util/geo.js';
-  import { countByCity } from '../../../util/domain';
+  import { countByCityAsKeyValue } from '../../../util/domain';
   import { SEARCH } from '../_layout.svelte';
 
   const { select } = getContext(SEARCH);
@@ -16,7 +16,7 @@
   export let isDirty;
 
   $: selectedItems = $screenStore[$currentTab].selected;
-  $: selectedItemsByCity = countByCity(selectedItems);
+  $: selectedItemsByCity = countByCityAsKeyValue(selectedItems);
   $: geoJson = makeGeoJson(selectedItems);
   $: bounds = $screenStore[$currentTab].selections.location &&
     $screenStore[$currentTab].selections.location.value;
