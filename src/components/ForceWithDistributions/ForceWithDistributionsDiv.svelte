@@ -3,6 +3,7 @@
   import { toPx, makeStyle } from '@svizzle/dom';
   import * as _ from 'lamb';
 
+  import { areValidBins } from '../../util/array';
   import { skipNull } from '../../util/object';
   import { HistogramDiv } from '../Histogram/';
   import { ForceCanvasDiv, LegendVolumeDegree } from '../Force/';
@@ -14,11 +15,11 @@
   export let degreeAccessor;
   export let focusedNodeId;
   export let linkKeyToVolumeColor;
-  export let linkVolumeBins;
+  export let linkVolumeBins = [];
   export let network;
-  export let nodeDegreeBins;
+  export let nodeDegreeBins = [];
   export let nodeKeyToVolumeColor;
-  export let nodeVolumeBins;
+  export let nodeVolumeBins = [];
   export let shouldResize;
   export let title;
   export let volumeAccessor;
@@ -40,6 +41,9 @@
 
   onMount(getSensorOrigin);
 
+  $: showLinkVolumeHistogram = areValidBins(linkVolumeBins)
+  $: showDegreeHistogram = areValidBins(nodeDegreeBins);
+  $: showNodeVolumeHistogram = areValidBins(nodeVolumeBins);
   $: $shouldResize && getSensorOrigin();
 
   const enteredNode = ({detail: {id, items}}) => {
@@ -124,25 +128,26 @@
         on:mouseout="{mouseleft}"
         {shouldResize}
       />
+      {#if showDegreeHistogram}
       <div class="widget histogram degree">
         <HistogramDiv
           bins="{nodeDegreeBins}"
-          title="Degree"
-          valueAccessor="{degreeAccessor}"
           orientation_y="top-down"
+          title="Connections"
+          valueAccessor="{degreeAccessor}"
         />
-        <!-- {selectedKeys} -->
-        <!-- on:clickedBin="{clickedBin}" -->
       </div>
+      {/if}
+      {#if showNodeVolumeHistogram}
       <div class="widget histogram nodes volume">
         <HistogramDiv
           bins="{nodeVolumeBins}"
           title="Nodes volume"
           valueAccessor="{volumeAccessor}"
         />
-        <!-- {selectedKeys} -->
-        <!-- on:clickedBin="{clickedBin}" -->
       </div>
+      {/if}
+      {#if showLinkVolumeHistogram}
       <div class="widget histogram links volume">
         <HistogramDiv
           bins="{linkVolumeBins}"
@@ -150,9 +155,8 @@
           title="Links volume"
           valueAccessor="{volumeAccessor}"
         />
-        <!-- {selectedKeys} -->
-        <!-- on:clickedBin="{clickedBin}" -->
       </div>
+      {/if}
       <div class="widget legend">
         <LegendVolumeDegree
           linecolor="grey"
@@ -204,6 +208,7 @@
           height: 32%;
           width: 16%;
           position: absolute;
+          pointer-events: none;
         }
 
         .histogram {

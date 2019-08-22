@@ -7,6 +7,7 @@
   // svg
   export let bins;
   export let colors;
+  export let interactive = false;
   export let orientation_x = 'left-right';
   export let orientation_y = 'bottom-up';
   export let selectedKeys = [];
@@ -18,7 +19,10 @@
   let width = 0;
 </script>
 
-<div class="container">
+<div
+  class="histogram"
+  class:interactive
+>
   {#if title}
   <header class:rightToLeft="{isRightToLeft}">
     <p>{title}</p>
@@ -37,6 +41,7 @@
         {bins}
         {colors}
         {height}
+        {interactive}
         on:clickedBin
         {orientation_x}
         {orientation_y}
@@ -49,11 +54,16 @@
 </div>
 
 <style lang="less">
-  .container {
+  .histogram {
     width: 100%;
     height: 100%;
 
     @header-height: 2em;
+
+    pointer-events: none;
+    &.interactive {
+      pointer-events: auto;
+    }
 
     header {
       width: 100%;

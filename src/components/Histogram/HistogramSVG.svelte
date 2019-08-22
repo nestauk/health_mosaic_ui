@@ -19,10 +19,10 @@
   export let bins;
   export let colors;
   export let height;
+  export let interactive = false;
   export let orientation_x = 'left-right';
   export let orientation_y = 'bottom-up';
   export let selectedKeys = [];
-  export let valueAccessor;
   export let width;
 
   $: isRightToLeft = orientation_x === 'right-left';
@@ -42,21 +42,22 @@
 
   $: valuesMax = getBinsMax(bins);
   $: valuesMin = getBinsMin(bins);
-  $: xScale =
-    bins.length && (
-    (Math.log10(Math.abs(valuesMax - valuesMin)) < 2)
-      ? scaleLinear
-      : scaleLog
-    );
+  $: isWidespread = (Math.log10(Math.abs(valuesMax - valuesMin)) > 2);
   $: binsExtent = bins.length
     ? [bins[0].range[0], _.last(bins).range[1]]
     : [];
+
   $: scales = bins.length && {
-    x: xScale()
-      .domain([1, valuesMax])
-      .range([innerWidth / Math.log10(valuesMax), innerWidth]),
+    x: isWidespread
+      ? scaleLog()
+        .domain([1, valuesMax])
+        .range([innerWidth / Math.log10(valuesMax), innerWidth])
+      : scaleLinear()
+        .domain([0, valuesMax])
+        .range([0, innerWidth]),
     y: scaleLinear().domain(binsExtent).range([0, innerHeight])
-  };
+  }
+
   $: bars = _.map(bins, (bin, index) => {
     const {range, values} = bin;
     const active = !selectedBins.length || selectedBins.includes(index);
@@ -104,7 +105,10 @@
 <svelte:options namespace="svg" />
 
 {#if scales}
-<g class="histogram">
+<g
+  class="histogram"
+  class:interactive
+>
   <!-- <rect class="box" {width} {height} /> -->
   <g transform="translate({safety.left},{safety.top})">
     {#each bars as {
@@ -124,12 +128,14 @@
       class:deselected="{!active}"
       transform="translate(0,{y})"
     >
+      {#if interactive}
       <rect
         class="sensor"
         width="{innerWidth}"
         height="{barThickness}"
         on:click="{clickedBin(index)}"
       />
+      {/if}
       <rect
         class="bar"
         {width}
@@ -170,6 +176,11 @@
 
 <style lang="less">
   .histogram {
+    pointer-events: none;
+    &.interactive {
+      pointer-events: auto;
+    }
+
     rect, line {
       stroke-width: 0.5px;
       shape-rendering: crispEdges;

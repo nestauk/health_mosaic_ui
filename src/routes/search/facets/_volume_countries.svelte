@@ -15,7 +15,6 @@
   import { screenStore, currentTab } from '../../../stores/search.ts';
   import {
     exactAmountBins,
-    exactAmountBinsInIterval,
     sortValueDescKeyAsc,
     trimBins
   } from '../../../util/array';
@@ -24,6 +23,7 @@
   import {
     getNodeDegree,
     getVolume,
+    makeEmptyNetwork,
     makeFilterUndirectedNetwork,
     makeLinksVolume,
     makeNodesDegrees,
@@ -63,7 +63,7 @@
   let linkKeyToVolumeColor;
   let linkVolumeBins;
   let linksVolume;
-  let network;
+  let network = makeEmptyNetwork();
   let nodesDegree;
   let nodeKeyToVolumeColor;
   let nodesVolume;
@@ -137,12 +137,12 @@
   $: {
     // TODO svizzle
     const {bins, start, end} = trimBins(
-      exactAmountBinsInIterval(
-        linksArray,
-        colors.length,
-        volumeInterval,
-        getVolume
-      )
+      exactAmountBins({
+        array: linksArray,
+        size: colors.length,
+        interval: volumeInterval,
+        accessor: getVolume
+      })
     );
     const linkVolumeColors = _.slice(colors, start, end + 1);
     const colorBinPairs = _.zip(bins, linkVolumeColors);
@@ -165,12 +165,12 @@
 
   $: {
     const {bins, start, end} = trimBins(
-      exactAmountBinsInIterval(
-        nodesArray,
-        colors.length,
-        volumeInterval,
-        getVolume
-      )
+      exactAmountBins({
+        array: nodesArray,
+        size: colors.length,
+        interval: volumeInterval,
+        accessor: getVolume
+      })
     );
     const nodeVolumeColors = _.slice(colors, start, end + 1);
     const colorBinPairs = _.zip(bins, nodeVolumeColors);
@@ -190,11 +190,13 @@
     ); // TODO util?
   };
 
-  $: nodeDegreeBins = exactAmountBins(
-    nodesArray,
-    colors.length,
-    getNodeDegree
-  );
+  $: nodeDegreeBins = trimBins(
+    exactAmountBins({
+      array: nodesArray,
+      size: 10,
+      accessor: getNodeDegree
+    })
+  ).bins;
 
   const nodeEntered = ({detail: {id}}) => {
     focusedNodeId = id;

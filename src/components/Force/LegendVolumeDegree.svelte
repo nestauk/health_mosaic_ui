@@ -44,8 +44,8 @@
       <line
         marker-end="url(#Triangle)"
         stroke="{linecolor}"
-        stroke-width="5"
         stroke-opacity="0"
+        stroke-width="5"
         x1="100"
         y1="-100"
       />
@@ -58,7 +58,12 @@
       >Degree</text>
     </g>
     <g transform="translate(100,-100)">
-      <circle r="30" fill="none" stroke="{linecolor}" />
+      <circle
+        r="30"
+        fill="none"
+        stroke="{linecolor}"
+        stroke-width="3"
+      />
       <text
         dominant-baseline="middle"
         font-size="20"

@@ -3,9 +3,11 @@ import { extent, pairs } from 'd3-array';
 import {
   arrayMaxWith,
   arrayMinWith,
+  hasIterableLength1,
+  isArray,
   isIterableEmpty,
   isIterableNotEmpty,
-  isArray,
+  isNotNil,
   makeIsWithinRange
 } from '@svizzle/utils';
 
@@ -14,57 +16,36 @@ import { getKey, getValue, getValues } from './object.any';
 
 /* binning */
 
-export const exactAmountBins = (array, amount, accessor = _.identity) => {
-  const [min, max] = extent(array, accessor);
-  const step = (max - min) / amount;
-
-  // rounding errors might give a range max lower than the actual max
-  // which might then exclude items in the last bin
-  const ranges = pairs(_.range(min, max, step).concat([max]));
-
-  // FIXME is there a _.find function in lamb to do this?
-  // TODO if not, make a util
-  const findRangeIndex = _.adapter(
-    _.map(ranges, (range, index) => {
-      const predicate = _.pipe([
-        accessor,
-        makeIsWithinRange(range)
-      ]);
-
-      return value => predicate(value) ? index : undefined
-    })
-  );
-
-  return _.reduce(array,
-    (acc, item) => {
-      const index = findRangeIndex(item);
-      acc[index].values.push(item)
-      return acc;
-    },
-    _.map(ranges, range => ({range, values: []}))
-  );
-}
-
-export const exactAmountBinsInIterval = (
+export const exactAmountBins = ({
   array,
-  amount,
-  interval = null,
-  accessor = _.identity
-) => {
-  const [min, max] = interval || extent(array, accessor);
-  const step = (max - min) / amount;
+  size,
+  accessor = _.identity,
+  interval = null
+}) => {
+  const activeRange = interval
+    ? _.sort(interval)
+    : extent(array, accessor);
+  const [min, max] = activeRange;
 
-  // rounding errors might give a range max lower than the actual max
-  // which might then exclude items in the last bin
-  const ranges = pairs(_.range(min, max, step).concat([max]));
+  if (min === max) {
+    return [{values: array}]
+  }
 
-  // FIXME is there a _.find function in lamb to do this?
-  // TODO if not, make a util
+  const minFloor = Math.floor(min);
+  const maxCeil = Math.ceil(max);
+  const step = Math.ceil((max - minFloor) / size);
+  const intMax = minFloor + step * size;
+  const ranges = pairs(_.range(minFloor, intMax, step).concat([intMax]));
+
+  // TODO svizzle
   const findRangeIndex = _.adapter(
     _.map(ranges, (range, index) => {
       const predicate = _.pipe([
         accessor,
-        makeIsWithinRange(range)
+        _.allOf([
+          makeIsWithinRange(activeRange),
+          makeIsWithinRange(range),
+        ])
       ]);
 
       return value => predicate(value) ? index : undefined
@@ -74,12 +55,32 @@ export const exactAmountBinsInIterval = (
   return _.reduce(array,
     (acc, item) => {
       const index = findRangeIndex(item);
-      acc[index].values.push(item)
+      isNotNil(index) && acc[index].values.push(item)
       return acc;
     },
     _.map(ranges, range => ({range, values: []}))
   );
 }
+
+// TODO svizzle
+/* bins getters and functions */
+
+export const areValidBins = _.allOf([
+  isIterableNotEmpty,
+  _.pathExists('0.range'),
+  _.pipe([_.getPath('0.range'), isNotNil])
+]);
+
+export const doBinsHaveRange = _.pipe([
+  _.getPath('0.range'),
+  isNotNil,
+]);
+
+export const hasNoBins = _.pipe([
+  hasIterableLength1,
+  _.getPath('0.range'),
+  _.isNil,
+]);
 
 export const getBinsItems = _.pipe([
   _.mapWith(_.getKey('values')),

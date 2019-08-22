@@ -11,7 +11,7 @@ import { isNilWith } from './function.any.boolean';
 import { getKey, getValue } from './object.any';
 import { getId } from './object.string';
 
-const makeEmptyNetwork = () => ({nodes: {}, links: {}});
+export const makeEmptyNetwork = () => ({nodes: {}, links: {}});
 
 export const getLinkId = (a, b) => `${a} <-> ${b}`;
 export const makeGetLinkLabel = nodeKeyToLabel =>
