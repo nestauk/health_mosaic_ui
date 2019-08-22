@@ -39,12 +39,12 @@
       {#if isEditing}
         <li>
           <label>{name}</label>
-          <input class="red" type="checkbox" on:change={handleCheckbox('excluded', i)}/>
-          <input class="green" type="checkbox" on:change={handleCheckbox('included', i)}/>
+          <input class="red" type="checkbox" on:change={handleCheckbox('excluded', i)} checked={status === 'excluded'}/>
+          <input class="green" type="checkbox" on:change={handleCheckbox('included', i)} checked={status === 'included'}/>
         </li>
       {:else if !isEditing && status !== 'default'}
         <li>
-          <label>{name} -  {status}</label>
+          <label class="{status}">{name}</label>
         </li>
       {/if}
     {/each}
@@ -59,6 +59,10 @@
 
       ul {
         flex-direction: column;
+
+        li {
+
+        }
       }
     }
 
@@ -70,19 +74,65 @@
       li {
         display: flex;
 
-        input:first-of-type {
-          margin-left: auto;
+        label {
+          &.included {
+            color: #fff;
+            font-weight: 500;
+            background-color: #8cc1c1;
+          }
+          &.excluded {
+            background-color: #f77c66;
+            color: #fff;
+            font-weight: 500;
+          }
+        }
+
+        input {
+          position: relative;
+          width: 1.3em;
+          height: 1.3em;
+          background-color: white;
+          border-radius: 3px;
+          vertical-align: middle;
+          border: 2px solid #ddd;
+          -webkit-appearance: none;
+          outline: none;
+          cursor: pointer;
+
+          &::after {
+            position: absolute;
+            content: '';
+            background: #fff;
+            border-radius: 1px;
+            width: calc(100% - 1px);
+            border: 0.5px solid #fff;
+            height: calc(100% - 1px);
+          }
+
+          &:first-of-type {
+            margin-left: auto;
+          }
+          /* .checkbox-round { */
+          &.green:checked::after {
+            background-color:  #8cc1c1;
+          }
+
+          &.red:checked::after {
+            background-color:  #f77c66;
+          }
 
           &.green {
-            color: green;
+            border-color: #43b192;
           }
 
           &.red {
-            color: red;
+            border-color: #f76146;
           }
         }
+
+
+
       }
     }
-
   }
 </style>
