@@ -1,15 +1,21 @@
 <script>
   import { createEventDispatcher, onMount } from 'svelte';
+  import { extent } from 'd3-array';
   import * as _ from 'lamb';
   import { toPx, makeStyle } from '@svizzle/dom';
-  import { toggleItem } from '@svizzle/utils';
+  import { getObjSize, toggleItem } from '@svizzle/utils';
 
   import { countries } from '../../../data/geo/iso_a2_to_name_by_type.json';
   import { exactAmountBins } from '../../util/array';
   import { skipNull } from '../../util/object';
   import { HistogramSVG } from '../Histogram';
   import { WorldMapSVG } from '../WorldMap';
-  import { histogramMargin, pointerMargin } from './index';
+  import {
+    histogramMargin,
+    histogramMaxHeight,
+    histogramMaxWidth,
+    pointerMargin
+  } from './index';
 
   const dispatch = createEventDispatcher();
 
@@ -20,8 +26,10 @@
   export let valueAccessor;
   export let selectedKeys = [];
 
+  let bins;
   let bbox;
   let height = 0;
+  let keyToColor;
   let pointer;
   let svg;
   let target;
@@ -29,19 +37,31 @@
   let width = 0;
 
   $: itemsByKey = _.index(items, keyAccessor);
-  $: histogramWidth = Math.min(300, width / 5);
-  $: histogramHeight = Math.min(300, height / 3);
-  $: bins = exactAmountBins(items, colors.length, valueAccessor);
-  $: keyToColor = _.reduce(
-    _.zip(colors, bins),
-    (obj, [color, {range, values}]) => {
-      values.forEach(({key}) => {
-        obj[key] = color;
-      })
-      return obj;
-    },
-    {}
-  ); // TODO investigate a util
+  $: histogramWidth = Math.min(histogramMaxWidth, width / 5);
+  $: histogramHeight = Math.min(histogramMaxHeight, height / 3);
+  $: isMultipleKeys = getObjSize(itemsByKey) > 1;
+
+  $: if (isMultipleKeys) {
+    const itemsExtent = extent(items, valueAccessor);
+    bins = exactAmountBins({
+      array: items,
+      size: colors.length,
+      interval: itemsExtent,
+      accessor: valueAccessor
+    });
+    keyToColor = _.reduce(
+      _.zip(colors, bins),
+      (obj, [color, {range, values}]) => {
+        values.forEach(({key}) => {
+          obj[key] = color;
+        })
+        return obj;
+      },
+      {}
+    ) // TODO investigate a util
+  } else {
+    keyToColor = _.mapValues(itemsByKey, x => colors[0])
+  }
   $: histogramOrigin = {
     x: histogramMargin,
     y: height - histogramHeight - histogramMargin
@@ -144,6 +164,7 @@
           {valueAccessor}
           {width}
         />
+        {#if isMultipleKeys}
         <g transform="translate({histogramOrigin.x},{histogramOrigin.y})">
           <HistogramSVG
             height="{histogramHeight}"
@@ -155,6 +176,7 @@
             on:clickedBin="{clickedBin}"
           />
         </g>
+        {/if}
       </svg>
       {#if tooltip}
       <div
