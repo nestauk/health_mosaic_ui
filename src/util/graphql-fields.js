@@ -38,7 +38,7 @@ const fieldMaps = {
   ],
   funders: ['terms_of_funders'],
   funding: ['json_funding_project'],
-  id: ['id_of_project'],
+  id_source: ['id_of_project'],
   is_health_related: ['booleanFlag_health_organisation'],
   location: [
     'coordinate_of_city',
@@ -61,7 +61,6 @@ const fieldMaps = {
     '_terms_sdg_description',
     'terms_sdg_abstract',
   ],
-
   start: [
     'date_birth_organisation',
     'date_start_group',
@@ -114,15 +113,16 @@ export const makeRequiredFields = requiredFields => ({
 
 export const fieldMapEntry = field =>
   field.reduce((acc, next) => {
-    return `${acc}if (parent._source.hasOwnProperty('${next}')) return parent._source.${next};
+    return `${acc}if (parent._source.hasOwnProperty('${next}')) { return parent._source.${next} };
     `;
   }, '');
 
+// NIH needs to use `id_of_project` for links
 export const makeResolvers = () => {
   let resolvers = '{\n';
 
   resolvers += `
-  es_id: (parent) => parent._id,
+  id: (parent) => parent._id,
   score: (parent) => parent._score,`;
 
   for (const field in fieldMaps) {

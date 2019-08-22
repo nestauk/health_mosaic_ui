@@ -25,7 +25,7 @@
     countries_ids,
     country,
     end,
-    id,
+    id_source,
     name,
     sdg_labels,
     start,
@@ -87,7 +87,7 @@
       <span on:mouseenter={() => hover = true} on:mouseleave={() => hover = false}>
         <a
           target="_blank"
-          href="http://grantome.com/grant/NIH/{id}"
+          href="http://grantome.com/grant/NIH/{id_source}"
         >
           <img src="/logo_nih.png"/>
         </a>

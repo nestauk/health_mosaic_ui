@@ -91,14 +91,17 @@ const sources = [
   'terms_mesh_description',
   'terms_mesh_abstract',
   'terms_topics_group',
+
   // title
   'title_of_project',
+
+  // type
+  'type_of_entity',
 
   // url
   'url_of_organisation',
   'url_of_group',
   'url_crunchBase_organisation',
-  'type_of_entity',
 ];
 
 // eslint-disable-next-line no-undef
@@ -194,8 +197,8 @@ const typeDefs = gql`
     end: String
     funders: [String]
     funding: [FundingRound]
-    es_id: String
     id: String
+    id_source: String
     is_health_related: Boolean
     location: Geopoint
     name: String

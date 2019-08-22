@@ -20,6 +20,7 @@ export const QUERY_ALL = gql`
         year
       }
       id
+      id_source
       is_health_related
       location {
         lon
@@ -38,6 +39,7 @@ export const QUERY_ALL = gql`
       title
       type
       url
+      url_source
     }
   }
 `;
@@ -62,6 +64,7 @@ export const QUERY_CB = gql`
         year
       }
       id
+      id_source
       is_health_related
       location {
         lon
@@ -105,6 +108,7 @@ export const QUERY_MU = gql`
         year
       }
       id
+      id_source
       is_health_related
       location {
         lon
@@ -123,6 +127,7 @@ export const QUERY_MU = gql`
       title
       type
       url
+      url_source
     }
   }
 `;
@@ -147,6 +152,7 @@ export const QUERY_NIH = gql`
         year
       }
       id
+      id_source
       is_health_related
       location {
         lon
@@ -165,6 +171,7 @@ export const QUERY_NIH = gql`
       title
       type
       url
+      url_source
     }
   }
 `;
