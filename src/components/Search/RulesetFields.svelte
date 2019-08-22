@@ -59,10 +59,6 @@
 
       ul {
         flex-direction: column;
-
-        li {
-
-        }
       }
     }
 

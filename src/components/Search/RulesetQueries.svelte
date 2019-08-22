@@ -110,6 +110,9 @@
     class:editing={isEditing}
     class="query-container"
   >
+    <div class="expand">
+      <span on:click={handleEdit}></span>
+    </div>
     <div
       class="query-labels"
       bind:this={pillContainer}
@@ -140,15 +143,56 @@
         />
       {/if}
     </div>
-    <button on:click={handleEdit}><Edit /></button>
+
   </div>
 
 
 <style lang="less">
   .query-container {
-    display: flex;
-    justify-content: space-between;
     margin-bottom: 15px;
+
+    .expand {
+      border-bottom: 1px solid #ccc;
+      position: relative;
+      margin-bottom: 2em;
+      height: 2em;
+
+      span {
+        position: absolute;
+        width: 1.7em;
+        height: 1.7em;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        margin: auto;
+        border-radius: 50%;
+        border: 1px solid #ccc;
+        background: #fff;
+        transform: translateY(0.95em);
+        cursor: pointer;
+
+        &::after {
+          content: '';
+          position: absolute;
+          width: 1.3em;
+          height: 1.3em;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          margin: auto;
+          border-radius: 50%;
+          border: 1px solid #fff;
+          background: #ddd;
+          transition: 0.1s;
+        }
+
+        &:hover::after {
+          background: #999
+        }
+      }
+    }
 
     .query-labels {
       border: 1px solid transparent;
@@ -165,6 +209,12 @@
         box-shadow: inset 0 1px 2px rgba(27,31,35,.075);
         background: #fff;
       }
+
+      .expand {
+        span::after {
+          background: #8cc1c1;
+        }
+      }
     }
 
     button {
@@ -177,6 +227,7 @@
 
       &:inactive {
         opacity: 0.6;
+
       }
 
       &:hover {
