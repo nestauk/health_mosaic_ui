@@ -5,7 +5,7 @@
 
   import { skipNull } from '../../util/object';
   import { HistogramDiv } from '../Histogram/';
-  import { ForceCanvasDiv } from '../Force/';
+  import { ForceCanvasDiv, LegendVolumeDegree } from '../Force/';
   import { pointerMargin } from './index';
 
   const dispatch = createEventDispatcher();
@@ -124,7 +124,7 @@
         on:mouseout="{mouseleft}"
         {shouldResize}
       />
-      <div class="histogram degree">
+      <div class="widget histogram degree">
         <HistogramDiv
           bins="{nodeDegreeBins}"
           title="Degree"
@@ -134,7 +134,7 @@
         <!-- {selectedKeys} -->
         <!-- on:clickedBin="{clickedBin}" -->
       </div>
-      <div class="histogram nodes volume">
+      <div class="widget histogram nodes volume">
         <HistogramDiv
           bins="{nodeVolumeBins}"
           title="Nodes volume"
@@ -143,7 +143,7 @@
         <!-- {selectedKeys} -->
         <!-- on:clickedBin="{clickedBin}" -->
       </div>
-      <div class="histogram links volume">
+      <div class="widget histogram links volume">
         <HistogramDiv
           bins="{linkVolumeBins}"
           orientation_x="right-left"
@@ -152,6 +152,12 @@
         />
         <!-- {selectedKeys} -->
         <!-- on:clickedBin="{clickedBin}" -->
+      </div>
+      <div class="widget legend">
+        <LegendVolumeDegree
+          linecolor="grey"
+          textcolor="black"
+        />
       </div>
       {#if tooltip}
       <div
@@ -194,11 +200,13 @@
         height: 100%;
         position: relative;
 
-        .histogram {
+        .widget {
           height: 32%;
           width: 16%;
           position: absolute;
+        }
 
+        .histogram {
           &.degree {
             top: 10px;
             left: 10px;
@@ -214,6 +222,14 @@
               right: 10px;
             }
           }
+        }
+
+        .legend {
+          top: 10px;
+          right: 10px;
+          display: flex;
+          flex-direction: column;
+          justify-content: flex-start;
         }
 
         .tooltip {
