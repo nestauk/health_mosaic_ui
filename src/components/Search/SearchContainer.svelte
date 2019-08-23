@@ -6,7 +6,11 @@
   import { setContext, createEventDispatcher } from 'svelte';
   import { writable } from 'svelte/store';
   import { Sync } from '../Icons';
+  import { ESIndices } from '../../config';
   import MultiToggle from '../MultiToggle.svelte';
+  import { SearchDropdown } from './index.js';
+
+  export let index;
 
   const rulesets = writable(new Map());
   const dispatch = createEventDispatcher();
@@ -37,7 +41,13 @@
   </div>
   <slot></slot>
   <div class="search">
-    <MultiToggle on:select items={search_indices}/>
+    <!-- <MultiToggle on:select items={search_indices}/> -->
+
+    <SearchDropdown
+      {index}
+      indices="{ESIndices}"
+      on:indexchange
+    />
     <button on:click|stopPropagation>Search</button>
   </div>
 </div>
@@ -63,7 +73,8 @@
         padding: 0;
         width: 30px;
         height: 30px;
-        border-radius: 50%;
+        border: none;
+        background: none;
         color: #888;
         cursor: pointer;
 
@@ -78,13 +89,17 @@
     }
 
     .search {
+      display: flex;
+      justify-content: center;
+      margin-top: 15px;
+
       button {
         font-size: 16px;
         border-radius: 3px;
         cursor: pointer;
         padding: 3px 10px;
-        margin-top: 10px;
       }
     }
   }
+
 </style>

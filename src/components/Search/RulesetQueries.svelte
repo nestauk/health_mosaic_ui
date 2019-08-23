@@ -6,7 +6,7 @@
   import { RULESET } from './Ruleset.svelte';
   import { Edit } from '../Icons';
 
-
+  export let disabled;
   export let isEditing = true;
   export let queries = [
     { query: 'Heart', status: 'and' },
@@ -112,6 +112,7 @@
 <svelte:body on:click={addQuery}/>
 
   <div
+    class:disabled
     class:editing={isEditing}
     class="query-container"
     on:click|stopPropagation={() => input && input.focus()}
@@ -156,7 +157,7 @@
 <style lang="less">
   .query-container {
     margin-bottom: 10px;
-
+    transition: 0.2s;
     .query-labels {
       border: 1px solid transparent;
       position: relative;
@@ -204,7 +205,7 @@
       margin: 0;
       list-style: none;
       flex-wrap: wrap;
-
+      user-select: none;
       &.padbottom {
         margin-bottom: 30px;
       }
@@ -269,5 +270,9 @@
     border: 1px solid transparent;
     border-radius: 3px;
     font-size: 14px;
+  }
+
+  .disabled {
+    opacity: 0.6;
   }
 </style>

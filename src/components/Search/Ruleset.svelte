@@ -9,6 +9,7 @@
   import { RULESETS } from './SearchContainer.svelte';
 
   export let hasContent;
+  export let disabled;
 
   const key = {};
   const { deregister, rulesets, register, setEditState } = getContext(RULESETS);
@@ -31,14 +32,11 @@
     {#if hasContent}
     <li on:click={() => dispatch('copy')}><CopyIcon size={1.5} /></li>
     <li on:click={() => dispatch('delete')}><Trash2Icon size={1.5} /></li>
-    <li on:click={() => dispatch('disable')}><ToggleLeftIcon size={1.5} /></li>
+    <li class:disabled on:click={() => dispatch('disable')}><ToggleLeftIcon size={1.5} /></li>
     {/if}
 
-    {#if !isEditing}
-      <li on:click={() => setEditState(key, true)}><EditIcon size={1.5} /></li>
-    {:else}
-      <li on:click={() => setEditState(key, false)}><SaveIcon /></li>
-    {/if}
+
+    <li class:isEditing on:click={() => setEditState(key, true)}><EditIcon size={1.5} /></li>
 
     {#if lastRuleset && hasContent}
       <li on:click={() => dispatch('newrule')}><PlusCircleIcon size={1.5} /></li>
@@ -66,9 +64,22 @@
       color: #777;
       cursor: pointer;
 
+      &.isEditing {
+        opacity: 0.5;
+        color: #777!important;
+
+      }
+
       &:hover {
         color: #333;
       }
     }
+  }
+
+  li :global(svg circle) {
+    transition: 0.2s;
+  }
+  .disabled :global(svg circle) {
+    transform: translateX(8px);
   }
 </style>

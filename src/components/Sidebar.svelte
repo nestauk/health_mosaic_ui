@@ -144,13 +144,14 @@
     checkDirty();
   }
 
-  const sendRuleLabel = (type, { section, index: labelIndex }, ruleIndex = rulesetIndex ) =>{
+  const sendRuleLabel = (type, { section, status, index: labelIndex }, ruleIndex = rulesetIndex ) =>{
     screenMachine.send({
       type,
       tabId: $currentTab,
       ruleIndex,
       section: section.toLowerCase(),
-      labelIndex
+      labelIndex,
+      status
     });
     checkDirty();
   }
@@ -205,6 +206,8 @@
     on:reset={handleReset}
     on:edit={({detail}) => selectRuleset(detail)}
     on:click={handleSend}
+    on:indexchange={({ detail }) => changeIndex(detail)}
+    index={$screenStore[$currentTab].index}
   >
     {#each uiQuery as { options, disabled, selected, terms, fields }, i}
       <Ruleset
@@ -213,6 +216,7 @@
           on:disable="{() => sendRule('RULE_DISABLED', i)}"
           on:newrule="{newRuleset}"
           hasContent={terms.length && terms[0].term.length}
+          {disabled}
       >
         <RulesetQueries
           queries={terms}
@@ -221,7 +225,8 @@
           {disabled}
         />
         <RulesetFields
-          on:select={({ detail }) => sendRuleLabel('LABEL_CLICKED', detail)}
+          on:select={({ detail }) => sendRuleLabel('LABEL_CLICKED', detail, i)}
+          {fields}
           {disabled}
         />
       </Ruleset>

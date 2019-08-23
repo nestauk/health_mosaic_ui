@@ -36,10 +36,20 @@ export const form_options = {
     },
     toggleLabelTernary: (
       { screenStore },
-      { tabId, ruleIndex, section, labelIndex }
+      { tabId, ruleIndex, section, labelIndex, status }
     ) => {
+      console.log(tabId, ruleIndex, section, labelIndex, status);
       const path = `${tabId}.uiQuery.${ruleIndex}.fields.${section}.${labelIndex}.status`;
-      screenStore.update(toggleLabelTernaryUpdater(path));
+      if (status) {
+        screenStore.update(v => {
+          v[tabId].uiQuery[ruleIndex].fields[section][
+            labelIndex
+          ].status = status;
+          return v;
+        });
+      } else {
+        screenStore.update(toggleLabelTernaryUpdater(path));
+      }
     },
     disableLabel: (
       { screenStore },
