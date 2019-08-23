@@ -69,7 +69,7 @@ export const termBuilder = (acc, next, i, arr) => {
 export const parseQuery = _.pipe([
   s => s.split(','),
   _.reduceWith(termBuilder, []),
-  _.filterWith((a, i, arr) => (i === arr.length - 1 ? true : a.term.length)),
+  _.filterWith((a, i, arr) => a.term.length),
 ]);
 
 export const ruleOptionsDeselect = _.setPath('options', false);

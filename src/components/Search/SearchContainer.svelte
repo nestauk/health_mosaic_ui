@@ -15,9 +15,9 @@
   setContext(RULESETS, {
     rulesets,
     register: key => $rulesets = $rulesets.set(key, false) ,
-    setEditState: key => {
+    setEditState: (key, bool = true) => {
       const _rulesets = $rulesets.forEach((edit_state, _key, map) =>
-        _key === key ? map.set(_key, true) : map.set(_key, false));
+        _key === key ? map.set(_key, bool) : map.set(_key, false));
 
       $rulesets = $rulesets;
     }
@@ -29,11 +29,7 @@
     <h2>Search</h2>
     <button><Sync /></button>
   </div>
-
-
-
   <slot></slot>
-
   <div class="search">
     <MultiToggle on:select items={search_indices}/>
     <button on:click>Search</button>

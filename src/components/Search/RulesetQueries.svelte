@@ -1,23 +1,30 @@
 
 
 <script>
-  import { setContext, getContext, tick } from 'svelte';
+  import { setContext, getContext, tick, createEventDispatcher } from 'svelte';
   import { RULESETS } from './SearchContainer.svelte';
   import { RULESET } from './Ruleset.svelte';
   import { Edit } from '../Icons';
 
+
   export let isEditing = true;
   export let queries = [
-    { query: 'Heart', status: 'include' },
-    { query: 'Disease', status: 'exclude' },
-    { query: 'Heart', status: 'include' },
-    { query: 'Disease', status: 'exclude' },
-    { query: 'Heart', status: 'include' },
-    { query: 'Disease', status: 'exclude' },
+    { query: 'Heart', status: 'and' },
+    { query: 'Disease', status: 'not' },
+    { query: 'Heart', status: 'and' },
+    { query: 'Disease', status: 'not' },
+    { query: 'Heart', status: 'and' },
+    { query: 'Disease', status: 'not' },
   ];
+
+  // $: queries_string = queries.map(({ query, status }) =>
+  //   `${status === 'not' ? '-' : ''}${query}`);
+
+  $: console.log(queries, textQuery)
 
   const key = getContext(RULESET);
   const { rulesets, setEditState } = getContext(RULESETS);
+  const dispatch = createEventDispatcher();
 
   let editing = false;
   let pillContainer;
@@ -32,8 +39,8 @@
 
   $: inputCoords = calculateInputLocation(pills[pills.length - 1]);
 
-  $: textQuery = queries.map(({ query, status }) =>
-      (status === 'exclude' ? '-' : '') + query, "").join(', ');
+  $: textQuery = queries.map(({ term, status }) =>
+      `${status === 'not' ? '-' : ''}${term}`);
 
   const calculateInputLocation = (lastPill, inputSize = 20) => {
     if (!lastPill) return { top: 6, right: 0 };
@@ -53,14 +60,10 @@
 
   const handleKeyup = event => {
     if (event.key === ',') {
-      const status = event.target.value.startsWith('-') ? 'exclude' : 'include';
+      const status = event.target.value.startsWith('-') ? 'not' : 'and';
       const value = event.target.value.replace(',', '');
-      queries.push({
-        status: status,
-        query: value.replace(/^-/, '')
-      })
+      dispatch('change', textQuery.concat(event.target.value).join(','));
       event.target.value = '';
-      queries = queries;
     }
   }
 
@@ -68,17 +71,10 @@
     if (event.key === 'Backspace' && event.target.value.length === 0) {
       if (!queries[queries.length-1]) return;
       event.preventDefault();
-      const { query, status } = queries[queries.length-1];
-      event.target.value = `${status === 'exclude' ? '-' : ''}${query}`;
-      queries.pop();
-      queries = queries;
+      const { term, status } = queries[queries.length-1];
+      event.target.value = `${status === 'not' ? '-' : ''}${term}`;
+      dispatch('change', textQuery.slice(0, -1).join(','));
     }
-  }
-
-  const handleEdit = async () => {
-    setEditState(key);
-    await tick();
-    input.focus();
   }
 
   const removeQuery = i => queries = queries.filter((_pills, _i) => i !== _i)
@@ -109,21 +105,19 @@
   <div
     class:editing={isEditing}
     class="query-container"
+    on:click={() => input && input.focus()}
   >
-    <div class="expand">
-      <span on:click={handleEdit}></span>
-    </div>
     <div
       class="query-labels"
       bind:this={pillContainer}
     >
       <ul class:padbottom>
-        {#each queries as { query, status }, i}
+        {#each queries.filter(({term}) => term.length) as { term, status }, i}
           <li
             class={status}
             bind:this={_pills[i]}
           >
-            {query}
+            {term}
             <span
               class="close"
               on:click={() => removeQuery(i)}
@@ -143,56 +137,12 @@
         />
       {/if}
     </div>
-
   </div>
 
 
 <style lang="less">
   .query-container {
-    margin-bottom: 15px;
-
-    .expand {
-      border-bottom: 1px solid #ccc;
-      position: relative;
-      margin-bottom: 2em;
-      height: 2em;
-
-      span {
-        position: absolute;
-        width: 1.7em;
-        height: 1.7em;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        margin: auto;
-        border-radius: 50%;
-        border: 1px solid #ccc;
-        background: #fff;
-        transform: translateY(0.95em);
-        cursor: pointer;
-
-        &::after {
-          content: '';
-          position: absolute;
-          width: 1.3em;
-          height: 1.3em;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          margin: auto;
-          border-radius: 50%;
-          border: 1px solid #fff;
-          background: #ddd;
-          transition: 0.1s;
-        }
-
-        &:hover::after {
-          background: #999
-        }
-      }
-    }
+    margin-bottom: 10px;
 
     .query-labels {
       border: 1px solid transparent;
@@ -257,13 +207,13 @@
           cursor: pointer;
         }
 
-        &.include {
+        &.and {
           color: #fff;
           font-weight: 500;
           background-color: #8cc1c1;
         }
 
-        &.exclude {
+        &.not {
           background-color: #f77c66;
           color: #fff;
           font-weight: 500;

@@ -4,7 +4,7 @@
 
 <script>
   import { getContext, setContext } from 'svelte';
-  import {Trash2Icon, CopyIcon, PlusCircleIcon, ToggleLeftIcon} from 'svelte-feather-icons';
+  import { EditIcon, CopyIcon, PlusCircleIcon, SaveIcon, ToggleLeftIcon, Trash2Icon } from 'svelte-feather-icons';
 
   import { RULESETS } from './SearchContainer.svelte';
 
@@ -12,25 +12,37 @@
   const { rulesets, register, setEditState } = getContext(RULESETS);
 
   $: lastRuleset = Array.from($rulesets)[$rulesets.size - 1][0] === key;
+  $: isEditing = $rulesets.get(key);
 
   setContext(RULESET, key);
   register(key);
 
 </script>
 
-<slot></slot>
+<div>
+  <slot></slot>
+  <ul>
+    <li><CopyIcon size={1.5} /></li>
+    <li><Trash2Icon size={1.5} /></li>
+    <li><ToggleLeftIcon size={1.5} /></li>
 
-<ul>
-  <li><CopyIcon size={1.5} /></li>
-  <li><Trash2Icon size={1.5} /></li>
-  <li><ToggleLeftIcon size={1.5} /></li>
-  {#if lastRuleset}
-    <li><PlusCircleIcon size={1.5} /></li>
-  {/if}
+    {#if !isEditing}
+      <li on:click={() => setEditState(key, true)}><EditIcon size={1.5} /></li>
+    {:else}
+      <li on:click={() => setEditState(key, false)}><SaveIcon /></li>
+    {/if}
+
+    {#if lastRuleset}
+      <li><PlusCircleIcon size={1.5} /></li>
+    {/if}
 </ul>
-
+</div>
 
 <style lang="less">
+  div {
+    margin-bottom: 15px;
+    border-bottom: 1px solid #ccc;
+  }
   ul {
     display: flex;
     justify-content: center;
@@ -43,6 +55,12 @@
       margin: 0 10px;
       width: 1.5em;
       height: 1.5em;
+      color: #777;
+      cursor: pointer;
+
+      &:hover {
+        color: #333;
+      }
     }
   }
 </style>

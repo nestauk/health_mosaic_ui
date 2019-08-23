@@ -92,6 +92,7 @@ export const form_options = {
       screenStore.update(_.pipe([hideOptions, selectRule]));
     },
     updateCurrentRuleText: ({ screenStore }, { tabId, ruleIndex, text }) => {
+      console.log('HI', text);
       const parseText = _.setPath(
         `${tabId}.uiQuery.${ruleIndex}.terms`,
         parseQuery(text)

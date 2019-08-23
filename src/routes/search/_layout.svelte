@@ -67,7 +67,7 @@
   });
 
   $: uiQuery = $screenStore[$currentTab].uiQuery;
-  $: hasNoQuery = isIterableEmpty(uiQuery[0].terms[0].term);
+  $: hasNoQuery = uiQuery[0] && uiQuery[0].terms.length && uiQuery[0].terms[0].term.length;
   $: withSelections = isObjNotEmpty($screenStore[$currentTab].selections);
   $: visible = $screenStore[$currentTab].visible;
   $: searchMachine = $screenMachine.context.searchMachines[$currentTab];

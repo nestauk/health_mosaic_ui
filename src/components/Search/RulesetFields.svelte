@@ -7,7 +7,6 @@
   const key = getContext(RULESET);
 
   $: isEditing = $rulesets.get(key);
-  $: console.log(isEditing)
 
   export let fields = [
     {name: 'name', status: 'default', },
@@ -16,21 +15,11 @@
     {name: 'content', status: 'default', }
   ];
 
-  $: console.log(fields)
-
   const handleCheckbox = (status, index) => event => {
-    console.log(status, index)
-    console.log(event.target.checked);
+
     if (event.target.checked) fields[index].status = status;
     else if (!event.target.checkbox && fields[index].status === status) fields[index].status = 'default';
   }
-
-  // let fieldsWithCheckboxes = [
-  //   {name: 'name', status: 'default', id: 0 },
-  //   {name: 'place', status: 'default', id: 1 },
-  //   {name: 'terms', status: 'default', id: 2 },
-  //   {name: 'content', status: 'default', id: 3 }
-  // ];
 </script>
 
 <div class="field-container" class:isEditing>
@@ -53,35 +42,20 @@
 
 <style lang="less">
   .field-container {
-    margin-bottom: 30px;
-
-    /* &.isEditing {
-
-      ul {
-      }
-    } */
+    margin-bottom: 10px;
 
     ul {
       margin: 0 10px;
       padding: 0;
       display: flex;
-        flex-direction: column;
+      flex-wrap: wrap;
+      justify-content: space-between;
 
       li {
         display: flex;
-
-        /* label {
-          &.included {
-            color: #fff;
-            font-weight: 500;
-            background-color: #8cc1c1;
-          }
-          &.excluded {
-            background-color: #f77c66;
-            color: #fff;
-            font-weight: 500;
-          }
-        } */
+        display: flex;
+        width: 40%;
+        margin-bottom: 5px;
 
         input {
           position: relative;
