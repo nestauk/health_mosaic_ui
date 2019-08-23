@@ -92,7 +92,7 @@ export const form_options = {
       screenStore.update(_.pipe([hideOptions, selectRule]));
     },
     updateCurrentRuleText: ({ screenStore }, { tabId, ruleIndex, text }) => {
-      console.log('HI', text);
+      console.log('ACTION', text);
       const parseText = _.setPath(
         `${tabId}.uiQuery.${ruleIndex}.terms`,
         parseQuery(text)
@@ -119,7 +119,6 @@ export const form_options = {
       screenStore.update(toggleRule);
     },
     copyRule: ({ screenStore }, { tabId, ruleIndex }) => {
-      console.log('copy');
       const updater = rules => _.appendTo(rules, _.getIndex(rules, ruleIndex));
       const copyRule = _.updatePath(`${tabId}.uiQuery`, updater);
 

@@ -17,11 +17,6 @@
     { query: 'Disease', status: 'not' },
   ];
 
-  // $: queries_string = queries.map(({ query, status }) =>
-  //   `${status === 'not' ? '-' : ''}${query}`);
-
-  $: console.log(queries, textQuery)
-
   const key = getContext(RULESET);
   const { rulesets, setEditState } = getContext(RULESETS);
   const dispatch = createEventDispatcher();
@@ -32,6 +27,7 @@
   let backspacing = false;
   let input;
   let padbottom = false;
+  let currentInput = '';
 
 
   $: pills = _pills && _pills.filter(v => v !== null);
@@ -58,21 +54,30 @@
     };
   }
 
+  const addQuery = () => {
+    const status = currentInput.startsWith('-') ? 'not' : 'and';
+    const value = currentInput.replace(',', '');
+    dispatch('change', textQuery.concat(currentInput).join(','));
+
+    currentInput = '';
+  }
+
   const handleKeyup = event => {
-    if (event.key === ',') {
-      const status = event.target.value.startsWith('-') ? 'not' : 'and';
-      const value = event.target.value.replace(',', '');
-      dispatch('change', textQuery.concat(event.target.value).join(','));
-      event.target.value = '';
+    if (event.key === ',' | event.key === 'Enter') {
+      addQuery();
+    }
+
+    if (event.key === 'Enter') {
+      setEditState(key, false);
     }
   }
 
   const handleKeydown = event => {
-    if (event.key === 'Backspace' && event.target.value.length === 0) {
+    if (event.key === 'Backspace' && currentInput.length === 0) {
       if (!queries[queries.length-1]) return;
       event.preventDefault();
       const { term, status } = queries[queries.length-1];
-      event.target.value = `${status === 'not' ? '-' : ''}${term}`;
+      currentInput = `${status === 'not' ? '-' : ''}${term}`;
       dispatch('change', textQuery.slice(0, -1).join(','));
     }
   }
@@ -100,12 +105,17 @@
     }
   }
 
+  const autofocus = async node => node.focus();
+
 </script>
+
+<svelte:body on:click={addQuery}/>
 
   <div
     class:editing={isEditing}
     class="query-container"
-    on:click={() => input && input.focus()}
+    on:click|stopPropagation={() => input && input.focus()}
+
   >
     <div
       class="query-labels"
@@ -131,8 +141,10 @@
       {#if isEditing}
         <input
           bind:this={input}
+          bind:value={currentInput}
           style="transform: translate({inputCoords.right}px, {inputCoords.top}px)"
           use:fitContent
+          use:autofocus
           on:keyup={handleKeyup}
           on:keydown={handleKeydown}
         />

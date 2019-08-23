@@ -25,8 +25,6 @@
 
   const { page } = stores();
 
-  let formHeight;
-  let input;
 
   $: searchMachine = $screenMachine.context.searchMachines[$currentTab];
   $: uiQuery = $screenStore[$currentTab] && $screenStore[$currentTab].uiQuery;
@@ -117,11 +115,9 @@
     event.preventDefault();
     screenMachine.send({ type:'QUERY_RESET', tab: $currentTab });
     checkDirty();
-    input.focus();
   };
 
   const newRuleset = () => {
-    input.focus();
     screenMachine.send({
       type: 'RULESET_CREATED',
       tabId: $currentTab,
@@ -206,6 +202,7 @@
 
 <div>
   <SearchContainer
+    on:reset={handleReset}
     on:edit={({detail}) => selectRuleset(detail)}
     on:click={handleSend}
   >
@@ -214,15 +211,18 @@
           on:copy="{() => copyRuleset(i)}"
           on:delete="{() => sendRule('RULE_DELETED', i)}"
           on:disable="{() => sendRule('RULE_DISABLED', i)}"
-          on:newrule
+          on:newrule="{newRuleset}"
+          hasContent={terms.length && terms[0].term.length}
       >
         <RulesetQueries
           queries={terms}
           on:change={({detail}) => handleChange(detail, i)}
           on:toggle={({detail}) => toggleTermStatus(i, detail)}
+          {disabled}
         />
         <RulesetFields
           on:select={({ detail }) => sendRuleLabel('LABEL_CLICKED', detail)}
+          {disabled}
         />
       </Ruleset>
     {/each}

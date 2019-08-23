@@ -22,6 +22,10 @@
         _key === key ? map.set(_key, bool) : map.set(_key, false));
       dispatch('edit', getIndex(key));
       $rulesets = $rulesets;
+    },
+    deregister: key => {
+      $rulesets.delete(key);
+      $rulesets = $rulesets;
     }
   })
 </script>
@@ -29,7 +33,7 @@
 <div class="container">
   <div class="header">
     <h2>Search</h2>
-    <button><Sync /></button>
+    <button on:click={() => dispatch('reset')}><Sync /></button>
   </div>
   <slot></slot>
   <div class="search">
