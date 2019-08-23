@@ -52,6 +52,8 @@
   $: logic = $screenStore[$currentTab].logic;
   $: if (!open && !isEmptyQuery) openDrawer();
 
+  $: console.log($screenStore)
+
   const stripEmpties = _.filterWith(_.allOf([
     _.getPath('values.length'),
     _.getPath('values.0.query.length')
@@ -90,12 +92,12 @@
   const sendTabEdit = ({detail: { value, id }}) =>
     screenMachine.send({type: 'TAB_RENAMED', labelText: value , id: parseInt(id, 10)});
 
-  const handleChange = ({ detail }) => {
+  const handleChange = (text, i) => {
     screenMachine.send({
       type: 'TEXT_CHANGED',
       tabId: $currentTab,
-      ruleIndex: rulesetIndex,
-      text: detail
+      ruleIndex: i,
+      text
     });
 
     if ($queryObj[$currentTab]) {
@@ -200,24 +202,28 @@
     })
     checkDirty();
   }
-
-  // const openDrawer = async () => {
-  //   await tick();
-  //   sendTab('TAB_VISIBILITY_TOGGLED', $currentTab);}
 </script>
 
 <div>
-  <SearchContainer>
-    <!-- <button
-      class={mode}
-      on:click={() => mode = mode === 'simple' ? 'complex' : 'simple'}
-    >
-      {mode === 'simple' ? 'C' : 'S'}
-    </button> -->
+  <SearchContainer
+    on:edit={({detail}) => selectRuleset(detail)}
+    on:click={handleSend}
+  >
     {#each uiQuery as { options, disabled, selected, terms, fields }, i}
-      <Ruleset>
-        <RulesetQueries queries={terms} on:change={handleChange}/>
-        <RulesetFields />
+      <Ruleset
+          on:copy="{() => copyRuleset(i)}"
+          on:delete="{() => sendRule('RULE_DELETED', i)}"
+          on:disable="{() => sendRule('RULE_DISABLED', i)}"
+          on:newrule
+      >
+        <RulesetQueries
+          queries={terms}
+          on:change={({detail}) => handleChange(detail, i)}
+          on:toggle={({detail}) => toggleTermStatus(i, detail)}
+        />
+        <RulesetFields
+          on:select={({ detail }) => sendRuleLabel('LABEL_CLICKED', detail)}
+        />
       </Ruleset>
     {/each}
   </SearchContainer>
@@ -233,38 +239,5 @@
     box-sizing: border-box;
     background: #fafbfc;
     overflow-y: scroll;
-
-    /* button {
-      height: 30px;
-      border: none;
-      background: none;
-      width: 100%;
-      border-bottom: 1px solid #ccc;
-      margin-bottom: 25px;
-      position: relative;
-      color: transparent;
-      outline: none;
-
-      &::after {
-        content: '';
-        position: absolute;
-        height: 2em;
-        width: 2em;
-        transform: translateY(1.3em);
-        border-radius: 50%;
-        border: 1px solid #ccc;
-        background: #fff;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        margin: auto;
-      }
-
-
-    } */
   }
 </style>

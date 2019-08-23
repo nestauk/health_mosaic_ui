@@ -30,6 +30,7 @@
           <label>{name}</label>
           <input class="red" type="checkbox" on:change={handleCheckbox('excluded', i)} checked={status === 'excluded'}/>
           <input class="green" type="checkbox" on:change={handleCheckbox('included', i)} checked={status === 'included'}/>
+
         </li>
       {:else if !isEditing && status !== 'default'}
         <li>

@@ -35,6 +35,15 @@ export const form_config = {
     LOGIC_TOGGLED: {
       actions: ['toggleSearchLogic'],
     },
+    RULE_DISABLED: {
+      actions: ['disableRule'],
+    },
+    RULE_COPIED: {
+      actions: ['copyRule', 'selectRule'],
+    },
+    RULE_DELETED: {
+      actions: ['deleteRule'],
+    },
   },
   states: {
     Idle: {
@@ -59,9 +68,9 @@ export const form_config = {
     LabelOptionsShowing: {
       onEntry: ['showLabelOptions'],
       on: {
-        LABEL_DISABLED: {
-          actions: ['disableLabel'],
-        },
+        // LABEL_DISABLED: {
+        //   actions: ['disableLabel'],
+        // },
         LABEL_TOGGLED: {
           actions: ['toggleLabelBinary'],
         },
@@ -79,16 +88,6 @@ export const form_config = {
     RuleOptionsShowing: {
       onEntry: ['showRuleOptions'],
       on: {
-        RULE_DISABLED: {
-          actions: ['disableRule'],
-        },
-        RULE_COPIED: {
-          actions: ['copyRule', 'selectRule'],
-        },
-        RULE_DELETED: {
-          actions: ['deleteRule'],
-          target: 'Idle',
-        },
         RULE_OPTIONS_DISMISSED: {
           target: 'Idle',
         },

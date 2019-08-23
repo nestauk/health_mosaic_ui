@@ -12,13 +12,15 @@
   const dispatch = createEventDispatcher();
   const search_indices= ['Research', 'Companies', 'Events'];
 
+  const getIndex = key => Array.from($rulesets).findIndex(([_key]) => key === _key)
+
   setContext(RULESETS, {
     rulesets,
     register: key => $rulesets = $rulesets.set(key, false) ,
     setEditState: (key, bool = true) => {
       const _rulesets = $rulesets.forEach((edit_state, _key, map) =>
         _key === key ? map.set(_key, bool) : map.set(_key, false));
-
+      dispatch('edit', getIndex(key));
       $rulesets = $rulesets;
     }
   })
@@ -32,7 +34,7 @@
   <slot></slot>
   <div class="search">
     <MultiToggle on:select items={search_indices}/>
-    <button on:click>Search</button>
+    <button on:click|stopPropagation>Search</button>
   </div>
 </div>
 

@@ -3,13 +3,14 @@
 </script>
 
 <script>
-  import { getContext, setContext } from 'svelte';
+  import { createEventDispatcher, getContext, setContext } from 'svelte';
   import { EditIcon, CopyIcon, PlusCircleIcon, SaveIcon, ToggleLeftIcon, Trash2Icon } from 'svelte-feather-icons';
 
   import { RULESETS } from './SearchContainer.svelte';
 
   const key = {};
   const { rulesets, register, setEditState } = getContext(RULESETS);
+  const dispatch = createEventDispatcher();
 
   $: lastRuleset = Array.from($rulesets)[$rulesets.size - 1][0] === key;
   $: isEditing = $rulesets.get(key);
@@ -22,9 +23,9 @@
 <div>
   <slot></slot>
   <ul>
-    <li><CopyIcon size={1.5} /></li>
-    <li><Trash2Icon size={1.5} /></li>
-    <li><ToggleLeftIcon size={1.5} /></li>
+    <li on:click={() => dispatch('copy')}><CopyIcon size={1.5} /></li>
+    <li on:click={() => dispatch('delete')}><Trash2Icon size={1.5} /></li>
+    <li on:click={() => dispatch('disable')}><ToggleLeftIcon size={1.5} /></li>
 
     {#if !isEditing}
       <li on:click={() => setEditState(key, true)}><EditIcon size={1.5} /></li>
@@ -33,7 +34,7 @@
     {/if}
 
     {#if lastRuleset}
-      <li><PlusCircleIcon size={1.5} /></li>
+      <li on:click={() => dispatch('newrule')}><PlusCircleIcon size={1.5} /></li>
     {/if}
 </ul>
 </div>

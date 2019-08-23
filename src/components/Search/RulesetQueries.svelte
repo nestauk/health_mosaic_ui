@@ -116,11 +116,12 @@
           <li
             class={status}
             bind:this={_pills[i]}
+            on:click|stopPropagation={() => dispatch('toggle', i)}
           >
             {term}
             <span
               class="close"
-              on:click={() => removeQuery(i)}
+              on:click|stopPropagation={() => dispatch('change', textQuery.filter((_, _i) => i !== _i ).join(','))}
             >
                 x
             </span>

@@ -119,6 +119,7 @@ export const form_options = {
       screenStore.update(toggleRule);
     },
     copyRule: ({ screenStore }, { tabId, ruleIndex }) => {
+      console.log('copy');
       const updater = rules => _.appendTo(rules, _.getIndex(rules, ruleIndex));
       const copyRule = _.updatePath(`${tabId}.uiQuery`, updater);
 
