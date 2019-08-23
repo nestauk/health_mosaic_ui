@@ -143,35 +143,28 @@
   on:textchange={sendTabRenamed}
 /> -->
 
-<Sidebar />
-
-<div
-  class="facets"
-  class:noQuery="{hasNoQuery}"
-  class:foldedWithNoSelections="{!hasNoQuery && !visible && !withSelections}"
-  class:foldedWithSelections="{!hasNoQuery && !visible && withSelections}"
-  class:withNoSelections="{!hasNoQuery && visible && !withSelections}"
-  class:withSelections="{!hasNoQuery && visible && withSelections}"
-  on:transitionend="{transitionended}"
-  on:transitionstart="{transitionstarted}"
->
-  <!-- <div class="tabs">
-    <ul>
-      {#each facetTabs as {id, label}}
-      <li
-        class:selected="{id === selectedFacet}"
+<Sidebar>
+  <ul>
+    {#each facetTabs as {id, label}}
+    <li
+      class:selected="{id === selectedFacet}"
+    >
+      <RouterLink
+        on:navigate={onFacetTabClick(id)}
+        base={searchRouteName}
+        href={id}
       >
-        <RouterLink
-          on:navigate={onFacetTabClick(id)}
-          base={searchRouteName}
-          href={id}
-        >
-          <div>{label}</div>
-        </RouterLink>
-      </li>
-      {/each}
-    </ul>
-  </div> -->
+        <div>{label}</div>
+      </RouterLink>
+    </li>
+    {/each}
+  </ul>
+</Sidebar>
+
+
+  <!-- <div class="tabs">-->
+
+<div class="facets">
   <div class="content">
     <slot></slot>
   </div>

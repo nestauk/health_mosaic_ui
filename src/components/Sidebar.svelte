@@ -202,6 +202,7 @@
 </script>
 
 <div>
+  <slot></slot>
   <SearchContainer
     on:reset={handleReset}
     on:edit={({detail}) => selectRuleset(detail)}
