@@ -44,6 +44,12 @@ export const form_config = {
     RULE_DELETED: {
       actions: ['deleteRule'],
     },
+    LABEL_TOGGLED: {
+      actions: ['toggleLabelBinary'],
+    },
+    LABEL_DISABLED: {
+      actions: ['disableLabel'],
+    },
   },
   states: {
     Idle: {
@@ -68,12 +74,6 @@ export const form_config = {
     LabelOptionsShowing: {
       onEntry: ['showLabelOptions'],
       on: {
-        // LABEL_DISABLED: {
-        //   actions: ['disableLabel'],
-        // },
-        LABEL_TOGGLED: {
-          actions: ['toggleLabelBinary'],
-        },
         LABEL_DELETED: {
           actions: ['deleteLabel'],
           target: 'Idle',

@@ -50,8 +50,6 @@
   $: logic = $screenStore[$currentTab].logic;
   $: if (!open && !isEmptyQuery) openDrawer();
 
-  $: console.log($screenStore)
-
   const stripEmpties = _.filterWith(_.allOf([
     _.getPath('values.length'),
     _.getPath('values.0.query.length')
@@ -151,7 +149,6 @@
       ruleIndex,
       section: section.toLowerCase(),
       labelIndex,
-      status
     });
     checkDirty();
   }
@@ -226,7 +223,9 @@
           {disabled}
         />
         <RulesetFields
-          on:select={({ detail }) => sendRuleLabel('LABEL_CLICKED', detail, i)}
+          on:toggleternary={({ detail }) => sendRuleLabel('LABEL_CLICKED', detail, i)}
+          on:togglebinary={({ detail }) => sendRuleLabel('LABEL_TOGGLED', detail, i)}
+          on:disable={({ detail }) => sendRuleLabel('LABEL_DISABLED', detail, i)}
           {fields}
           {disabled}
         />

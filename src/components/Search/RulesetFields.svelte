@@ -1,5 +1,7 @@
 <script>
   import { createEventDispatcher, getContext } from 'svelte';
+  import { flip } from 'svelte/animate';
+  import { scale } from 'svelte/transition';
   import { RULESETS } from './SearchContainer.svelte';
   import { RULESET } from './Ruleset.svelte';
 
@@ -21,67 +23,71 @@
     content.forEach( v => fields.push({...v, section: 'content'}))
     return fields;
   }
-
   $: all_fields = makeFields(fields);
-  $: console.log(all_fields)
   $: isEditing = $rulesets.get(key);
-  $: allDefault = all_fields.every(({status}) => status === 'default');
+  $: current_fields = isEditing ? all_fields : all_fields.filter(({ status }) => status !== 'default');
+
+  const find_field = (section, field) => fields[section].findIndex(v => v.field === field);
 
   const handleCheckbox = (section, status, index, field) => event => {
-    const _i = fields[section].findIndex(v => v.field === field);
+    const _i = find_field(section, field);
     if (event.target.checked)
       dispatch('select', { section, index: _i, status })
-    else if (!event.target.checkbox && all_fields[index].status === status)
+    else if (!event.target.checkbox && current_fields[index].status === status)
       dispatch('select', { section, index: _i, status: 'default' });
   }
 
-  const disableField = (section, status, index, field) => event => {
-    const _i = fields[section].findIndex(v => v.field === field);
-    dispatch('select', { section, index: _i, status: 'default' });
+  const disableField = (section, field) => {
+    const _i = find_field(section, field);
+    dispatch('disable', { section, index: _i, status: 'default' });
   }
 
-  const flipField = (section, status, index, field) => event => {
-    const _i = fields[section].findIndex(v => v.field === field);
-    const status = all_fields[index].status === 'included' ? 'excluded' : 'included';
-    dispatch('select', { section, index: _i, status})
+  const toggleFieldTernary = (section, field) => {
+    const _i = find_field(section, field);
+    dispatch('toggleternary', { section, index: _i})
   }
 
+  const toggleFieldBinary = (section, field) => {
+    const _i = find_field(section, field);
+    dispatch('togglebinary', { section, index: _i})
+  }
+
+  let timer, action_completed;
+
+  const handle_mousedown = (section, field) => event => {
+    timer = setTimeout(() => {
+      disableField(section, field);
+      action_completed = true;
+    }, 400)
+  }
+
+  const handle_mouseup = (section, field) => event => {
+    if (action_completed) {
+      action_completed = false;
+    } else {
+      clearTimeout(timer);
+      return isEditing ?
+        toggleFieldTernary(section, field) :
+        toggleFieldBinary(section, field);
+    }
+  }
 
 </script>
 
 <div class="field-container" class:isEditing class:disabled>
   <ul>
-    {#each all_fields as { field, status, section }, i}
-      {#if isEditing}
-        <li class:allDefault>
-          <label>{field}</label>
-          <input
-            class="red" type="checkbox"
-            on:change={handleCheckbox(section, 'excluded', i, field)}
-            checked={status === 'excluded'}
-        />
-          <input
-          class="green"
-          type="checkbox"
-          on:change={handleCheckbox(section, 'included', i, field)}
-          checked={status === 'included'}
-        />
-
-        </li>
-      {:else if !isEditing && status !== 'default'}
-        <li class="{status}">
-          <label class="{status}"
-            on:click={flipField(section, 'included', i, field)}
-          >
-            {field}
-            <span
-              on:click|stopPropagation={disableField(section, 'included', i, field)}
-            >
-              x
-            </span>
-          </label>
-        </li>
-      {/if}
+    {#each current_fields as { field, status, section, disabled }, i (field)}
+      <li
+        in:scale={{delay: 100}}
+        out:scale={{delay: 0}}
+        animate:flip={{duration: 500}}
+        class:disabled
+        on:mousedown={handle_mousedown(section, field)}
+        on:mouseup={handle_mouseup(section, field)}
+        class="{status}"
+      >
+        {field}
+      </li>
     {/each}
   </ul>
 </div>
@@ -90,19 +96,6 @@
   .field-container {
     margin-bottom: 10px;
     transition: 0.2s;
-
-    &.isEditing {
-      ul {
-        flex-wrap: wrap;
-        justify-content: space-between;
-        li {
-          width: 40%;
-          background: none;
-          border: none;
-        }
-      }
-
-    }
 
     ul {
       margin: 0 10px;

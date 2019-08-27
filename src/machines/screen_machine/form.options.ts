@@ -38,18 +38,8 @@ export const form_options = {
       { screenStore },
       { tabId, ruleIndex, section, labelIndex, status }
     ) => {
-      console.log(tabId, ruleIndex, section, labelIndex, status);
       const path = `${tabId}.uiQuery.${ruleIndex}.fields.${section}.${labelIndex}.status`;
-      if (status) {
-        screenStore.update(v => {
-          v[tabId].uiQuery[ruleIndex].fields[section][
-            labelIndex
-          ].status = status;
-          return v;
-        });
-      } else {
-        screenStore.update(toggleLabelTernaryUpdater(path));
-      }
+      screenStore.update(toggleLabelTernaryUpdater(path));
     },
     disableLabel: (
       { screenStore },
@@ -102,7 +92,6 @@ export const form_options = {
       screenStore.update(_.pipe([hideOptions, selectRule]));
     },
     updateCurrentRuleText: ({ screenStore }, { tabId, ruleIndex, text }) => {
-      console.log('ACTION', text);
       const parseText = _.setPath(
         `${tabId}.uiQuery.${ruleIndex}.terms`,
         parseQuery(text)
