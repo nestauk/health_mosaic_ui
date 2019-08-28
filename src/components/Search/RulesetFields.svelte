@@ -29,27 +29,19 @@
 
   const find_field = (section, field) => fields[section].findIndex(v => v.field === field);
 
-  const handleCheckbox = (section, status, index, field) => event => {
-    const _i = find_field(section, field);
-    if (event.target.checked)
-      dispatch('select', { section, index: _i, status })
-    else if (!event.target.checkbox && current_fields[index].status === status)
-      dispatch('select', { section, index: _i, status: 'default' });
-  }
-
   const disableField = (section, field) => {
     const _i = find_field(section, field);
-    dispatch('disable', { section, index: _i, status: 'default' });
+    dispatch('disable', { section, index: _i });
   }
 
-  const toggleFieldTernary = (section, field) => {
+  const toggleField = (section, field) => {
     const _i = find_field(section, field);
-    dispatch('toggleternary', { section, index: _i})
+    dispatch('toggle', { section, index: _i})
   }
 
-  const toggleFieldBinary = (section, field) => {
+  const deleteField = (section, field) => event => {
     const _i = find_field(section, field);
-    dispatch('togglebinary', { section, index: _i})
+    dispatch('delete', { section, index: _i, status: 'default' });
   }
 
   let timer, action_completed;
@@ -66,9 +58,7 @@
       action_completed = false;
     } else {
       clearTimeout(timer);
-      return isEditing ?
-        toggleFieldTernary(section, field) :
-        toggleFieldBinary(section, field);
+      toggleField(section, field);
     }
   }
 
@@ -87,6 +77,7 @@
         class="{status}"
       >
         {field}
+        <span on:click={deleteField(section, field)}>x</span>
       </li>
     {/each}
   </ul>
@@ -112,6 +103,7 @@
         margin: 5px;
         border-radius: 30px;
         font-size: 0.9rem;
+        cursor: pointer;
 
         &.included {
           border-color: red;

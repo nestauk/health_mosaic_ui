@@ -5,7 +5,6 @@
 <script>
   import { createEventDispatcher, getContext, setContext, onDestroy } from 'svelte';
   import { EditIcon, CopyIcon, PlusCircleIcon, SaveIcon, ToggleLeftIcon, Trash2Icon } from 'svelte-feather-icons';
-
   import { RULESETS } from './SearchContainer.svelte';
 
   export let hasContent;
@@ -26,23 +25,20 @@
 
 </script>
 
+{#if isEditing | hasContent}
 <div>
   <slot></slot>
   <ul>
     {#if hasContent}
-    <li on:click={() => dispatch('copy')}><CopyIcon size={1.5} /></li>
-    <li on:click={() => dispatch('delete')}><Trash2Icon size={1.5} /></li>
-    <li class:disabled on:click={() => dispatch('disable')}><ToggleLeftIcon size={1.5} /></li>
+      <li on:click={() => dispatch('copy')}><CopyIcon size={1.5} /></li>
+      <li on:click={() => dispatch('delete')}><Trash2Icon size={1.5} /></li>
+      <li class:disabled on:click={() => dispatch('disable')}><ToggleLeftIcon size={1.5} /></li>
     {/if}
 
-
-    <li class:isEditing on:click={() => setEditState(key, true)}><EditIcon size={1.5} /></li>
-
-    {#if lastRuleset && hasContent}
-      <li on:click={() => dispatch('newrule')}><PlusCircleIcon size={1.5} /></li>
-    {/if}
-</ul>
+    <li class:isEditing on:click={() => setEditState(key, !isEditing)}><EditIcon size={1.5} /></li>
+  </ul>
 </div>
+{/if}
 
 <style lang="less">
   div {

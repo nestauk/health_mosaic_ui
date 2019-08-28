@@ -66,10 +66,6 @@
     if (event.key === ',' | event.key === 'Enter') {
       addQuery();
     }
-
-    if (event.key === 'Enter') {
-      setEditState(key, false);
-    }
   }
 
   const handleKeydown = event => {

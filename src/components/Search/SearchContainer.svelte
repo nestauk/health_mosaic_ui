@@ -5,12 +5,17 @@
 <script>
   import { setContext, createEventDispatcher } from 'svelte';
   import { writable } from 'svelte/store';
+
+  import { PlusCircleIcon } from 'svelte-feather-icons';
   import { Sync } from '../Icons';
+  import Switch from '../Switch.svelte';
+
   import { ESIndices } from '../../config';
   import MultiToggle from '../MultiToggle.svelte';
   import { SearchDropdown } from './index.js';
 
   export let index;
+  export let logic;
 
   const rulesets = writable(new Map());
   const dispatch = createEventDispatcher();
@@ -39,16 +44,28 @@
     <h2>Search</h2>
     <button on:click={() => dispatch('reset')}><Sync /></button>
   </div>
-  <slot></slot>
-  <div class="search">
-    <!-- <MultiToggle on:select items={search_indices}/> -->
 
-    <SearchDropdown
-      {index}
-      indices="{ESIndices}"
-      on:indexchange
-    />
-    <button on:click|stopPropagation>Search</button>
+  <slot></slot>
+
+  <div class="search">
+    <div>
+      <Switch
+        on:toggle
+        values={["AND", "OR"]}
+        current={logic}
+      />
+      <span on:click={() => dispatch('newrule')}><PlusCircleIcon size={1.5} /></span>
+    </div>
+
+    <div>
+      <SearchDropdown
+        {index}
+        indices="{ESIndices}"
+        on:indexchange
+      />
+
+      <button on:click|stopPropagation>Search</button>
+    </div>
   </div>
 </div>
 
@@ -90,14 +107,27 @@
 
     .search {
       display: flex;
+      flex-direction: column;
       justify-content: center;
       margin-top: 15px;
 
-      button {
-        font-size: 16px;
-        border-radius: 3px;
-        cursor: pointer;
-        padding: 3px 10px;
+      div {
+        display: flex;
+        justify-content: center;
+        margin-top: 15px;
+        height: 2em;
+
+        span {
+          height: 100%;
+          width: 2em;
+        }
+
+        button {
+          font-size: 16px;
+          border-radius: 3px;
+          cursor: pointer;
+          padding: 3px 10px;
+        }
       }
     }
   }

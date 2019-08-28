@@ -50,6 +50,9 @@ export const form_config = {
     LABEL_DISABLED: {
       actions: ['disableLabel'],
     },
+    LABEL_DELETED: {
+      actions: ['deleteLabel'],
+    },
   },
   states: {
     Idle: {

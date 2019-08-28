@@ -205,14 +205,16 @@
     on:edit={({detail}) => selectRuleset(detail)}
     on:click={handleSend}
     on:indexchange={({ detail }) => changeIndex(detail)}
+    on:newrule={newRuleset}
+    on:toggle={toggleSearchLogic}
     index={$screenStore[$currentTab].index}
+    {logic}
   >
     {#each uiQuery as { options, disabled, selected, terms, fields }, i}
       <Ruleset
-          on:copy="{() => copyRuleset(i)}"
-          on:delete="{() => sendRule('RULE_DELETED', i)}"
-          on:disable="{() => sendRule('RULE_DISABLED', i)}"
-          on:newrule="{newRuleset}"
+          on:copy={() => copyRuleset(i)}
+          on:delete={() => sendRule('RULE_DELETED', i)}
+          on:disable={() => sendRule('RULE_DISABLED', i)}
           hasContent={terms.length && terms[0].term.length}
           {disabled}
       >
@@ -223,9 +225,9 @@
           {disabled}
         />
         <RulesetFields
-          on:toggleternary={({ detail }) => sendRuleLabel('LABEL_CLICKED', detail, i)}
-          on:togglebinary={({ detail }) => sendRuleLabel('LABEL_TOGGLED', detail, i)}
+          on:toggle={({ detail }) => sendRuleLabel('LABEL_TOGGLED', detail, i)}
           on:disable={({ detail }) => sendRuleLabel('LABEL_DISABLED', detail, i)}
+          on:delete={({ detail }) => sendRuleLabel('LABEL_DELETED', detail, i)}
           {fields}
           {disabled}
         />

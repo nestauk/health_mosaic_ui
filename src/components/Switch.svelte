@@ -110,7 +110,8 @@
 fieldset {
 	border: none;
 	user-select: none;
-	margin: 15px;
+	width: 12em;
+  padding: 0;
 }
 
 </style>
