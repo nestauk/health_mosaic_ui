@@ -1,21 +1,13 @@
 <script>
-  import { createEventDispatcher, getContext } from 'svelte';
+  import { createEventDispatcher } from 'svelte';
   import { flip } from 'svelte/animate';
   import { scale } from 'svelte/transition';
-  import { RULESETS } from './SearchContainer.svelte';
-  import { RULESET } from './Ruleset.svelte';
 
-  const { rulesets } = getContext(RULESETS);
-  const key = getContext(RULESET);
   const dispatch = createEventDispatcher();
 
   export let disabled;
-  export let fields = [
-    {name: 'name', status: 'default', },
-    {name: 'place', status: 'default', },
-    {name: 'terms', status: 'default', },
-    {name: 'content', status: 'default', }
-  ];
+  export let fields;
+  export let isEditing;
 
   const makeFields = ({ subject, content }) => {
     let fields = [];
@@ -24,7 +16,7 @@
     return fields;
   }
   $: all_fields = makeFields(fields);
-  $: isEditing = $rulesets.get(key);
+  // $: isEditing = $rulesets.get(key);
   $: current_fields = isEditing ? all_fields : all_fields.filter(({ status }) => status !== 'default');
 
   const find_field = (section, field) => fields[section].findIndex(v => v.field === field);

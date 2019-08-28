@@ -163,6 +163,16 @@
     checkDirty();
   }
 
+  const editRuleset = (ruleIndex, isEditing) => {
+    screenMachine.send({
+      type: 'RULE_EDITED',
+      tabId: $currentTab,
+      ruleIndex,
+      isEditing
+    })
+    checkDirty();
+  }
+
   const selectRuleset = targetIndex =>
     screenMachine.send({
       type: 'RULE_SELECTED',
@@ -210,19 +220,22 @@
     index={$screenStore[$currentTab].index}
     {logic}
   >
-    {#each uiQuery as { options, disabled, selected, terms, fields }, i}
+    {#each uiQuery as { options, disabled, selected, terms, fields, isEditing }, i}
       <Ruleset
           on:copy={() => copyRuleset(i)}
           on:delete={() => sendRule('RULE_DELETED', i)}
           on:disable={() => sendRule('RULE_DISABLED', i)}
+          on:edit={({detail}) => editRuleset(i, detail)}
           hasContent={terms.length && terms[0].term.length}
           {disabled}
+          {isEditing}
       >
         <RulesetQueries
           queries={terms}
           on:change={({detail}) => handleChange(detail, i)}
           on:toggle={({detail}) => toggleTermStatus(i, detail)}
           {disabled}
+          {isEditing}
         />
         <RulesetFields
           on:toggle={({ detail }) => sendRuleLabel('LABEL_TOGGLED', detail, i)}
@@ -230,6 +243,7 @@
           on:delete={({ detail }) => sendRuleLabel('LABEL_DELETED', detail, i)}
           {fields}
           {disabled}
+          {isEditing}
         />
       </Ruleset>
     {/each}

@@ -23,6 +23,22 @@ import {
 
 export const form_options = {
   actions: {
+    editRuleset: ({ screenStore }, { tabId, ruleIndex = 0 }) => {
+      const labelEditStatus = _.updatePath(
+        `${tabId}.uiQuery.${ruleIndex}.isEditing`,
+        toggleBoolean
+      );
+
+      screenStore.update(labelEditStatus);
+
+      const updater = _.pipe([
+        _.filterWith(rule => rule.terms.length && rule.terms[0].term.length),
+      ]);
+
+      const newRule = _.updatePath(`${tabId}.uiQuery`, updater);
+
+      screenStore.update(newRule);
+    },
     toggleLabelBinary: (
       { screenStore },
       { tabId, ruleIndex, section, labelIndex }
@@ -173,7 +189,10 @@ export const form_options = {
       screenStore.update(toggleTermStatus);
     },
     createRuleset: ({ screenStore }, { tabId }) => {
-      const updater = rules => _.appendTo(rules, newRuleset());
+      const updater = _.pipe([
+        _.filterWith(rule => rule.terms.length && rule.terms[0].term.length),
+        _.append(newRuleset()),
+      ]);
       const newRule = _.updatePath(`${tabId}.uiQuery`, updater);
 
       screenStore.update(newRule);

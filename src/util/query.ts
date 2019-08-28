@@ -26,4 +26,5 @@ export const newRuleset = (selected = false) => ({
   options: false,
   disabled: false,
   selected: selected,
+  isEditing: true,
 });

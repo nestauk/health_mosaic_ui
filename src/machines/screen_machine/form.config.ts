@@ -53,6 +53,9 @@ export const form_config = {
     LABEL_DELETED: {
       actions: ['deleteLabel'],
     },
+    RULE_EDITED: {
+      actions: ['editRuleset'],
+    },
   },
   states: {
     Idle: {

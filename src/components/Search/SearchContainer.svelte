@@ -1,9 +1,5 @@
-<script context="module">
-  export const RULESETS = {};
-</script>
-
 <script>
-  import { setContext, createEventDispatcher } from 'svelte';
+  import { createEventDispatcher } from 'svelte';
   import { writable } from 'svelte/store';
 
   import { PlusCircleIcon } from 'svelte-feather-icons';
@@ -16,27 +12,11 @@
 
   export let index;
   export let logic;
+  export let ruesets;
 
-  const rulesets = writable(new Map());
   const dispatch = createEventDispatcher();
   const search_indices= ['Research', 'Companies', 'Events'];
 
-  const getIndex = key => Array.from($rulesets).findIndex(([_key]) => key === _key)
-
-  setContext(RULESETS, {
-    rulesets,
-    register: key => $rulesets = $rulesets.set(key, false) ,
-    setEditState: (key, bool = true) => {
-      const _rulesets = $rulesets.forEach((edit_state, _key, map) =>
-        _key === key ? map.set(_key, bool) : map.set(_key, false));
-      dispatch('edit', getIndex(key));
-      $rulesets = $rulesets;
-    },
-    deregister: key => {
-      $rulesets.delete(key);
-      $rulesets = $rulesets;
-    }
-  })
 </script>
 
 <div class="container">

@@ -1,9 +1,7 @@
 
 
 <script>
-  import { setContext, getContext, tick, createEventDispatcher } from 'svelte';
-  import { RULESETS } from './SearchContainer.svelte';
-  import { RULESET } from './Ruleset.svelte';
+  import { tick, createEventDispatcher } from 'svelte';
   import { Edit } from '../Icons';
 
   export let disabled;
@@ -17,8 +15,6 @@
     { query: 'Disease', status: 'not' },
   ];
 
-  const key = getContext(RULESET);
-  const { rulesets, setEditState } = getContext(RULESETS);
   const dispatch = createEventDispatcher();
 
   let editing = false;
@@ -31,7 +27,6 @@
 
 
   $: pills = _pills && _pills.filter(v => v !== null);
-  $: isEditing = $rulesets.get(key);
 
   $: inputCoords = calculateInputLocation(pills[pills.length - 1]);
 

@@ -9,23 +9,12 @@
 
   export let hasContent;
   export let disabled;
+  export let isEditing;
 
-  const key = {};
-  const { deregister, rulesets, register, setEditState } = getContext(RULESETS);
   const dispatch = createEventDispatcher();
-
-  $: lastRuleset = Array.from($rulesets)[$rulesets.size - 1][0] === key;
-  $: isEditing = $rulesets.get(key);
-
-  setContext(RULESET, key);
-  register(key);
-  setEditState(key, true);
-
-  onDestroy(() => deregister(key))
 
 </script>
 
-{#if isEditing | hasContent}
 <div>
   <slot></slot>
   <ul>
@@ -35,10 +24,9 @@
       <li class:disabled on:click={() => dispatch('disable')}><ToggleLeftIcon size={1.5} /></li>
     {/if}
 
-    <li class:isEditing on:click={() => setEditState(key, !isEditing)}><EditIcon size={1.5} /></li>
+    <li class:isEditing on:click={() => dispatch('edit')}><EditIcon size={1.5} /></li>
   </ul>
 </div>
-{/if}
 
 <style lang="less">
   div {
