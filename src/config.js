@@ -14,12 +14,12 @@ export const endpointNIH = `${BASE_URL}/${NIH_index}`;
 export const endpointNIHCount = `${endpointNIH}/_count`;
 export const endpointNIHSearch = `${endpointNIH}/_search`;
 
-export const CB_index = 'companies_v3';
+export const CB_index = 'companies_v4';
 export const endpointCB = `${BASE_URL}/${CB_index}`;
 export const endpointCBCount = `${endpointCB}/_count`;
 export const endpointCBSearch = `${endpointCB}/_search`;
 
-export const MU_index = 'meetup_v2';
+export const MU_index = 'meetup_v3';
 export const endpointMU = `${BASE_URL}/${MU_index}`;
 export const endpointMU_Count = `${endpointMU}/_count`;
 export const endpointMU_Search = `${endpointMU}/_search`;
@@ -75,13 +75,13 @@ export const requiredFields = {
     { field: 'id_iso2_country', type: 'keyword' },
     { field: 'name_of_group', type: 'text' },
     { field: 'placeName_city_group', type: 'keyword' },
-    { field: 'terms_topics_group', type: 'text' },
+    { field: 'terms_mesh_group', type: 'text' },
     { field: 'textBody_descriptive_group', type: 'text' },
   ],
   NIH: [
     { field: 'title_of_organisation', type: 'text' },
-    // { field: 'textBody_abstract_project', type: 'text' },
-    // { field: 'terms_mesh_abstract', type: 'text' },
+    { field: 'textBody_abstract_project', type: 'text' },
+    { field: 'terms_mesh_abstract', type: 'text' },
     { field: 'placeName_city_organisation', type: 'keyword' },
     { field: 'id_iso2_country', type: 'keyword' },
     { field: 'coordinate_of_organisation', type: 'geo_point' },

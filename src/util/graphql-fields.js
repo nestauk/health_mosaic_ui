@@ -51,9 +51,9 @@ const fieldMaps = {
     'title_of_organisation',
   ],
   novelty: [
-    'cost_of_funding',
-    'count_member_group',
-    'rank_rhodonite_abstract'
+    'rank_rhodonite_abstract',
+    'rank_rhodonite_group',
+    'rank_rhodonite_organisation',
   ],
   region: ['placeName_region_organisation'],
   sdg_labels: [
@@ -77,7 +77,7 @@ const fieldMaps = {
   ],
   terms: [
     'terms_mesh_description',
-    'terms_topics_group',
+    'terms_mesh_group',
     'terms_mesh_abstract',
   ],
   title: ['title_of_project'],

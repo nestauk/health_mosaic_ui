@@ -16,17 +16,17 @@ import { mappedQueryBuilder } from '../util/graphql-fields';
 // queryObject -> queryMapper -> mappedQueryBuilder
 const sources = [
   // body
-  'textBody_descriptive_project',
-  'textBody_descriptive_organisation',
   'textBody_abstract_project',
+  'textBody_descriptive_organisation',
+  'textBody_descriptive_project',
 
   // city
   'placeName_city_group',
   'placeName_city_organisation',
 
   // continent_id
-  'id_continent_organisation',
   'id_continent_group',
+  'id_continent_organisation',
   'id_of_continent',
 
   // cost_ref
@@ -58,14 +58,14 @@ const sources = [
   'coordinate_of_organisation',
 
   // name
-  'name_of_organisation',
   'name_of_group',
+  'name_of_organisation',
   'title_of_organisation',
 
   // novelty
-  'cost_of_funding',
-  'count_member_group',
   'rank_rhodonite_abstract',
+  'rank_rhodonite_group',
+  'rank_rhodonite_organisation',
 
   // region
   'placeName_region_organisation',
@@ -84,13 +84,13 @@ const sources = [
   'id_state_organisation',
 
   // summary
-  'textBody_summary_organisation',
   'textBody_abstract_project',
+  'textBody_summary_organisation',
 
   // terms
-  'terms_mesh_description',
   'terms_mesh_abstract',
-  'terms_topics_group',
+  'terms_mesh_description',
+  'terms_mesh_group',
 
   // title
   'title_of_project',
@@ -99,9 +99,9 @@ const sources = [
   'type_of_entity',
 
   // url
-  'url_of_organisation',
-  'url_of_group',
   'url_crunchBase_organisation',
+  'url_of_group',
+  'url_of_organisation',
 ];
 
 // eslint-disable-next-line no-undef
@@ -301,10 +301,10 @@ const resolvers = {
           parent._source.terms_mesh_description &&
           parent._source.terms_mesh_description.sort(compare)
         );
-      if (parent._source.hasOwnProperty('terms_topics_group'))
+      if (parent._source.hasOwnProperty('terms_mesh_group'))
         return (
-          parent._source.terms_topics_group &&
-          parent._source.terms_topics_group.sort(compare)
+          parent._source.terms_mesh_group &&
+          parent._source.terms_mesh_group.sort(compare)
         );
       if (parent._source.hasOwnProperty('terms_mesh_abstract'))
         return (
