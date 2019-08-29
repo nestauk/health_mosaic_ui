@@ -20,6 +20,7 @@ import {
   hideTabRuleOptions,
   toggleTerm,
 } from './utils';
+import { accessSync } from 'fs';
 
 const toArray = x => [x];
 
@@ -34,11 +35,19 @@ const fieldUpdater = ({ content, subject }) => {
 const setDefaultFields = ruleset =>
   _.updatePathIn(ruleset, 'fields', fieldUpdater);
 
+const reduceQueries = rulesets =>
+  _.pipe([
+    _.reduceWith(
+      (acc, next) => ({ ...acc, terms: acc.terms.concat(next.terms) }),
+      _.head(rulesets)
+    ),
+  ])(rulesets);
+
 export const form_options = {
   actions: {
     activateSimpleSearch: ({ screenStore }, { tabId }) => {
       const updater = _.pipe([
-        _.head,
+        reduceQueries,
         setDefaultRuleset,
         setDefaultFields,
         toArray,
@@ -46,9 +55,6 @@ export const form_options = {
       const copyRule = _.pipe([_.updatePath(`${tabId}.uiQuery`, updater)]);
 
       screenStore.update(copyRule);
-      // clear results except first
-      // reset all rulsesets to disbaled: false
-      // reset all fields to status: 'default' and disabled: false
     },
     editRuleset: ({ screenStore }, { tabId, ruleIndex = 0 }) => {
       const labelEditStatus = _.updatePath(
