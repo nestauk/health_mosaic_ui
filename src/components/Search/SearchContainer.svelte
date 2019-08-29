@@ -22,13 +22,12 @@
 <div class="container">
   <div class="header">
     <h2>Search</h2>
-    <button on:click={() => dispatch('reset')}><Sync /></button>
   </div>
 
   <slot></slot>
 
   <div class="search">
-    <div>
+    <div class="logic">
       <Switch
         on:toggle
         values={["AND", "OR"]}
@@ -44,16 +43,14 @@
         on:indexchange
       />
 
-      <button on:click|stopPropagation>Search</button>
+      <button class="search-button" on:click|stopPropagation>Search</button>
+      <button class="reset-button" on:click={() => dispatch('reset')}><Sync /></button>
     </div>
   </div>
 </div>
 
 <style lang="less">
   .container {
-    border-bottom: 1px solid #ccc;
-    padding-bottom: 25px;
-
     button {
       background: var(--button-bg);
       background-image: var(--button-bg-image);
@@ -65,34 +62,18 @@
       }
     }
 
-    .header {
-      display: flex;
-      justify-content: space-between;
-
-      button {
-        padding: 0;
-        width: 30px;
-        height: 30px;
-        border: none;
-        background: none;
-        color: #888;
-        cursor: pointer;
-
-        &:inactive {
-          opacity: 0.6;
-        }
-
-        &:hover {
-          color: #333;
-        }
-      }
-    }
-
     .search {
       display: flex;
       flex-direction: column;
       justify-content: center;
       margin-top: 15px;
+
+      .logic {
+        border-bottom: 1px solid #ccc;
+        box-sizing: border-box;
+        padding-bottom: 2em;
+        height: 3.6em;
+      }
 
       div {
         display: flex;
@@ -106,12 +87,31 @@
           width: 2em;
         }
 
-        button {
+        .search-button {
           font-size: 16px;
           border-radius: 3px;
           cursor: pointer;
           padding: 3px 10px;
           user-select: none;
+        }
+
+        .reset-button {
+          padding: 0;
+          width: 30px;
+          height: 30px;
+          border: none;
+          background: none;
+          color: #888;
+          cursor: pointer;
+          margin-left: 20px;
+
+          &:inactive {
+            opacity: 0.6;
+          }
+
+          &:hover {
+            color: #333;
+          }
         }
       }
     }
