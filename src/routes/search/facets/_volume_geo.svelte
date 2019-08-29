@@ -18,10 +18,14 @@
 
   export let isDirty;
 
-  $: selections = $screenStore[$currentTab].selections;
+  $: store = $screenStore[$currentTab];
+  $: items = store.results.data;
+  $: itemsByCountryId = countByCountryIdAsKeyValue(items); // {key: country_id, value: number}[]
+  $: selections = store.selections;
   $: selectedCountries = (selections.country_id && selections.country_id.value) || [];
-  $: selectedItems = $screenStore[$currentTab].selected;
+  $: selectedItems = store.selected;
   $: selectedItemsByCountryId = countByCountryIdAsKeyValue(selectedItems); // {key: country_id, value: number}[]
+  $: bounds = selections.location && selections.location.value;
 
   // TODO utils?
   const updateSelections = ({ detail: selection }) =>
@@ -34,12 +38,12 @@
 </script>
 
 <div class="container" class:dirty="{isDirty}">
-  {#if selectedItems.length}
   <div class="col col1">
     <WorldMapWithHistogramScaleHTML
       colors={schemeSet3}
-      items={selectedItemsByCountryId}
+      items={itemsByCountryId}
       keyAccessor="{getKey}"
+      geoMask="{bounds}"
       on:selected="{updateSelections}"
       on:deselectAll="{deselectCountries}"
       selectedKeys="{selectedCountries}"
@@ -53,12 +57,12 @@
       items={selectedItemsByCountryId}
       labels={countries}
     />
+    {#if !selectedItemsByCountryId.length}
+    <div class="col overlay">
+      <Fallback message="No results" />
+    </div>
+    {/if}
   </div>
-  {:else}
-  <div class="col fullwidth">
-    <Fallback message="No results" />
-  </div>
-  {/if}
 </div>
 
 <style lang="less">
@@ -85,9 +89,16 @@
       }
       &.col2 {
         grid-column: 11 / span 2;
-      }
-      &.fullwidth {
-        grid-column: 1 / span 12;
+        position: relative;
+
+        .overlay {
+          position: absolute;
+          top: 0;
+          left: 0;
+          height: 100%;
+          width: 100%;
+          pointer-events: none;
+        }
       }
     }
 

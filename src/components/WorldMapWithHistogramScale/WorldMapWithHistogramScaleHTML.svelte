@@ -20,6 +20,7 @@
   const dispatch = createEventDispatcher();
 
   export let colors;
+  export let geoMask;
   export let keyAccessor;
   export let items = [];
   export let title;
@@ -159,6 +160,7 @@
           on:exited="{exitedNode}"
           on:clickTarget="{toggleTarget}"
           on:deselectAll
+          {geoMask}
           {selectedKeys}
           {valueAccessor}
           {width}

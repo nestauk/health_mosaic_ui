@@ -13,25 +13,37 @@
 
 <script>
   import { createEventDispatcher } from 'svelte';
-  import { geoPath } from 'd3-geo';
+  import { geoPath, geoGraticule } from 'd3-geo';
   import { geoCylindricalEqualArea } from 'd3-geo-projection';
   import * as _ from 'lamb';
 
   import { createColoredFeatures } from '../../util/geo';
 
   const dispatch = createEventDispatcher();
+  const projection = geoCylindricalEqualArea;
+  const outline = geoGraticule().outline();
+  const safety = {
+    top: 10,
+    right: 10,
+    bottom: 10,
+    left: 10,
+  };
 
   export let height;
   export let items = []; // {key, value}
   export let key;
   export let keyToColor;
+  export let geoMask;
   export let width;
   export let selectedKeys = [];
 
+  $: height = Math.max(0, height - safety.top - safety.bottom);
+  $: width = Math.max(0, width - safety.left - safety.right);
+  $: geoMaskBbox = geoMask && geoGraticule().extent(geoMask).outline();
   $: getFeatures = createColoredFeatures(keyToColor, key);
   $: features = getFeatures(geojson);
-  $: projection = geoCylindricalEqualArea().fitSize([width, height], geojson);
-  $: geopath = projection && geoPath(projection);
+  $: fitProjection = projection().fitSize([width, height], geojson);
+  $: geopath = fitProjection && geoPath(fitProjection);
   $: exists = string => _.someIn(items, x => x.key === string);
 
   const clickedTarget = feature => () => {
@@ -47,10 +59,13 @@
 
 <svelte:options namespace="svg" />
 
-<g class="worldmap">
-  <rect
-    {width}
-    {height}
+<g
+  class="worldmap"
+  transform="{`translate(${safety.left},${safety.top})`}"
+>
+  <path
+    class="outline"
+    d="{geopath(outline)}"
     on:click="{() => {dispatch('deselectAll')}}"
   />
   {#if geopath}
@@ -68,23 +83,40 @@
     />
   </g>
   {/each}
+  {#if geoMaskBbox}
+  <path
+    class="mask"
+    fill-rule="nonzero"
+    d="{geopath(geoMaskBbox)}"
+  />
+  {/if}
   {/if}
 </g>
 
 <style lang="less">
-  rect {
+  .outline {
     fill-opacity: 0;
+    stroke: none;
     cursor: pointer;
   }
-  path {
-    stroke: grey;
-    stroke-width: 0.5;
+  .feature {
+    path {
+      stroke: grey;
+      stroke-width: 0.5;
 
-    &.active {
-      cursor: pointer;
+      &.active {
+        cursor: pointer;
+      }
+      &.deselected {
+        fill-opacity: 0.25;
+      }
     }
-    &.deselected {
-      fill-opacity: 0.25;
-    }
+  }
+  .mask {
+    fill-opacity: 0.05;
+    /* fill: none; */
+    stroke: black;
+    stroke-width: 1.5;
+    pointer-events: none;
   }
 </style>
