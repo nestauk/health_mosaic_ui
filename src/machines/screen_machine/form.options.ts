@@ -39,7 +39,7 @@ const reduceQueries = rulesets =>
   _.pipe([
     _.reduceWith(
       (acc, next) => ({ ...acc, terms: acc.terms.concat(next.terms) }),
-      _.head(rulesets)
+      { ..._.head(rulesets), terms: [] }
     ),
   ])(rulesets);
 
