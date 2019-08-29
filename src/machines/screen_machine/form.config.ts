@@ -1,24 +1,21 @@
 export const form_config = {
   id: 'Form',
-  initial: 'Idle',
+  initial: 'Simple',
   on: {
     TAB_DELETED: {
-      target: 'Form.Idle',
+      target: 'Form.Simple',
     },
     TAB_CREATED: {
-      target: 'Form.Idle',
+      target: 'Form.Simple',
     },
     TAB_SELECTED: {
-      target: 'Form.Idle',
+      target: 'Form.Simple',
     },
     TAB_RENAMED: {
-      target: 'Form.Idle',
+      target: 'Form.Simple',
     },
     TAB_VISIBILITY_TOGGLED: {
       actions: ['toggleTabVisibility'],
-    },
-    LABEL_CLICKED: {
-      actions: ['toggleLabelTernary'],
     },
     TERM_CLICKED: {
       actions: ['toggleTermStatus'],
@@ -32,74 +29,58 @@ export const form_config = {
     STORE_RESET: {
       actions: ['resetStore'],
     },
-    LOGIC_TOGGLED: {
-      actions: ['toggleSearchLogic'],
+    TEXT_CHANGED: {
+      actions: ['updateCurrentRuleText'],
     },
-    RULE_DISABLED: {
-      actions: ['disableRule'],
-    },
-    RULE_COPIED: {
-      actions: ['copyRule', 'selectRule'],
-    },
-    RULE_DELETED: {
-      actions: ['deleteRule'],
-    },
-    LABEL_TOGGLED: {
-      actions: ['toggleLabelBinary'],
-    },
-    LABEL_DISABLED: {
-      actions: ['disableLabel'],
-    },
-    LABEL_DELETED: {
-      actions: ['deleteLabel'],
-    },
-    RULE_EDITED: {
-      actions: ['editRuleset'],
+    RULE_SELECTED: {
+      actions: ['selectRule'],
     },
   },
   states: {
-    Idle: {
+    Simple: {
       on: {
-        TEXT_CHANGED: {
-          actions: ['updateCurrentRuleText'],
+        CHANGE_SEARCH_MODE: {
+          target: 'Complex',
+        },
+      },
+    },
+    Complex: {
+      on: {
+        RULE_EDITED: {
+          actions: ['editRuleset'],
+        },
+        CHANGE_SEARCH_MODE: {
+          target: 'Simple',
+          actions: ['activateSimpleSearch'],
+        },
+        LABEL_CLICKED: {
+          actions: ['toggleLabelTernary'],
+        },
+        LOGIC_TOGGLED: {
+          actions: ['toggleSearchLogic'],
+        },
+        RULE_DISABLED: {
+          actions: ['disableRule'],
+        },
+        RULE_COPIED: {
+          actions: ['copyRule', 'selectRule'],
+        },
+        RULE_DELETED: {
+          actions: ['deleteRule'],
+        },
+        LABEL_TOGGLED: {
+          actions: ['toggleLabelBinary'],
+        },
+        LABEL_DISABLED: {
+          actions: ['disableLabel'],
+        },
+        LABEL_DELETED: {
+          actions: ['deleteLabel'],
         },
         RULESET_CREATED: {
           actions: ['createRuleset', 'selectRule'],
         },
-        RULE_SELECTED: {
-          actions: ['selectRule'],
-        },
-        LABEL_OPTIONS_SELECTED: {
-          target: 'LabelOptionsShowing',
-        },
-        RULE_OPTIONS_SELECTED: {
-          target: 'RuleOptionsShowing',
-        },
       },
-    },
-    LabelOptionsShowing: {
-      onEntry: ['showLabelOptions'],
-      on: {
-        LABEL_DELETED: {
-          actions: ['deleteLabel'],
-          target: 'Idle',
-        },
-        LABEL_OPTIONS_DISMISSED: {
-          target: 'Idle',
-        },
-      },
-
-      onExit: ['hideLabelOptions'],
-    },
-    RuleOptionsShowing: {
-      onEntry: ['showRuleOptions'],
-      on: {
-        RULE_OPTIONS_DISMISSED: {
-          target: 'Idle',
-        },
-      },
-
-      onExit: ['hideRuleOptions'],
     },
   },
 };

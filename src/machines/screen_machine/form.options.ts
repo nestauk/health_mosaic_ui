@@ -21,8 +21,35 @@ import {
   toggleTerm,
 } from './utils';
 
+const toArray = x => [x];
+
+const setDefaultRuleset = ruleset => _.setPathIn(ruleset, 'disabled', false);
+
+const fieldUpdater = ({ content, subject }) => {
+  return {
+    content: _.map(content, c => ({ ...c, status: 'default' })),
+    subject: _.map(subject, c => ({ ...c, status: 'default' })),
+  };
+};
+const setDefaultFields = ruleset =>
+  _.updatePathIn(ruleset, 'fields', fieldUpdater);
+
 export const form_options = {
   actions: {
+    activateSimpleSearch: ({ screenStore }, { tabId }) => {
+      const updater = _.pipe([
+        _.head,
+        setDefaultRuleset,
+        setDefaultFields,
+        toArray,
+      ]);
+      const copyRule = _.pipe([_.updatePath(`${tabId}.uiQuery`, updater)]);
+
+      screenStore.update(copyRule);
+      // clear results except first
+      // reset all rulsesets to disbaled: false
+      // reset all fields to status: 'default' and disabled: false
+    },
     editRuleset: ({ screenStore }, { tabId, ruleIndex = 0 }) => {
       const labelEditStatus = _.updatePath(
         `${tabId}.uiQuery.${ruleIndex}.isEditing`,

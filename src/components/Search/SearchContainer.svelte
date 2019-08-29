@@ -1,6 +1,8 @@
 <script>
   import { createEventDispatcher } from 'svelte';
   import { writable } from 'svelte/store';
+  import { scale } from 'svelte/transition';
+
 
   import { PlusCircleIcon } from 'svelte-feather-icons';
   import { Sync } from '../Icons';
@@ -13,6 +15,7 @@
   export let index;
   export let logic;
   export let ruesets;
+  export let mode;
 
   const dispatch = createEventDispatcher();
   const search_indices= ['Research', 'Companies', 'Events'];
@@ -22,20 +25,37 @@
 <div class="container">
   <div class="header">
     <h2>Search</h2>
+    <ul>
+      <li
+        class:active={mode === 'simple'}
+        on:click={() => dispatch('modechange')}
+      >
+        Simple
+      </li>
+      <li
+        class:active={mode === 'complex'}
+        on:click={() => dispatch('modechange')}
+      >
+        Complex
+      </li>
+    </ul>
   </div>
 
   <slot></slot>
 
-  <div class="search">
-    <div class="logic">
-      <Switch
-        on:toggle
-        values={["AND", "OR"]}
-        current={logic}
-      />
-      <span on:click={() => dispatch('newrule')}><PlusCircleIcon size={1.5} /></span>
-    </div>
 
+
+  <div class="search">
+    {#if mode === 'complex'}
+      <div transition:scale class="logic">
+        <Switch
+          on:toggle
+          values={["AND", "OR"]}
+          current={logic}
+        />
+        <span on:click={() => dispatch('newrule')}><PlusCircleIcon size={1.5} /></span>
+      </div>
+    {/if}
     <div>
       <SearchDropdown
         {index}
@@ -51,6 +71,40 @@
 
 <style lang="less">
   .container {
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+
+      h2 {
+        margin: 0;
+      }
+
+      ul {
+        margin: 0;
+        margin-left: auto;
+        display: flex;
+        list-style: none;
+        font-size: 0.9rem;
+
+        li {
+          margin: 0 0 0 10px;
+          color: #777;
+
+          &:first-child:after {
+            content: '|';
+            margin-left: 10px;
+            color: #333;
+          }
+          &.active {
+            opacity: 1;
+            color: #333;
+          }
+        }
+      }
+    }
+
     button {
       background: var(--button-bg);
       background-image: var(--button-bg-image);

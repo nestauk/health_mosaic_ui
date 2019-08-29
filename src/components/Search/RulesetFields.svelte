@@ -9,6 +9,7 @@
   export let fields;
   export let isEditing;
 
+
   const makeFields = ({ subject, content }) => {
     let fields = [];
     subject.forEach( v => fields.push({...v, section: 'subject'}))
@@ -16,7 +17,6 @@
     return fields;
   }
   $: all_fields = makeFields(fields);
-  // $: isEditing = $rulesets.get(key);
   $: current_fields = isEditing ? all_fields : all_fields.filter(({ status }) => status !== 'default');
 
   const find_field = (section, field) => fields[section].findIndex(v => v.field === field);

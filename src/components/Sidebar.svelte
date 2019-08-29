@@ -1,20 +1,10 @@
 <script>
-  import { SearchContainer, Ruleset, RulesetQueries, RulesetFields } from './Search';
-  export let val;
-
-  let mode = 'simple';
-
   import { stores } from '@sapper/app';
   import { tick } from 'svelte';
   import compare from 'just-compare';
   import * as _ from 'lamb';
 
-  // import { Form, FormInput, FormLabels, FormDropdown, FormControls } from './QueryBuilder/Form';
-  // import { Rules, Ruleset, RulesetQueries, RulesetLabels } from './QueryBuilder/Rules';
-  // import Selections from './Selections.svelte';
-
-
-
+  import { SearchContainer, Ruleset, RulesetQueries, RulesetFields } from './Search';
   import { screenMachine } from '../services/screen_service.ts';
   import {
     screenStore,
@@ -49,6 +39,8 @@
   $: selections = $screenStore[$currentTab] && $screenStore[$currentTab].selections;
   $: logic = $screenStore[$currentTab].logic;
   $: if (!open && !isEmptyQuery) openDrawer();
+  $: mode = $screenMachine.matches('Form.Simple') ? 'simple' : 'complex';
+  $: console.log('Current Search Mode:', mode);
 
   const stripEmpties = _.filterWith(_.allOf([
     _.getPath('values.length'),
@@ -206,6 +198,10 @@
     })
     checkDirty();
   }
+
+  const changeMode = mode => {
+    mode === ''
+  }
 </script>
 
 <div>
@@ -217,8 +213,10 @@
     on:indexchange={({ detail }) => changeIndex(detail)}
     on:newrule={newRuleset}
     on:toggle={toggleSearchLogic}
+    on:modechange={() => screenMachine.send({type: 'CHANGE_SEARCH_MODE', tabId: $currentTab})}
     index={$screenStore[$currentTab].index}
     {logic}
+    {mode}
   >
     {#each uiQuery as { options, disabled, selected, terms, fields, isEditing }, i}
       <Ruleset
@@ -229,6 +227,7 @@
           hasContent={terms.length && terms[0].term.length}
           {disabled}
           {isEditing}
+          {mode}
       >
         <RulesetQueries
           queries={terms}
@@ -237,14 +236,16 @@
           {disabled}
           {isEditing}
         />
-        <RulesetFields
-          on:toggle={({ detail }) => sendRuleLabel('LABEL_TOGGLED', detail, i)}
-          on:disable={({ detail }) => sendRuleLabel('LABEL_DISABLED', detail, i)}
-          on:delete={({ detail }) => sendRuleLabel('LABEL_DELETED', detail, i)}
-          {fields}
-          {disabled}
-          {isEditing}
-        />
+        {#if mode === 'complex'}
+          <RulesetFields
+            on:toggle={({ detail }) => sendRuleLabel('LABEL_TOGGLED', detail, i)}
+            on:disable={({ detail }) => sendRuleLabel('LABEL_DISABLED', detail, i)}
+            on:delete={({ detail }) => sendRuleLabel('LABEL_DELETED', detail, i)}
+            {fields}
+            {disabled}
+            {isEditing}
+          />
+        {/if}
       </Ruleset>
     {/each}
   </SearchContainer>

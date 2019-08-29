@@ -3,29 +3,31 @@
 </script>
 
 <script>
-  import { createEventDispatcher, getContext, setContext, onDestroy } from 'svelte';
+  import { createEventDispatcher } from 'svelte';
+  import { scale } from 'svelte/transition';
   import { EditIcon, CopyIcon, PlusCircleIcon, SaveIcon, ToggleLeftIcon, Trash2Icon } from 'svelte-feather-icons';
-  import { RULESETS } from './SearchContainer.svelte';
 
   export let hasContent;
   export let disabled;
   export let isEditing;
-
+  export let mode;
   const dispatch = createEventDispatcher();
 
 </script>
 
 <div>
   <slot></slot>
-  <ul>
-    {#if hasContent}
-      <li on:click={() => dispatch('copy')}><CopyIcon size={1.5} /></li>
-      <li on:click={() => dispatch('delete')}><Trash2Icon size={1.5} /></li>
-      <li class:disabled on:click={() => dispatch('disable')}><ToggleLeftIcon size={1.5} /></li>
-    {/if}
+  {#if mode === 'complex'}
+    <ul transition:scale>
+      {#if hasContent}
+        <li on:click={() => dispatch('copy')}><CopyIcon size={1.5} /></li>
+        <li on:click={() => dispatch('delete')}><Trash2Icon size={1.5} /></li>
+        <li class:disabled on:click={() => dispatch('disable')}><ToggleLeftIcon size={1.5} /></li>
+      {/if}
 
-    <li class:isEditing on:click={() => dispatch('edit')}><EditIcon size={1.5} /></li>
-  </ul>
+      <li class:isEditing on:click={() => dispatch('edit')}><EditIcon size={1.5} /></li>
+    </ul>
+  {/if}
 </div>
 
 <style lang="less">
