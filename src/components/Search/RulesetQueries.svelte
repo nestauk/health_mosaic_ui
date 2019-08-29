@@ -206,6 +206,8 @@
         margin: 3px;
         border-radius: 14px;
         font-size: 14px;
+        user-select: none;
+        cursor: pointer;
 
         .close {
           margin-left: 5px;

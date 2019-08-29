@@ -51,6 +51,9 @@
 
 <style lang="less">
   .container {
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 25px;
+
     button {
       background: var(--button-bg);
       background-image: var(--button-bg-image);
@@ -96,6 +99,7 @@
         justify-content: center;
         margin-top: 15px;
         height: 2em;
+        cursor: pointer;
 
         span {
           height: 100%;
@@ -107,6 +111,7 @@
           border-radius: 3px;
           cursor: pointer;
           padding: 3px 10px;
+          user-select: none;
         }
       }
     }

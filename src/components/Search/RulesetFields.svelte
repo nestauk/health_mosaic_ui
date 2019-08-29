@@ -107,14 +107,12 @@
         &.allDefault input.green::after {
           background: #ccc;
         }
-        label {
-          cursor: pointer;
 
-          span {
-            font-weight: 700;
-            margin-left: 5px;
-          }
+        span {
+          font-weight: 700;
+          margin-left: 5px;
         }
+
 
         input {
           position: relative;

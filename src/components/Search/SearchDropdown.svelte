@@ -28,7 +28,7 @@ const dispatch = createEventDispatcher();
     &::after {
       content: ' ';
       width: 34px;
-      height: 34px;
+      height: 95%;
       right: 1px;
       top: 1px;
       background: #fff url('../arrow.svg') no-repeat center/60%;
@@ -39,7 +39,7 @@ const dispatch = createEventDispatcher();
   }
 
   select {
-    height: 36px;
+    height: 100%;
     padding: 0 35px 0 5px;
     border-radius: 2px;
     border: 1px solid #ddd;
