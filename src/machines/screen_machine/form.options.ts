@@ -150,44 +150,33 @@ export const form_options = {
     deleteRule: ({ screenStore }, { tabId, ruleIndex }) => {
       const uiQuery = get(screenStore)[tabId].uiQuery;
       const currentSelection = uiQuery.findIndex(({ selected }) => selected);
+      console.log(uiQuery);
 
-      if (uiQuery.length > 1) {
-        const deleteRule = _.updatePath(
-          `${tabId}.uiQuery`,
-          _.filterWith((_, i) => i !== ruleIndex)
-        );
+      if (uiQuery.length <= 1) return;
 
-        const newIndex =
-          currentSelection === ruleIndex
-            ? 0
-            : currentSelection > ruleIndex
-            ? currentSelection - 1
-            : currentSelection;
+      const deleteRule = _.updatePath(
+        `${tabId}.uiQuery`,
+        _.filterWith((_, i) => i !== ruleIndex)
+      );
 
-        const hideOptions = _.updatePath(
-          `${tabId}.uiQuery`,
-          _.mapWith(deselectRule)
-        );
+      const newIndex =
+        currentSelection === ruleIndex
+          ? 0
+          : currentSelection > ruleIndex
+          ? currentSelection - 1
+          : currentSelection;
 
-        const updateSelected = _.setPath(
-          `${tabId}.uiQuery.${newIndex}.selected`,
-          true
-        );
+      const hideOptions = _.updatePath(
+        `${tabId}.uiQuery`,
+        _.mapWith(deselectRule)
+      );
 
-        screenStore.update(_.pipe([deleteRule, hideOptions, updateSelected]));
-      } else {
-        const blankRule = _.setPath(`${tabId}.uiQuery.0`, {
-          terms: [newTerm()],
-          fields: {
-            subject: newField(subjectAliases),
-            content: newField(contentAliases),
-          },
-          options: false,
-          disabled: false,
-          selected: true,
-        });
-        screenStore.update(blankRule);
-      }
+      const updateSelected = _.setPath(
+        `${tabId}.uiQuery.${newIndex}.selected`,
+        true
+      );
+
+      screenStore.update(_.pipe([deleteRule, hideOptions, updateSelected]));
     },
     toggleTermStatus: ({ screenStore }, { tabId, ruleIndex, termIndex }) => {
       const toggleTermStatus = _.updatePath(
