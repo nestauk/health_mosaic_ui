@@ -14,7 +14,7 @@
 
   export let index;
   export let logic;
-  export let ruesets;
+  export let rulesets;
   export let mode;
 
   const dispatch = createEventDispatcher();

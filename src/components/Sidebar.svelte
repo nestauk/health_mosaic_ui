@@ -40,7 +40,8 @@
   $: logic = $screenStore[$currentTab].logic;
   $: if (!open && !isEmptyQuery) openDrawer();
   $: mode = $screenMachine.matches('Form.Simple') ? 'simple' : 'complex';
-
+  $: isOnly = uiQuery.length === 1;
+  $: console.log(isOnly)
   const stripEmpties = _.filterWith(_.allOf([
     _.getPath('values.length'),
     _.getPath('values.0.query.length')
@@ -227,6 +228,7 @@
           {disabled}
           {isEditing}
           {mode}
+          {isOnly}
       >
         <RulesetQueries
           queries={terms}

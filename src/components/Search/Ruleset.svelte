@@ -10,6 +10,7 @@
   export let hasContent;
   export let disabled;
   export let isEditing;
+  export let isOnly;
   export let mode;
   const dispatch = createEventDispatcher();
 
@@ -21,7 +22,7 @@
     <ul transition:scale>
       {#if hasContent}
         <li on:click={() => dispatch('copy')}><CopyIcon size={1.5} /></li>
-        <li on:click={() => dispatch('delete')}><Trash2Icon size={1.5} /></li>
+        <li class:inactive={isOnly} on:click={() => dispatch('delete')}><Trash2Icon size={1.5} /></li>
         <li class:disabled on:click={() => dispatch('disable')}><ToggleLeftIcon size={1.5} /></li>
       {/if}
 
@@ -67,5 +68,8 @@
   }
   .disabled :global(svg circle) {
     transform: translateX(8px);
+  }
+  .inactive {
+    opacity: 0.6;
   }
 </style>
