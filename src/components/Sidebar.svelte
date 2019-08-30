@@ -5,6 +5,7 @@
   import * as _ from 'lamb';
 
   import { SearchContainer, Ruleset, RulesetQueries, RulesetFields } from './Search';
+  import Selections from './Selections.svelte';
   import { screenMachine } from '../services/screen_service.ts';
   import {
     screenStore,
@@ -205,6 +206,7 @@
 </script>
 
 <div>
+  <slot></slot>
   <SearchContainer
     on:reset={handleReset}
     on:edit={({detail}) => selectRuleset(detail)}
@@ -249,7 +251,7 @@
       </Ruleset>
     {/each}
   </SearchContainer>
-  <slot></slot>
+  <Selections {selections} on:toggleselection={toggleSelection}/>
 </div>
 
 <style lang="less">

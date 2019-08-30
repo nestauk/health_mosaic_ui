@@ -19,65 +19,75 @@
   }
 </script>
 
-{#each selectionsArray as [ key, selection ]}
-<div class="container">
-  <div class="icon left">
-    <img src={arrowForward} >
-  </div>
-  <ul>
-  <span on:click={() => dispatch('toggleselection',  {key, type:selection.type, value: undefined}) }>{key}</span>
-    {#each selection.value as item}
-      <li
-        on:click={() => dispatch('toggleselection',  filterCurrent(selection, item, key))}
-      >
-        {item}
-      </li>
+{#if selectionsArray.length}
+  <div class="container">
+  <h2>Selections</h2>
+    {#each selectionsArray as [ key, selection ]}
+      <div class="title">
+        <h3>{key}</h3>
+        <span
+          on:click={() => dispatch('toggleselection',  {key, type:selection.type, value: undefined}) }
+        >
+          x
+        </span>
+      </div>
+      <ul>
+      <!-- <span on:click={() => dispatch('toggleselection',  {key, type:selection.type, value: undefined}) }></span> -->
+        {#each selection.value as item}
+          <li
+            on:click={() => dispatch('toggleselection',  filterCurrent(selection, item, key))}
+          >
+            {item}
+          </li>
+        {/each}
+      </ul>
     {/each}
-  </ul>
-  <div class="icon right">
-    <img src={arrowForward} >
   </div>
-</div>
-
-{/each}
+{/if}
 
 <style lang="less">
   .container {
-    width: calc(100% - 500px);
-    position: relative;
-    padding: 0 30px;
+    margin-top: 2rem;
+  }
+  h2 {
+    font-size: 1.3rem;
   }
 
-  .icon {
-    position: absolute;
-    top: 0px;
-    position: absolute;
-    bottom: 0;
-    margin: auto;
+  .title {
     display: flex;
     align-items: center;
 
-    &.left {
-      transform: rotate(180deg);
-      left: 0;
+    h3 {
+      margin:0 1rem 0 0;
+      padding-left: 1rem;
+
     }
 
-    &.right {
-      left: unset;
-      right: 0;
-    }
+    span {
+      border-radius: 2rem;
+      display: block;
+      width: 1.3em;
+      height: 1.3em;
+      background: #eee;
+      font-size: 1rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 0 0px 2px 0px;
 
-    img {
-      height: 50%;
+      &:hover {
+        background: #ccc;
+      }
     }
   }
 
   ul {
     display: flex;
+    flex-wrap: wrap;
     padding: 0;
     color: #333;
     padding: 10px;
-    margin-bottom: 0px;
+    margin: 0 0 1rem 0;
     list-style: none;
     border-radius: 30px;
     font-size: 0.9em;
@@ -107,7 +117,7 @@
       border: #ccc solid 1px;
       background: #fff;
       padding: 4px 10px;
-      margin: 0 3px;
+      margin: 3px;
       cursor: pointer;
       user-select: none;
 

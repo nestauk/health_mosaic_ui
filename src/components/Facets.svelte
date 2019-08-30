@@ -44,7 +44,10 @@ Fynder
 
 <style lang="less">
   .container {
-    margin-top: 2rem;
+    margin: 2rem 0;
+  }
+  h2 {
+    font-size: 1.3rem;
   }
 	ul {
 		padding: 0 0px;
