@@ -162,9 +162,10 @@
         class:selected="{id === selectedFacet}"
       >
         <RouterLink
-          on:navigate={onFacetTabClick(id)}
           base={searchRouteName}
+          direct={false}
           href={id}
+          on:navigate={onFacetTabClick(id)}
         >
           <div>{label}</div>
         </RouterLink>
@@ -185,6 +186,7 @@
     height: 100%;
     width: 100%;
     display: flex;
+    background-color: white;
 
     .drawerTransition();
 

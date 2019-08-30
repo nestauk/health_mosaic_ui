@@ -285,7 +285,7 @@
   @import '../styles/mixins.less';
 
   .search {
-    position: fixed;
+    position: absolute;
     width: 100%;
     top: 3.5rem;
     left: 0;
