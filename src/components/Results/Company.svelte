@@ -136,6 +136,7 @@
 
       ul {
         list-style: none;
+        padding: 0;
       }
     }
 
