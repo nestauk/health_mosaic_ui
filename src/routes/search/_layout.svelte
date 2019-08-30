@@ -22,6 +22,9 @@
   const { page } = stores();
 
   onMount(() => {
+    if($page.query.q.includes('in')) {
+      screenMachine.send({type: 'CHANGE_SEARCH_MODE', tabId: $currentTab})
+    }
     if($page.query && $page.query.q) {
       searchMachine.send('QUERY_ENTERED')
       searchMachine.send({ type:'SEARCHED', tabId: $currentTab });

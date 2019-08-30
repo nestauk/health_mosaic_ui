@@ -20,7 +20,6 @@ import {
   hideTabRuleOptions,
   toggleTerm,
 } from './utils';
-import { accessSync } from 'fs';
 
 const toArray = x => [x];
 
