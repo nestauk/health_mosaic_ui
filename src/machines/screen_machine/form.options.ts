@@ -35,7 +35,11 @@ const setDefaultFields = ruleset =>
 const reduceQueries = rulesets =>
   _.pipe([
     _.reduceWith(
-      (acc, next) => ({ ...acc, terms: acc.terms.concat(next.terms) }),
+      (acc, next) => ({
+        ...acc,
+        isEditing: true,
+        terms: acc.terms.concat(next.terms),
+      }),
       { ..._.head(rulesets), terms: [] }
     ),
   ])(rulesets);
