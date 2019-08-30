@@ -36,7 +36,7 @@
         class:active={mode === 'complex'}
         on:click={() => dispatch('modechange')}
       >
-        Complex
+        Advanced
       </li>
     </ul>
   </div>
@@ -91,6 +91,7 @@
         li {
           margin: 0 0 0 10px;
           color: #777;
+          cursor: pointer;
 
           &:first-child:after {
             content: '|';
