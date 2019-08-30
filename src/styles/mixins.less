@@ -1,5 +1,13 @@
-// @import './import.less';
-
 .drawerTransition {
   transition: 0.5s;
+}
+
+.highlighted {
+  padding: 0.2em 0.4em;
+  background-color: var(--color-text-highlight-bkg);
+
+  &:hover {
+    background-color: var(--color-text-highlight-bkg-hover);
+    color: white;
+  }
 }

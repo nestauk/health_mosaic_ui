@@ -1,7 +1,10 @@
+import { name } from '../package.json';
+import { kebabcaseToCamelcase } from './util/string';
+
 const mode = process.env.NODE_ENV;
 const dev = mode === 'development';
 
-export const project_title = 'HealthWeb';
+export const project_title = kebabcaseToCamelcase(name);
 export const BASE_URL =
   'https://search-health-scanner-5cs7g52446h7qscocqmiky5dn4.eu-west-2.es.amazonaws.com';
 
@@ -131,4 +134,29 @@ export const testLayer = {
 export const testSource = {
   type: 'vector',
   url: 'mapbox://examples.8fgz4egr',
+};
+
+
+/*
+mediaqueries (the last one must be of type `lt`)
+*/
+export const widthBreakpoints = {
+  // gt_1460: '(min-width: 1460px)',
+  // gt_1200: '(min-width: 1200px)',
+  // gt_1080: '(min-width: 1080px)',
+  // gt_920: '(min-width: 920px)',
+  // gt_910: '(min-width: 910px)',
+  // gt_900: '(min-width: 900px)',
+  // gt_870: '(min-width: 870px)',
+  // gt_840: '(min-width: 840px)',
+  // gt_832: '(min-width: 832px)',
+  // gt_800: '(min-width: 800px)',
+  // gt_768: '(min-width: 768px)',
+  // gt_720: '(min-width: 720px)',
+  gt_640: '(min-width: 640px)',
+  // gt_600: '(min-width: 600px)',
+  // gt_540: '(min-width: 540px)',
+  // gt_480: '(min-width: 480px)',
+  lt_640: '(max-width: 640px)',
+  // lt_480: '(max-width: 480px)'
 };

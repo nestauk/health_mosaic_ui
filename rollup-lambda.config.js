@@ -1,3 +1,4 @@
+import json from 'rollup-plugin-json';
 import replace from 'rollup-plugin-replace';
 
 import {
@@ -14,6 +15,7 @@ export default {
   },
   external: id => id.includes('apollo'),
   plugins: [
+    json(),
     replace({
       REPLACE_ES_EXISTS_QUERY: JSON.stringify(
         makeRequiredFields(requiredFields)
