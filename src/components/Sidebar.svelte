@@ -205,7 +205,6 @@
 </script>
 
 <div>
-  <slot></slot>
   <SearchContainer
     on:reset={handleReset}
     on:edit={({detail}) => selectRuleset(detail)}
@@ -250,6 +249,7 @@
       </Ruleset>
     {/each}
   </SearchContainer>
+  <slot></slot>
 </div>
 
 <style lang="less">

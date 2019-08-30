@@ -7,6 +7,7 @@
   import { onMount, onDestroy, setContext } from 'svelte';
   import { isIterableEmpty, isObjNotEmpty } from '@svizzle/utils';
 
+  import Facets from '../../components/Facets.svelte';
   import Nav from '../../components/Nav.svelte';
   import Sidebar from '../../components/Sidebar.svelte';
   import RouterLink from '../../components/RouterLink.svelte';
@@ -98,26 +99,22 @@
   const sendTabRenamed = ({detail: { value, id }}) =>
     screenMachine.send({type: 'TAB_RENAMED', labelText: value , id: parseInt(id, 10)});
 
-  const sendRouteChanged = (route) =>
+  const sendRouteChanged = ({detail}) =>
     screenMachine.send({
       type: 'ROUTE_CHANGED',
-      route: `/${searchRouteName}/${route}`
-    });
+      route: `/${searchRouteName}/${detail}`
+    })
 
   /* facets */
 
   const facetTabs = [
-    {id: '', label: 'List'},
+    {id: 'list', label: 'List'},
     {id: 'volume_geo', label: 'Volume by Country'},
     {id: 'map_geo', label: 'Locations'},
     {id: 'volume_terms', label: 'Volume by Term'},
     {id: 'volume_countries', label: 'Volume by Mentioned Countries'},
     {id: 'volume_funders', label: 'Volume by Funder'},
   ];
-
-  const onFacetTabClick = id => () => {
-    sendRouteChanged(id);
-  }
 
   const renderTitle = (query = '', type = '') => {
     let typeTitle;
@@ -150,21 +147,7 @@
 /> -->
 
 <Sidebar>
-  <ul>
-    {#each facetTabs as {id, label}}
-    <li
-      class:selected="{id === selectedFacet}"
-    >
-      <RouterLink
-        on:navigate={onFacetTabClick(id)}
-        base={searchRouteName}
-        href={id}
-      >
-        <div>{label}</div>
-      </RouterLink>
-    </li>
-    {/each}
-  </ul>
+  <Facets on:link={sendRouteChanged} facets={facetTabs}/>
 </Sidebar>
 
 
