@@ -6,6 +6,7 @@
 
   import { SEARCH } from './_layout.svelte';
   import {
+    list,
     map_geo,
     volume_countries,
     volume_funders,
@@ -14,6 +15,7 @@
   } from './facets';
 
   const facets = {
+    list,
     map_geo,
     volume_countries,
     volume_funders,
