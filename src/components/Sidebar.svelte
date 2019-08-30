@@ -40,7 +40,6 @@
   $: logic = $screenStore[$currentTab].logic;
   $: if (!open && !isEmptyQuery) openDrawer();
   $: mode = $screenMachine.matches('Form.Simple') ? 'simple' : 'complex';
-  $: console.log('Current Search Mode:', mode);
 
   const stripEmpties = _.filterWith(_.allOf([
     _.getPath('values.length'),

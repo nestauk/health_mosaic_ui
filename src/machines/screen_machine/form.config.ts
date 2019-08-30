@@ -14,6 +14,7 @@ export const form_config = {
     TAB_RENAMED: {
       target: 'Form.Simple',
     },
+    // I don't know if this is needed
     TAB_VISIBILITY_TOGGLED: {
       actions: ['toggleTabVisibility'],
     },

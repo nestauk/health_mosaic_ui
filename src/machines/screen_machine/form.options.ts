@@ -14,10 +14,8 @@ import { makeRouteUrl, toggleBoolean, removeEmpty } from '../../util/transform';
 import {
   toggleLabelBinaryUpdater,
   toggleLabelTernaryUpdater,
-  hideTabLabelOptions,
   deselectRule,
   parseQuery,
-  hideTabRuleOptions,
   toggleTerm,
 } from './utils';
 
@@ -100,21 +98,6 @@ export const form_options = {
 
       screenStore.update(disableLabelStatus);
     },
-    showLabelOptions: (
-      { screenStore },
-      { tabId, ruleIndex, section, labelIndex }
-    ) => {
-      const showLabelOption = _.setPath(
-        `${tabId}.uiQuery.${ruleIndex}.fields.${section}.${labelIndex}.options`,
-        true
-      );
-
-      screenStore.update(_.pipe([hideTabLabelOptions(tabId), showLabelOption]));
-    },
-    hideLabelOptions: ({ screenStore }, { tabId }) => {
-      screenStore.update(hideTabLabelOptions(tabId));
-    },
-
     deleteLabel: (
       { screenStore },
       { tabId, ruleIndex, section, labelIndex }
@@ -146,17 +129,6 @@ export const form_options = {
       );
 
       screenStore.update(parseText);
-    },
-    showRuleOptions: ({ screenStore }, { tabId, ruleIndex }) => {
-      const showRuleOptions = _.setPath(
-        `${tabId}.uiQuery.${ruleIndex}.options`,
-        true
-      );
-
-      screenStore.update(_.pipe([hideTabRuleOptions(tabId), showRuleOptions]));
-    },
-    hideRuleOptions: ({ screenStore }, { tabId }) => {
-      screenStore.update(hideTabRuleOptions(tabId));
     },
     disableRule: ({ screenStore }, { tabId, ruleIndex }) => {
       const toggleRule = _.updatePath(
