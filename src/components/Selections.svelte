@@ -32,7 +32,6 @@
         </span>
       </div>
       <ul>
-      <!-- <span on:click={() => dispatch('toggleselection',  {key, type:selection.type, value: undefined}) }></span> -->
         {#each selection.value as item}
           <li
             on:click={() => dispatch('toggleselection',  filterCurrent(selection, item, key))}

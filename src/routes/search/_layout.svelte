@@ -22,6 +22,9 @@
   import { capitalise } from '../../util/string';
 
   const { page } = stores();
+  let padTop;
+
+  $: console.log(padTop)
 
   onMount(() => {
 
@@ -90,7 +93,7 @@
 
   const sendTab = (type, id) =>  screenMachine.send({
     type,
-    tabId: parseInt(id, 10),
+    tabId: id,
     route: $page.path,
     queryParams: $page.query && $page.query.q,
     ESIndex: $page.query && $page.query.i
@@ -146,7 +149,19 @@
   on:textchange={sendTabRenamed}
 /> -->
 
-<Sidebar>
+<Sidebar {padTop}>
+    <Nav
+    {isLoading}
+    {isError}
+    {tabs}
+    activeTab="{$currentTab}"
+    on:newtab="{sendTabCreated}"
+    on:changetab="{({detail}) => sendTab('TAB_SELECTED', detail)}"
+    on:deletetab="{({detail}) => sendTab('TAB_DELETED', detail)}"
+    on:duplicatetab="{({detail}) => sendTab('TAB_DELETED', detail)}"
+    on:textchange={sendTabRenamed}
+    bind:tabHeight={padTop}
+  />
   <Facets on:link={sendRouteChanged} facets={facetTabs}/>
 </Sidebar>
 

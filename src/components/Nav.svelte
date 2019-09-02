@@ -2,6 +2,7 @@
   import { createEventDispatcher, tick, onMount } from 'svelte';
   import Spinner from './Spinner.svelte';
   import Alert from './Icons/Alert.svelte';
+  import { CopyIcon, PlusCircleIcon, Trash2Icon } from 'svelte-feather-icons';
 
   import addIcon from 'ionicons/dist/ionicons/svg/ios-add-circle-outline.svg';
   import arrowForward from 'ionicons/dist/ionicons/svg/ios-arrow-forward.svg';
@@ -21,18 +22,11 @@
   let tabEls = [];
   let tabWidth;
   let windowWidth;
+  let tab_status = [];
+
+
 
   const dispatch = createEventDispatcher();
-
-  const calculateWidth = async () => {
-    await tick();
-    tabEls = tabEls.filter(v => !!v);
-    tabWidth = [].reduce.call(tabEls, (a, n) => a + n.offsetWidth, 0)
-    // accounts for margins, etc.
-    isFullWidth =  tabWidth + 123 > windowWidth;
-    isRight = (tabWidth - navEl.offsetWidth - navEl.scrollLeft) === 0;
-    isLeft = navEl.scrollLeft === 0;
-  }
 
   const handleDoubleClick = ({ target }) => {
     if (editedTarget) return;
@@ -71,30 +65,51 @@
     } else if (type === 'click' || keyCode === 13) {
       window.getSelection().removeAllRanges();
       editedTarget.blur();
-      editedTarget.style.cursor = 'auto';
+      editedTarget.style.cursor = 'pointer';
       editedTarget.contentEditable = false;
       editedTarget = null;
     }
   };
 
+  const registerTabs = (node, id) => {
+
+    function toggleChecked(e) {
+      if (e.target.checked) {
+        tab_status.push(parseInt(id, 10));
+      } else {
+        let el = tab_status.findIndex(_id =>_id === parseInt(id, 10));
+        tab_status.splice(el, 1);
+      }
+
+    }
+
+    node.addEventListener('change', toggleChecked);
+
+    return {
+      destroy: () => node.removeEventListener('change', toggleChecked)
+    }
+  }
+
+
+
   const newTab = async () => {
     dispatch('newtab')
     await tick();
-    tabEls[tabEls.length - 1].scrollIntoView();
-    calculateWidth();
   }
 
   const textChange = ({ target }, id) => {
     dispatch('textchange', { value: target.innerText, id });
-    calculateWidth();
   }
 
-  const deleteTab = async id => {
-    dispatch('deletetab', id)
-    calculateWidth();
+  const duplicateTabs = async id => {
+    dispatch('duplicatetab', tab_status)
   }
 
-  onMount(calculateWidth)
+  const deleteTabs = async id => {
+    dispatch('deletetab', tab_status)
+    tab_status = tab_status.length === tabs.length ? [tab_status[0]] : [];
+  }
+
 </script>
 
 <svelte:window
@@ -103,65 +118,41 @@
 />
 
 <nav bind:offsetHeight="{tabHeight}">
-  {#if isFullWidth}
-    <div
-      class="scroll scroll-left"
-      style="opacity:{isLeft ? 0.3 : 1}"
-      on:click={() => navEl.scrollLeft -= 100}
-    >
-      <span class="icon">
-        <img alt="scroll tabs left" src="{arrowForward}"/>
-      </span>
-    </div>
-  {/if}
-  <ul bind:this={navEl} on:scroll={calculateWidth}>
-    {#each tabs as [id, tab], i}
-      <li bind:this={tabEls[i]}>
+  <h2>Tabs</h2>
+  <ul bind:this={navEl} >
+    {#each tabs as [id, tab], i (id)}
+      <li
+        bind:this={tabEls[i]}
+        class:selected={parseInt(id, 10) === activeTab}
+      >
         <div
-          on:click|preventDefault="{() => dispatch('changetab', id)}"
-          on:dblclick="{handleDoubleClick}"
-          on:keydown="{stopEdit}"
-          on:input="{ e => textChange(e, id) }"
-          class:selected="{parseInt(id, 10) === activeTab}"
+          on:dblclick={handleDoubleClick}
+          on:keydown={stopEdit}
+          on:input={ e => textChange(e, id) }
+          on:click|preventDefault={() => dispatch('changetab', parseInt(id, 10))}
           class="button"
         >
           {tab.name}
         </div>
-
-        {#if tabs.length > 1}
-        <span on:click="{() => deleteTab(id)}" class="icon">
-          <img alt="delete tab" src="{closeIcon}" />
-        </span>
-        {/if}
+        <input click:stopPropagation use:registerTabs={id} type="checkbox"/>
       </li>
     {/each}
 
   </ul>
-  {#if isFullWidth}
-    <div
-      class="scroll scroll-right"
-      style="opacity:{isRight ? 0.3 : 1}"
-      on:click={() => navEl.scrollLeft += 100}
-    >
-      <span class="icon">
-        <img alt="scroll tabs left" src="{arrowForward}"/>
-      </span>
-    </div>
-  {/if}
   <div
     class="close-container"
-    class:sticky={isFullWidth}
-    style="left:{isFullWidth ? 'unset' : `${tabWidth + 30}px`}"
+
+
   >
-    <span on:click="{newTab}" class="newtab icon">
-      <img alt="create tab" src="{addIcon}"/>
+    <span on:click={newTab} class="icon">
+      <PlusCircleIcon size={1.5}/>
     </span>
+    {#if tabs.length > 1}
+    <span on:click={() => deleteTabs(activeTab)} class="icon">
+      <Trash2Icon size={1.5}/>
+    </span>
+    {/if}
   </div>
-  {#if isLoading}
-    <span><Spinner/></span>
-  {:else if isError}
-    <span class="error"><Alert color="red"/></span>
-  {/if}
 </nav>
 
 <style lang="less">
@@ -176,17 +167,23 @@
     align-self: center;
     margin-right: 15px;
   }
+
+  h2 {
+    margin: 1rem;
+  }
+
   nav {
     border-bottom: 1px solid rgba(170, 30, 30, 0.1);
     font-weight: 300;
-    padding: 0 30px;
     display: flex;
     justify-content: space-between;
-    background: #fff;
-    position: relative;
-    z-index: 4;
+    flex-direction: column;
+    margin: 0 -1em;
+    width: calc(100% + 2em);
     position: fixed;
-    width: 100%;
+    top: 0;
+    width: var(--sidebar-width);
+    background: var(--sidebar-bg);
   }
 
   ul {
@@ -194,53 +191,44 @@
     padding: 0;
     list-style: none;
     display: flex;
-    overflow-x: scroll;
-    overflow-y: hidden;
-    position: relative;
-    margin-right: 64px;
-    padding-right: 64px;
-  }
-
-  /* clearfix */
-  ul::after {
-    content: '';
-    display: block;
-    clear: both;
+    flex-direction: column;
   }
 
   li {
     float: left;
     display: flex;
     align-items: center;
-    border-right: 1px solid #ccc;
-    padding: 0 10px;
+    justify-content: space-between;
     flex-shrink: 0;
+    padding-left: 1.5em;
+    cursor: pointer;
+  }
+
+  li input {
+    margin-right: 1em
+  }
+
+  li:nth-child(even) {
+    border-bottom: 1px solid #eee;
+    border-top: 1px solid #eee;
   }
 
   .selected {
-    position: relative;
-    display: inline-block;
-  }
-
-  .selected::after {
-    position: absolute;
-    content: '';
-    width: calc(100% - 1em);
-    height: 2px;
-    background-color: rgb(170, 30, 30);
-    display: block;
-    bottom: -1px;
+    background: var(--tab-highlight)!important;
   }
 
   .button {
-    padding: 1em 0.5em;
+    padding: 0.2em 0em;
     display: block;
     cursor: pointer;
     background: none;
     border: none;
     font-size: 1.1em;
-    font-weight: 200;
+    white-space: nowrap;
+    overflow: hidden;
+    width: 100%;
   }
+
 
   .icon {
     height: 22px;
@@ -252,7 +240,6 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    margin: auto;
     opacity: 1;
 
     &:hover {
@@ -265,48 +252,16 @@
     }
   }
 
-
-  .scroll {
-    position: fixed;
-    left: 0;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    height: 100%;
-    border-right: none;
-    height: 61px;
-    height: 61px;
-    width: 45px;
-    border-left: 1px solid #ccc;
-    background: #fff;
-    z-index: 2;
-
-    &.scroll-left {
-      transform: rotate(180deg);
-    }
-
-    &.scroll-right {
-      left: unset;
-      right: 50px;
-    }
-  }
-
-
-
   .close-container {
-    flex-direction: column;
     display: flex;
-    flex-direction: column;
     justify-content: center;
     height: 100%;
     margin-left: 10px;
     border-right: none;
-    position:fixed;
-    height: 61px;
-    //width: 60px;
+    margin: 15px 0;
+
 
     &.sticky {
-      position: fixed;
       right: 0;
       top: 0;
       width: 50px;

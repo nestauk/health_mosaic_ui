@@ -16,6 +16,8 @@
 
   const { page } = stores();
 
+  export let padTop;
+
 
   $: searchMachine = $screenMachine.context.searchMachines[$currentTab];
   $: uiQuery = $screenStore[$currentTab] && $screenStore[$currentTab].uiQuery;
@@ -42,8 +44,8 @@
   $: if (!open && !isEmptyQuery) openDrawer();
   $: mode = $screenMachine.matches('Form.Simple') ? 'simple' : 'complex';
   $: isOnly = uiQuery.length === 1;
-  $: console.log(isOnly)
-  const stripEmpties = _.filterWith(_.allOf([
+
+const stripEmpties = _.filterWith(_.allOf([
     _.getPath('values.length'),
     _.getPath('values.0.query.length')
   ]));
@@ -205,7 +207,7 @@
   }
 </script>
 
-<div>
+<div style="padding-top: {padTop}px">
   <slot></slot>
   <SearchContainer
     on:reset={handleReset}
@@ -262,7 +264,7 @@
     border-right: 1px solid #e1e4e8;
     padding: 15px;
     box-sizing: border-box;
-    background: #fafbfc;
+    background: var(--sidebar-bg);
     overflow-y: scroll;
   }
 </style>

@@ -19,6 +19,7 @@ import {
 } from '../../util/transform';
 import { newTab, removeHistoryEntries } from './utils';
 import { newRuleset } from '../../util/query';
+import { tabs_config } from './tabs.config';
 
 export const tabs_options = {
   actions: {
@@ -66,17 +67,25 @@ export const tabs_options = {
       { screenStore, historyStore, currentTab, searchMachines },
       { tabId }
     ) => {
-      searchMachines[tabId].stop();
-      delete searchMachines[tabId];
+      let ids = tabId;
+      console.log(ids, get(historyStore), get(screenStore));
+      if (Object.keys(get(screenStore)).length === tabId.length)
+        ids = tabId.filter((_, i) => i !== 0);
 
-      screenStore.update(_.skipKeys([tabId]));
+      screenStore.update(_.skipKeys(ids));
+
+      ids.forEach(id => {
+        let _id = parseInt(id, 10);
+        searchMachines[id].stop();
+        delete searchMachines[_id];
+        historyStore.update(removeHistoryEntries(_id));
+      });
+
       const current = get(currentTab);
-
-      historyStore.update(removeHistoryEntries(tabId));
       const history: [] = get(historyStore);
       const prev = history[history.length - 1];
 
-      currentTab.set(tabId === current ? prev : current);
+      currentTab.set(ids.includes(current) ? prev : current);
     },
     setUrlQuery: ({ screenStore, currentTab, routeStore }, { route: path }) => {
       const tab: any = get(currentTab);

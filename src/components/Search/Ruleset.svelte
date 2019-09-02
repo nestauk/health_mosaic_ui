@@ -5,7 +5,7 @@
 <script>
   import { createEventDispatcher } from 'svelte';
   import { scale } from 'svelte/transition';
-  import { EditIcon, CopyIcon, PlusCircleIcon, SaveIcon, ToggleLeftIcon, Trash2Icon } from 'svelte-feather-icons';
+  import { EditIcon, CopyIcon, PlusCircleIcon, ToggleLeftIcon, Trash2Icon } from 'svelte-feather-icons';
 
   export let hasContent;
   export let disabled;

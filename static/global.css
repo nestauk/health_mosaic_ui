@@ -109,9 +109,11 @@ code {
   --sidebar-width: 25rem;
   --sidebar-width: 20rem;
   --sidebar-width: 23rem;
+  --sidebar-bg: #fafbfc;
   --button-bg: #eff3f6;
   --button-bg-image: linear-gradient(-180deg, #fafbfc, #eff3f6 90%);
   --button-hover-bg: #e6ebf1;
   --button-hover-bg-image: linear-gradient(-180deg, #f0f3f6, #e6ebf1 90%);
   --button-border: 1px solid #cececf;
+  --tab-highlight: #d2edfd;
 }
