@@ -1,5 +1,6 @@
 export { default as Add } from './Add.svelte';
 export { default as Alert } from './Alert.svelte';
+export { default as ArrowDown } from './ArrowDown.svelte';
 export { default as Close } from './Close.svelte';
 export { default as Delete } from './Delete.svelte';
 export { default as Edit } from './Edit.svelte';

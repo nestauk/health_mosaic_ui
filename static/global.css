@@ -82,6 +82,8 @@ code {
   --color-text: var(--color-rjwf-darker-blue);
   --color-text-highlight-bkg: var(--color-light-blue);
   --color-text-highlight-bkg-hover: var(--color-blue-dark-pastel);
+  --color-ui-border: lightgrey;
+  --color-ui-shadow: darkgrey;
   --size-bars-padding: 12px;
   --size-header-height: 70px;
   --size-header-innerheight: calc(var(--size-header-height) - 2 * var(--size-bars-padding));

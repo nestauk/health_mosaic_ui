@@ -18,6 +18,7 @@
     currentTab,
   } from '../../stores/search.ts';
   import { shouldResizeStore } from '../../stores/';
+  import { capitalise } from '../../util/string';
 
   const { page } = stores();
 
@@ -96,7 +97,7 @@
     screenMachine.send({
       type: 'ROUTE_CHANGED',
       route: `/${searchRouteName}/${route}`
-    })
+    });
 
   /* facets */
 
@@ -118,7 +119,7 @@
     if (!type) {
       typeTitle = '';
     } else {
-      typeTitle = type.charAt(0).toUpperCase() + type.substring(1);
+      typeTitle = capitalise(type);
     }
 
     return query ? `- ${typeTitle} ${query}` : '';

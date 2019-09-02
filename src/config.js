@@ -132,3 +132,26 @@ export const testSource = {
   type: 'vector',
   url: 'mapbox://examples.8fgz4egr',
 };
+
+
+// wt = wider than
+// nt = narrower than
+export const widthBreakpoints = {
+  wt_1460: '(min-width: 1460px)',
+  wt_1200: '(min-width: 1200px)',
+  wt_1080: '(min-width: 1080px)',
+  wt_920: '(min-width: 920px)',
+  wt_910: '(min-width: 910px)',
+  wt_900: '(min-width: 900px)',
+  wt_870: '(min-width: 870px)',
+  wt_840: '(min-width: 840px)',
+  wt_832: '(min-width: 832px)',
+  wt_800: '(min-width: 800px)',
+  wt_768: '(min-width: 768px)',
+  wt_720: '(min-width: 720px)',
+  wt_640: '(min-width: 640px)',
+  wt_600: '(min-width: 600px)',
+  wt_540: '(min-width: 540px)',
+  wt_480: '(min-width: 480px)',
+  nt_480: '(max-width: 480px)'
+};

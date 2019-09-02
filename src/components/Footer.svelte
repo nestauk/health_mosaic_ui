@@ -5,7 +5,7 @@
   <a href="https://www.nesta.org.uk" target="_blank">
     <div class="logo">
       <img
-        src="Nesta_Horizontal_Logo_RGB.png"
+        src="/Nesta_Horizontal_Logo_RGB.png"
         alt="Nesta"
       />
     </div>
@@ -22,7 +22,7 @@
     align-items: center;
     justify-content: space-between;
 
-    padding: var(--size-bars-padding) calc(2 * var(--size-bars-padding));
+    padding: var(--size-bars-padding);
     font-size: 0.8em;
     color: var(--color-text);
 

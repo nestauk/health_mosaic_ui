@@ -1,28 +1,55 @@
 <script>
+  // import { setContext } from 'svelte';
+
   import Footer from '../components/Footer.svelte';
   import Header from '../components/Header.svelte';
+  import { widthBreakpoints } from '../config';
+  import {
+    makeMatchingMqStore,
+    registerBreakpoints
+  } from '../util/mediaqueries';
+
+  let matchingMqStore;
+  registerBreakpoints(widthBreakpoints, matchesStore => {
+    matchingMqStore = makeMatchingMqStore(matchesStore);
+  });
+
+  // setContext('_layout', {
+  //   getMqNameStore: () => mqNameStore
+  // });
 </script>
 
-<header>
-  <Header/>
-</header>
-<main>
-  <slot></slot>
-</main>
-<footer>
-  <Footer/>
-</footer>
+<div class="container">
+  <header>
+    <Header {matchingMqStore} />
+  </header>
+  <main>
+    <slot></slot>
+  </main>
+  <footer>
+    <Footer/>
+  </footer>
+</div>
 
 <style lang="less">
-  /* TODO use a grid */
+  .container {
+    height: 100%;
+    width: 100%;
+    display: grid;
+    grid-template-rows:
+      var(--size-header-height)
+      var(--size-main-height)
+      var(--size-footer-height);
+    grid-template-columns: 100%;
+  }
   header {
     width: 100%;
-    height: var(--size-header-height);
+    grid-row: 1 / span 1;
   }
   main {
     position: relative;
     width: 100%;
-    height: var(--size-main-height);
+    grid-row: 2 / span 1;
     margin: 0;
 
     &::before {
@@ -42,6 +69,6 @@
   }
   footer {
     width: 100%;
-    height: var(--size-footer-height);
+    grid-row: 3 / span 1;
   }
 </style>
