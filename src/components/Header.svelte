@@ -28,7 +28,6 @@
 
   $: pageId = $page.path.slice(1);
   $: menuHeadItem = isNarrow && _.find(navLinks, x => x.href === pageId);
-  $: menuItems = isNarrow && _.filter(navLinks, x => x.href !== pageId);
   $: showMenu = isNarrow && false; // hide the menu when `isNarrow` changes
 
   const toggleMenu = () => {
@@ -53,6 +52,7 @@
         <span>{menuHeadItem.text}</span>
       </div>
       {/if}
+
       <div
         class="navLink hoverable toggle"
         class:left={!showMenu}
@@ -60,10 +60,11 @@
       >
         <ArrowDown color="rgb(15,51,102)"/> <!-- var(--color-text) -->
       </div>
+
       {#if showMenu}
       <div class="menu">
-        {#each menuItems as {href, text, type}}
-        <RouterLink {href} width="100%">
+        {#each navLinks as {href, text, type}}
+        <RouterLink {href} style="width:100%">
           <div class="navLink hoverable {type}">
             <span>{text}</span>
           </div>
@@ -82,6 +83,7 @@
           class:highlighted="{href === pageId}"
         >
           <span>{text}</span>
+          <div class="mark"></div>
         </div>
       </RouterLink>
       {/each}
@@ -142,6 +144,12 @@
 
         .navLink {
           padding: calc(0.6em + var(--size-bars-padding));
+
+          &.hoverable {
+            &:hover {
+              background-color: var(--color-light-blue);
+            }
+          }
         }
       }
 
@@ -151,15 +159,30 @@
         display: flex;
         align-items: center;
         justify-content: center;
+        position: relative;
 
         &.hoverable {
           &:hover {
-            background-color: var(--color-light-blue);
+            .mark {
+              display: block;
+              background-color: var(--color-light-blue);
+            }
           }
         }
 
         &.highlighted {
-          font-weight: 700;
+          .mark {
+            display: block;
+          }
+        }
+
+        .mark {
+          display: none;
+          position: absolute;
+          bottom: calc(-1px - var(--size-bars-padding));
+          width: 100%;
+          height: 6px;
+          background-color: var(--color-blue-dark-pastel);
         }
 
         &.button {
