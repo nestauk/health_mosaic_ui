@@ -17,34 +17,20 @@
 
   export let matchingMqStore;
 
-  let narrow;
+  let isNarrow;
   $: matchingMqStore && matchingMqStore.subscribe(
     ({key, value}) => {
-      narrow =
+      isNarrow =
         (key === 'wt' && value < 640) ||
         (key === 'nt' && value <= 640)
     }
   );
 
   $: pageId = $page.path.slice(1);
+  $: menuHeadItem = isNarrow && _.find(navLinks, x => x.href === pageId);
+  $: menuItems = isNarrow && _.filter(navLinks, x => x.href !== pageId);
+  $: showMenu = isNarrow && false; // hide the menu when `isNarrow` changes
 
-  // menu label for the root page (path == '/' -> pageId == '' -> show about as menu label)
-  $: menuId = pageId || 'about';
-
-  $: console.log(`pageId |${pageId}|`);
-  $: console.log('menuId', menuId);
-
-  let menuHeadItem;
-  let menuItems;
-  $: if (narrow) {
-    menuHeadItem = _.find(navLinks, x => x.href === menuId);
-    menuItems = _.filter(navLinks, x => x.href !== menuId);
-
-    console.log('narrow', narrow);
-    console.log('menuHeadItem', menuHeadItem);
-    console.log('menuItems', menuItems);
-  }
-  $: showMenu = narrow && false; // hide the menu when `narrow` changes
   const toggleMenu = () => {
     showMenu = !showMenu;
   }
@@ -60,11 +46,13 @@
       <span>HealthMosaic</span>
     </div>
   </RouterLink>
-  {#if narrow}
+  {#if isNarrow}
     <div class="nav">
+      {#if menuHeadItem}
       <div class="navLink {menuHeadItem.type}">
         <span>{menuHeadItem.text}</span>
       </div>
+      {/if}
       <div
         class="navLink hoverable toggle"
         class:left={!showMenu}
