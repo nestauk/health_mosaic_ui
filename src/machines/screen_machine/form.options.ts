@@ -2,13 +2,13 @@ import { get } from 'svelte/store';
 //@ts-ignore
 import { goto } from '@sapper/app';
 import * as _ from 'lamb';
+import { send } from 'xstate';
 
-import { contentAliases, subjectAliases } from '../../config';
 import {
   uiQueryToUrlString,
   selectionToUrlString,
 } from '../../util/urlBuilder';
-import { newRuleset, newField, newTerm } from '../../util/query';
+import { newRuleset } from '../../util/query';
 
 import { makeRouteUrl, toggleBoolean, removeEmpty } from '../../util/transform';
 import {
@@ -45,6 +45,17 @@ const reduceQueries = rulesets =>
   ])(rulesets);
 
 export const form_options = {
+  guards: {
+    isComplex: ({ screenStore }, { tabId }) => {
+      const currentQuery = get(screenStore)[tabId].uiQuery;
+      const { fields } = currentQuery[0];
+      const hasSelectedFields = fields.subject
+        .concat(fields.content)
+        .some(v => v.status !== 'default');
+
+      if (currentQuery.length > 1 || hasSelectedFields) return true;
+    },
+  },
   actions: {
     activateSimpleSearch: ({ screenStore }, { tabId }) => {
       const updater = _.pipe([
@@ -150,7 +161,6 @@ export const form_options = {
     deleteRule: ({ screenStore }, { tabId, ruleIndex }) => {
       const uiQuery = get(screenStore)[tabId].uiQuery;
       const currentSelection = uiQuery.findIndex(({ selected }) => selected);
-      console.log(uiQuery);
 
       if (uiQuery.length <= 1) return;
 

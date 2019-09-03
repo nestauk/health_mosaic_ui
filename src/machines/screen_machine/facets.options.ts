@@ -17,7 +17,10 @@ export const facets_options = {
       const currentQuery = get(screenStore)[tab];
       routeStore.set(path);
 
-      screenStore.update(_.setPath(`${tab}.route`, path));
+      if (path) {
+        screenStore.update(_.setPath(`${tab}.route`, path));
+        routeStore.set(path);
+      }
 
       const urlQuery = {
         q: uiQueryToUrlString(currentQuery.uiQuery),
@@ -26,7 +29,7 @@ export const facets_options = {
         o: currentQuery.logic,
       };
 
-      goto(makeRouteUrl(path, urlQuery));
+      goto(makeRouteUrl(path ? path : get(screenStore)[tab].route, urlQuery));
     },
     updateSelections: (
       { screenStore },

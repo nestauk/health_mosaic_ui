@@ -13,9 +13,8 @@
   .spinner {
     display: inline-block;
     position: relative;
-    width: 64px;
-    height: 64px;
-    transform: scale(0.5);
+    transform: scale(0.35) translate(-6em, -2em);
+    margin-left: auto;
   }
   .spinner div {
     animation: spinner 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;

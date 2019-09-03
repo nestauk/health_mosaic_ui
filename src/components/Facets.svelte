@@ -11,7 +11,7 @@
   const dispatch = createEventDispatcher();
 
   $: current_facet = $page.path.split('/').filter(Boolean)[1];
-  $: console.log(current_facet)
+  // $: console.log(current_facet)
 
 </script>
 <div class="container">

@@ -7,6 +7,9 @@ import { facets_options } from './facets.options';
 import { facets_config } from './facets.config';
 
 export const screen_options = {
+  guards: {
+    ...form_options.guards,
+  },
   actions: {
     ...facets_options.actions,
     ...form_options.actions,

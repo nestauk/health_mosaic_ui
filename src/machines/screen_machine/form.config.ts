@@ -8,9 +8,10 @@ export const form_config = {
     TAB_CREATED: {
       target: 'Form.Simple',
     },
-    TAB_SELECTED: {
-      target: 'Form.Simple',
-    },
+    TAB_SELECTED: [
+      { target: 'Form.Complex', cond: 'isComplex' },
+      { target: 'Form.Simple' },
+    ],
     TAB_RENAMED: {
       target: 'Form.Simple',
     },
@@ -36,23 +37,20 @@ export const form_config = {
     RULE_SELECTED: {
       actions: ['selectRule'],
     },
+    CHANGE_SEARCH_COMPLEX: {
+      target: 'Form.Complex',
+    },
+    CHANGE_SEARCH_SIMPLE: {
+      target: 'Form.Simple',
+      actions: ['activateSimpleSearch'],
+    },
   },
   states: {
-    Simple: {
-      on: {
-        CHANGE_SEARCH_MODE: {
-          target: 'Complex',
-        },
-      },
-    },
+    Simple: {},
     Complex: {
       on: {
         RULE_EDITED: {
           actions: ['editRuleset'],
-        },
-        CHANGE_SEARCH_MODE: {
-          target: 'Simple',
-          actions: ['activateSimpleSearch'],
         },
         LABEL_CLICKED: {
           actions: ['toggleLabelTernary'],

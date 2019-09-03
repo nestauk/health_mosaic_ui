@@ -2,7 +2,7 @@
   import { createEventDispatcher, tick, onMount } from 'svelte';
   import Spinner from './Spinner.svelte';
   import Alert from './Icons/Alert.svelte';
-  import { CopyIcon, PlusCircleIcon, Trash2Icon } from 'svelte-feather-icons';
+  import { EditIcon, CopyIcon, PlusCircleIcon, Trash2Icon } from 'svelte-feather-icons';
 
   import addIcon from 'ionicons/dist/ionicons/svg/ios-add-circle-outline.svg';
   import arrowForward from 'ionicons/dist/ionicons/svg/ios-arrow-forward.svg';
@@ -28,27 +28,6 @@
 
   const dispatch = createEventDispatcher();
 
-  const handleDoubleClick = ({ target }) => {
-    if (editedTarget) return;
-
-    editedTarget = target;
-    editedTarget.contentEditable = true;
-    editedTarget.style.cursor = 'text';
-
-    var range, selection;
-    if (document.body.createTextRange) {
-      range = document.body.createTextRange();
-      range.moveToElementText(target);
-      range.select();
-    } else if (window.getSelection) {
-      selection = window.getSelection();
-      range = document.createRange();
-      range.selectNodeContents(target);
-      selection.removeAllRanges();
-      selection.addRange(range);
-    }
-  };
-
   // various keypresses trigger window click events for accessibility reasons
   // we need to check to ensure the click event is coming from an actual click rather than a keypress
   // we can do this by checking the detail property of the event object. 0 means it was not a true click
@@ -71,6 +50,30 @@
     }
   };
 
+  const handleClick = e => {
+    const { target } = e;
+
+    if (editedTarget === target) return;
+    stopEdit(e);
+
+    editedTarget = target;
+    editedTarget.contentEditable = true;
+    editedTarget.style.cursor = 'text';
+
+    var range, selection;
+    if (document.body.createTextRange) {
+      range = document.body.createTextRange();
+      range.moveToElementText(target);
+      range.select();
+    } else if (window.getSelection) {
+      selection = window.getSelection();
+      range = document.createRange();
+      range.selectNodeContents(target);
+      selection.removeAllRanges();
+      selection.addRange(range);
+    }
+  };
+
   const registerTabs = (node, id) => {
 
     function toggleChecked(e) {
@@ -90,8 +93,6 @@
     }
   }
 
-
-
   const newTab = async () => {
     dispatch('newtab')
     await tick();
@@ -109,7 +110,6 @@
     dispatch('deletetab', tab_status)
     tab_status = tab_status.length === tabs.length ? [tab_status[0]] : [];
   }
-
 </script>
 
 <svelte:window
@@ -120,29 +120,37 @@
 <nav bind:offsetHeight="{tabHeight}">
   <h2>Tabs</h2>
   <ul bind:this={navEl} >
-    {#each tabs as [id, tab], i (id)}
+    {#each tabs as { id, name, isLoading, hovering }, i (id)}
       <li
         bind:this={tabEls[i]}
         class:selected={parseInt(id, 10) === activeTab}
+        on:click|preventDefault={() => dispatch('changetab', parseInt(id, 10))}
       >
+        {#if hovering}
+          <span>
+            <EditIcon />
+          </span>
+        {/if}
         <div
-          on:dblclick={handleDoubleClick}
+          on:click|stopPropagation={handleClick}
           on:keydown={stopEdit}
           on:input={ e => textChange(e, id) }
-          on:click|preventDefault={() => dispatch('changetab', parseInt(id, 10))}
+          on:mouseenter={() => tabs[i].hovering = true}
+          on:mouseleave={() => tabs[i].hovering = false}
           class="button"
         >
-          {tab.name}
+          {name}
         </div>
-        <input click:stopPropagation use:registerTabs={id} type="checkbox"/>
+        {#if isLoading}
+          <Spinner />
+        {/if}
+        <input on:click|stopPropagation use:registerTabs={id} type="checkbox"/>
       </li>
     {/each}
 
   </ul>
   <div
     class="close-container"
-
-
   >
     <span on:click={newTab} class="icon">
       <PlusCircleIcon size={1.5}/>
@@ -181,7 +189,7 @@
     margin: 0 -1em;
     width: calc(100% + 2em);
     position: fixed;
-    top: 0;
+    top: var(--size-header-height);
     width: var(--sidebar-width);
     background: var(--sidebar-bg);
   }
@@ -200,8 +208,16 @@
     align-items: center;
     justify-content: space-between;
     flex-shrink: 0;
-    padding-left: 1.5em;
+    padding-left: 1.8em;
     cursor: pointer;
+    position: relative;
+
+    span {
+      position: absolute;
+      left: 9px;
+      width: 15px;
+      top: -8px;
+    }
   }
 
   li input {
@@ -214,7 +230,7 @@
   }
 
   .selected {
-    background: var(--tab-highlight)!important;
+    background: var(--highlight)!important;
   }
 
   .button {
@@ -226,7 +242,6 @@
     font-size: 1.1em;
     white-space: nowrap;
     overflow: hidden;
-    width: 100%;
   }
 
 

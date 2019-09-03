@@ -28,13 +28,13 @@
     <ul>
       <li
         class:active={mode === 'simple'}
-        on:click={() => dispatch('modechange')}
+        on:click={() => mode === 'complex' && dispatch('modechange', 'SIMPLE')}
       >
         Simple
       </li>
       <li
         class:active={mode === 'complex'}
-        on:click={() => dispatch('modechange')}
+        on:click={() => mode === 'simple' && dispatch('modechange', 'COMPLEX')}
       >
         Advanced
       </li>
@@ -93,6 +93,7 @@
           margin: 0 0 0 10px;
           color: #777;
           cursor: pointer;
+          user-select: none;
 
           &:first-child:after {
             content: '|';

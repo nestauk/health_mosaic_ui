@@ -17,7 +17,7 @@
   const { page } = stores();
 
   export let padTop;
-
+  let query = [];
 
   $: searchMachine = $screenMachine.context.searchMachines[$currentTab];
   $: uiQuery = $screenStore[$currentTab] && $screenStore[$currentTab].uiQuery;
@@ -45,7 +45,7 @@
   $: mode = $screenMachine.matches('Form.Simple') ? 'simple' : 'complex';
   $: isOnly = uiQuery.length === 1;
 
-const stripEmpties = _.filterWith(_.allOf([
+  const stripEmpties = _.filterWith(_.allOf([
     _.getPath('values.length'),
     _.getPath('values.0.query.length')
   ]));
@@ -96,10 +96,12 @@ const stripEmpties = _.filterWith(_.allOf([
     } else {
       searchMachine.send('QUERY_CLEARED')
     }
-    checkDirty()
+
+    checkDirty();
   }
 
   const handleSend = event => {
+    query.forEach( q => q && q.handleKeyup && q.handleKeyup({key: 'Enter'}))
     event.preventDefault();
     searchMachine.send({ type:'SEARCHED', tabId: $currentTab, route: $page.path });
   };
@@ -201,10 +203,6 @@ const stripEmpties = _.filterWith(_.allOf([
     })
     checkDirty();
   }
-
-  const changeMode = mode => {
-    mode === ''
-  }
 </script>
 
 <div style="padding-top: {padTop}px">
@@ -216,7 +214,7 @@ const stripEmpties = _.filterWith(_.allOf([
     on:indexchange={({ detail }) => changeIndex(detail)}
     on:newrule={newRuleset}
     on:toggle={toggleSearchLogic}
-    on:modechange={() => screenMachine.send({type: 'CHANGE_SEARCH_MODE', tabId: $currentTab})}
+    on:modechange={({ detail }) => screenMachine.send({type: `CHANGE_SEARCH_${detail}`, tabId: $currentTab})}
     index={$screenStore[$currentTab].index}
     {logic}
     {mode}
@@ -237,6 +235,7 @@ const stripEmpties = _.filterWith(_.allOf([
           queries={terms}
           on:change={({detail}) => handleChange(detail, i)}
           on:toggle={({detail}) => toggleTermStatus(i, detail)}
+          bind:this={query[i]}
           {disabled}
           {isEditing}
         />
@@ -259,7 +258,7 @@ const stripEmpties = _.filterWith(_.allOf([
 <style lang="less">
   div {
     position: fixed;
-    height: 100%;
+    height: calc(100% - var(--size-footer-height) - var(--size-header-height));
     width: var(--sidebar-width);
     border-right: 1px solid #e1e4e8;
     padding: 15px;

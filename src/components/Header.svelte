@@ -23,14 +23,6 @@
       (key === 'gt' && value < 640) ||
       (key === 'lt' && value <= 640)
   }
-  // let isNarrow;
-  // $: matchingMqStore && matchingMqStore.subscribe(
-  //   ({key, value}) => {
-  //     isNarrow =
-  //       (key === 'gt' && value < 640) ||
-  //       (key === 'lt' && value <= 640)
-  //   }
-  // );
 
   $: pageId = $page.path.split('/')[1];
   $: menuHeadItem = isNarrow && _.find(navLinks, x => x.href === pageId);
@@ -109,6 +101,8 @@
 
     padding: var(--size-bars-padding);
     position: relative;
+    z-index: 1;
+    background: #fff;
 
     a {
       text-decoration: none;

@@ -68,7 +68,7 @@ export const tabs_options = {
       { tabId }
     ) => {
       let ids = tabId;
-      console.log(ids, get(historyStore), get(screenStore));
+
       if (Object.keys(get(screenStore)).length === tabId.length)
         ids = tabId.filter((_, i) => i !== 0);
 

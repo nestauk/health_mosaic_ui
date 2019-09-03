@@ -36,10 +36,10 @@ export const makeRouteUrl = (
   path: string,
   params: { [x: string]: string }
 ): string => {
-  const pathString = path ? (path.startsWith('/') ? path.slice(0) : path) : '';
+  // const pathString = path ? (path.startsWith('/') ? path.slice(0) : path) : '';
   const paramString = params.q ? makeParamString(params) : '';
 
-  return `${pathString}${paramString}`;
+  return `${path}${paramString}`;
 };
 
 export const isValidField = ({ disabled, status }) => {

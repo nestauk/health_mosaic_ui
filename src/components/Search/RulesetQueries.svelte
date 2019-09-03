@@ -57,7 +57,7 @@
     currentInput = '';
   }
 
-  const handleKeyup = event => {
+  export const handleKeyup = event => {
     if (event.key === ',' | event.key === 'Enter') {
       addQuery();
     }

@@ -24,13 +24,14 @@
   const { page } = stores();
   let padTop;
 
-  $: console.log(padTop)
-
   onMount(() => {
 
     if($page.query && $page.query.q) {
-      if($page.query.q.includes('in')) {
-        screenMachine.send({type: 'CHANGE_SEARCH_MODE', tabId: $currentTab})
+      const hasLabels = !!$page.query.q.match(/\(.+,in:.+\)/);
+      const hasRulesets = !!$page.query.q.match(/(?:\(.+\)){2,}/);
+
+      if(hasLabels || hasRulesets) {
+        screenMachine.send({type: 'CHANGE_SEARCH_COMPLEX', tabId: $currentTab})
       }
 
       searchMachine.send('QUERY_ENTERED')
@@ -65,7 +66,7 @@
       () => screenMachine.send({ type: 'ROUTE_CHANGE_COMPLETED' }),
     data: screenStore,
     checkDirty: () =>
-      searchMachine && searchMachine.state.matches('Search.NotEmpty.Dirty'),
+      searchMachine && !searchMachine.state.matches('Search.NotEmpty.Matching'),
     select: (selection, tabId) =>
       screenMachine.send({
         type: 'SELECTION_UPDATED',
@@ -80,10 +81,11 @@
   $: hasNoQuery = uiQuery[0] && uiQuery[0].terms.length && uiQuery[0].terms[0].term.length;
   $: withSelections = isObjNotEmpty($screenStore[$currentTab].selections);
   $: visible = $screenStore[$currentTab].visible;
+  $: searchMachines = $screenMachine.context.searchMachines;
   $: searchMachine = $screenMachine.context.searchMachines[$currentTab];
   $: isLoading = searchMachine && searchMachine.state.matches('Search.NotEmpty.Dirty.Pending');
   $: isError = searchMachine && searchMachine.state.matches('Search.NotEmpty.Dirty.Error');
-  $: tabs = Object.entries($screenStore);
+  $: tabs = Object.entries($screenStore).map(([id, t]) => ({id, name: t.name, isLoading: searchMachines[id].state.matches('Search.NotEmpty.Dirty.Pending')}));
 
   const sendTabCreated = () =>  screenMachine.send({
     type: 'TAB_CREATED',
@@ -130,6 +132,14 @@
     return query ? `- ${typeTitle} ${query}` : '';
   }
 
+  const changeTab = detail => {
+    console.log($page.path);
+    sendTab('TAB_SELECTED', detail);
+    screenMachine.send({
+      type: 'ROUTE_CHANGED'
+    })
+  }
+
   $: selectedFacet = $page.params.facet || '';
   $: queryTitle = renderTitle($page.query.q, $page.query.i);
 </script>
@@ -138,17 +148,6 @@
   <title>{project_title} {queryTitle}</title>
 </svelte:head>
 
-<!-- <Nav
-  {isLoading}
-  {isError}
-  {tabs}
-  activeTab="{$currentTab}"
-  on:newtab="{sendTabCreated}"
-  on:changetab="{({detail}) => sendTab('TAB_SELECTED', detail)}"
-  on:deletetab="{({detail}) => sendTab('TAB_DELETED', detail)}"
-  on:textchange={sendTabRenamed}
-/> -->
-
 <Sidebar {padTop}>
     <Nav
     {isLoading}
@@ -156,9 +155,9 @@
     {tabs}
     activeTab="{$currentTab}"
     on:newtab="{sendTabCreated}"
-    on:changetab="{({detail}) => sendTab('TAB_SELECTED', detail)}"
-    on:deletetab="{({detail}) => sendTab('TAB_DELETED', detail)}"
-    on:duplicatetab="{({detail}) => sendTab('TAB_DELETED', detail)}"
+    on:changetab={({detail}) => changeTab(detail)}
+    on:deletetab={({detail}) => sendTab('TAB_DELETED', detail)}
+    on:duplicatetab={({detail}) => sendTab('TAB_DELETED', detail)}
     on:textchange={sendTabRenamed}
     bind:tabHeight={padTop}
   />
