@@ -131,6 +131,10 @@
     }
   }
 
+  ul {
+    padding-left: 2em;
+  }
+
   .cta {
     display: flex;
     align-items: center;

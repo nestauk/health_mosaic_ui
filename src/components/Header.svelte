@@ -140,14 +140,14 @@
         align-items: center;
         flex-direction: column;
         justify-content: flex-start;
-        z-index: 100;
+        z-index: var(--z-index-menu);
 
         .navLink {
           padding: calc(0.6em + var(--size-bars-padding));
 
           &.hoverable {
             &:hover {
-              background-color: var(--color-light-blue);
+              background-color: var(--color-text-highlight-bkg);
             }
           }
         }
@@ -165,7 +165,7 @@
           &:hover {
             .mark {
               display: block;
-              background-color: var(--color-light-blue);
+              background-color: var(--color-text-highlight-bkg);
             }
           }
         }
@@ -182,7 +182,7 @@
           bottom: calc(-1px - var(--size-bars-padding));
           width: 100%;
           height: 6px;
-          background-color: var(--color-blue-dark-pastel);
+          background-color: var(--color-nav-current);
         }
 
         &.button {
