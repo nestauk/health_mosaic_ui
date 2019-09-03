@@ -5,6 +5,9 @@
   import { project_title } from '../config.js';
   import RouterLink from '../components/RouterLink.svelte';
   import { ArrowDown } from '../components/Icons/';
+  import globalCssVars from '../global.css.json';
+
+  const colorText = globalCssVars['--color-text'];
 
   const { page } = stores();
   const navLinks = [
@@ -58,7 +61,7 @@
         class:left={!showMenu}
         on:click={toggleMenu}
       >
-        <ArrowDown color="rgb(15,51,102)"/> <!-- var(--color-text) -->
+        <ArrowDown color="{colorText}"/>
       </div>
 
       {#if showMenu}
