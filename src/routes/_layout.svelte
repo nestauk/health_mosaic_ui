@@ -7,11 +7,6 @@
     registerBreakpoints
   } from '../util/mediaqueries';
 
-  // let matchingMqStore;
-  // registerBreakpoints(widthBreakpoints, matchesStore => {
-  //   matchingMqStore = makeMatchingMqStore(matchesStore);
-  // });
-
   const matchingMqStore =
     registerBreakpoints(widthBreakpoints, makeMatchingMqStore);
 </script>
@@ -48,6 +43,12 @@
     width: 100%;
     grid-row: 2 / span 1;
     margin: 0;
+    display: grid;
+    grid-template-columns:
+      var(--size-sidebar-width)
+      1fr
+      var(--size-sidebar-width);
+    grid-template-rows: 100%;
 
     &::before {
       display: block;

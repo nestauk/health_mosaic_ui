@@ -89,7 +89,10 @@
           target="_blank"
           href="http://grantome.com/grant/NIH/{id_source}"
         >
-          <img src="/logo_nih.png"/>
+          <img
+            src="/logo_nih.png"
+            alt="NIH Logo"
+          />
         </a>
         {#if hover}
           <Tooltip offset="{-5}" text="The National Institute for Health"/>
@@ -143,12 +146,7 @@
     h2 {
       margin-bottom: 0.2em;
     }
-    h3 {
-      font-size: 1em;
-      margin-top: 0;
-      margin-bottom: 0.5em;
-      text-align: right;
-    }
+
     .place {
       margin-bottom: 1em;
       font-style: italic;

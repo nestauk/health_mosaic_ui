@@ -3,8 +3,9 @@
   import * as _ from 'lamb';
   import arrowForward from 'ionicons/dist/ionicons/svg/ios-arrow-forward.svg';
 
-  export let selections;
   const dispatch = createEventDispatcher();
+
+  export let selections;
 
   $: selectionsArray = _.pairs(selections);
 
@@ -59,7 +60,6 @@
     h3 {
       margin:0 1rem 0 0;
       padding-left: 1rem;
-
     }
 
     span {
@@ -91,20 +91,6 @@
     border-radius: 30px;
     font-size: 0.9em;
     overflow-x: scroll;
-
-    span {
-      padding: 4px 10px;
-      border-radius: 20px;
-      border: 1px solid #ccc;
-      margin-right: 10px;
-      user-select: none;
-      background: #eee;
-      cursor: pointer;
-
-      &:hover {
-        background: #ccc;
-      }
-    }
 
     li {
       color: #333;

@@ -9,7 +9,6 @@
   export let fields;
   export let isEditing;
 
-
   const makeFields = ({ subject, content }) => {
     let fields = [];
     subject.forEach( v => fields.push({...v, section: 'subject'}))
@@ -53,10 +52,12 @@
       toggleField(section, field);
     }
   }
-
 </script>
 
-<div class="field-container" class:isEditing class:disabled>
+<div
+  class="field-container"
+  class:isEditing class:disabled
+>
   <ul>
     {#each current_fields as { field, status, section, disabled }, i (field)}
       <li
@@ -104,61 +105,10 @@
           border-color: green;
         }
 
-        &.allDefault input.green::after {
-          background: #ccc;
-        }
-
         span {
           font-weight: 700;
           margin-left: 5px;
         }
-
-
-        input {
-          position: relative;
-          width: 1.3em;
-          height: 1.3em;
-          background-color: white;
-          border-radius: 3px;
-          vertical-align: middle;
-          border: 2px solid #ddd;
-          -webkit-appearance: none;
-          outline: none;
-          cursor: pointer;
-
-          &::after {
-            position: absolute;
-            content: '';
-            background: #fff;
-            border-radius: 1px;
-            width: calc(100% - 1px);
-            border: 0.5px solid #fff;
-            height: calc(100% - 1px);
-          }
-
-          &:first-of-type {
-            margin-left: auto;
-          }
-          /* .checkbox-round { */
-          &.green:checked::after {
-            background-color:  #8cc1c1;
-          }
-
-          &.red:checked::after {
-            background-color:  #f77c66;
-          }
-
-          &.green {
-            border-color: #43b192;
-          }
-
-          &.red {
-            border-color: #f76146;
-          }
-        }
-
-
-
       }
     }
   }

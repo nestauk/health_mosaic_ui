@@ -13,7 +13,6 @@
   export let isOnly;
   export let mode;
   const dispatch = createEventDispatcher();
-
 </script>
 
 <div>
@@ -21,12 +20,26 @@
   {#if mode === 'complex'}
     <ul transition:scale>
       {#if hasContent}
-        <li on:click={() => dispatch('copy')}><CopyIcon size={1.5} /></li>
-        <li class:inactive={isOnly} on:click={() => dispatch('delete')}><Trash2Icon size={1.5} /></li>
-        <li class:disabled on:click={() => dispatch('disable')}><ToggleLeftIcon size={1.5} /></li>
+        <li on:click={() => dispatch('copy')}>
+          <CopyIcon size={1.5} />
+        </li>
+        <li
+          class:inactive={isOnly}
+          on:click={() => dispatch('delete')}
+        >
+          <Trash2Icon size={1.5} />
+        </li>
+        <li
+          class:disabled
+          on:click={() => dispatch('disable')}
+        >
+          <ToggleLeftIcon size={1.5} />
+        </li>
       {/if}
 
-      <li class:isEditing on:click={() => dispatch('edit')}><EditIcon size={1.5} /></li>
+      <li class:isEditing on:click={() => dispatch('edit')}>
+        <EditIcon size={1.5} />
+      </li>
     </ul>
   {/if}
 </div>
@@ -48,17 +61,16 @@
       margin: 0 10px;
       width: 1.5em;
       height: 1.5em;
-      color: #777;
+      color: var(--color-ruleset-icon);
       cursor: pointer;
 
       &.isEditing {
         opacity: 0.5;
-        color: #777!important;
-
+        color: var(--color-ruleset-icon)!important;
       }
 
       &:hover {
-        color: #333;
+        color: var(--color-ruleset-icon-hover);
       }
     }
   }

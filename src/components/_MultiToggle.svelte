@@ -2,6 +2,7 @@
   import { createEventDispatcher } from 'svelte';
 
   const dispatch = createEventDispatcher();
+
   export let items = [];
   export let activeItems = false;
 
@@ -14,7 +15,9 @@
       itemSet.add(item)
     }
 
-  if (itemSet.size === 0) items.map( _item => itemSet.add(_item));
+    if (itemSet.size === 0) {
+      items.map( _item => itemSet.add(_item));
+    }
 
     itemSet = itemSet;
     dispatch('select', Array.from(itemSet))
@@ -27,7 +30,6 @@
   {/each}
 </div>
 
-
 <style lang="less">
   div {
     button {
@@ -37,9 +39,9 @@
       background: none;
       font-size: 16px;
       padding: 5px 10px;
-      background: var(--button-bg);
-      background-image: var(--button-bg-image);
-      border: var(--button-border);
+      background: var(--color-button-background);
+      background-image: var(--gradient-button-background);
+      border: var(--border-button);
       border-right: none;
       overflow: hidden;
 
@@ -55,8 +57,8 @@
         border-right: solid 1px #cececf;
       }
       &:hover {
-        background-color:var(--button-hover-bg);
-        background-image: var(--button-hover-bg-image);
+        background-color:var(--color-button-background-hover);
+        background-image: var(--gradient-button-background-hover);
       }
       &.selected {
         background: #333!important;

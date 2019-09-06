@@ -4,19 +4,18 @@
   import compare from 'just-compare';
   import * as _ from 'lamb';
 
-  import { SearchContainer, Ruleset, RulesetQueries, RulesetFields } from './Search';
-  import Selections from './Selections.svelte';
-  import { screenMachine } from '../services/screen_service.ts';
+  import { SearchPanelContainer, Rule, RuleQueries, RuleFields } from './SearchPanel';
+  import SelectionsPanel from './SelectionsPanel.svelte';
+  import { screenMachine } from '../../services/screen_service.ts';
   import {
     screenStore,
     idStore,
     currentTab,
     queryObj
-  } from '../stores/search.ts'
+  } from '../../stores/search.ts'
 
   const { page } = stores();
 
-  export let padTop;
   let query = [];
 
   $: searchMachine = $screenMachine.context.searchMachines[$currentTab];
@@ -39,7 +38,7 @@
   $: tabs = Object.entries($screenStore);
   $: isEmptyQuery = uiQuery[0] && uiQuery[0].terms.length && uiQuery[0].terms[0].term;
   $: hasPreviousQuery = $screenStore[$currentTab].results.prevQuery;
-  $: selections = $screenStore[$currentTab] && $screenStore[$currentTab].selections;
+  $: selections = $screenStore[$currentTab] ? $screenStore[$currentTab].selections : [];
   $: logic = $screenStore[$currentTab].logic;
   $: if (!open && !isEmptyQuery) openDrawer();
   $: mode = $screenMachine.matches('Form.Simple') ? 'simple' : 'complex';
@@ -205,65 +204,29 @@
   }
 </script>
 
-<div style="padding-top: {padTop}px">
-  <slot></slot>
-  <SearchContainer
-    on:reset={handleReset}
-    on:edit={({detail}) => selectRuleset(detail)}
-    on:click={handleSend}
-    on:indexchange={({ detail }) => changeIndex(detail)}
-    on:newrule={newRuleset}
-    on:toggle={toggleSearchLogic}
-    on:modechange={({ detail }) => screenMachine.send({type: `CHANGE_SEARCH_${detail}`, tabId: $currentTab})}
-    index={$screenStore[$currentTab].index}
-    {logic}
-    {mode}
-  >
-    {#each uiQuery as { options, disabled, selected, terms, fields, isEditing }, i}
-      <Ruleset
-          on:copy={() => copyRuleset(i)}
-          on:delete={() => sendRule('RULE_DELETED', i)}
-          on:disable={() => sendRule('RULE_DISABLED', i)}
-          on:edit={({detail}) => editRuleset(i, detail)}
-          hasContent={terms.length && terms[0].term.length}
-          {disabled}
-          {isEditing}
-          {mode}
-          {isOnly}
-      >
-        <RulesetQueries
-          queries={terms}
-          on:change={({detail}) => handleChange(detail, i)}
-          on:toggle={({detail}) => toggleTermStatus(i, detail)}
-          bind:this={query[i]}
-          {disabled}
-          {isEditing}
-        />
-        {#if mode === 'complex'}
-          <RulesetFields
-            on:toggle={({ detail }) => sendRuleLabel('LABEL_TOGGLED', detail, i)}
-            on:disable={({ detail }) => sendRuleLabel('LABEL_DISABLED', detail, i)}
-            on:delete={({ detail }) => sendRuleLabel('LABEL_DELETED', detail, i)}
-            {fields}
-            {disabled}
-            {isEditing}
-          />
-        {/if}
-      </Ruleset>
-    {/each}
-  </SearchContainer>
-  <Selections {selections} on:toggleselection={toggleSelection}/>
+<div class="sidebar">
+  <div>
+    <slot name="sticky"></slot>
+  </div>
+  <div class="scrollable">
+    <slot name="scrollable"></slot>
+  </div>
 </div>
 
 <style lang="less">
-  div {
-    position: fixed;
-    height: calc(100% - var(--size-footer-height) - var(--size-header-height));
-    width: var(--sidebar-width);
-    border-right: 1px solid #e1e4e8;
-    padding: 15px;
+  .sidebar {
+    width: 100%;
+    height: 100%;
     box-sizing: border-box;
-    background: var(--sidebar-bg);
-    overflow-y: scroll;
+    background: var(--color-sidebar-background);
+
+    display: flex;
+    flex-direction: column;
+
+    .scrollable {
+      flex: 1;
+      overflow-y: scroll;
+      padding: 15px;
+    }
   }
 </style>

@@ -88,8 +88,6 @@
 </div>
 
 <style lang="less">
-  @import '../styles/mixins.less';
-
   .container {
     width: 100%;
     height: 100%;
@@ -123,12 +121,6 @@
   a {
     text-decoration: none;
     display: inline-block;
-  }
-
-  span {
-    &.highlight {
-      .highlighted();
-    }
   }
 
   ul {

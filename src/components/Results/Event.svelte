@@ -101,7 +101,10 @@
           target="_blank"
           href="{url}"
         >
-          <img src="/logo_meetup.svg"/>
+          <img
+            src="/logo_meetup.svg"
+            alt="Meetup Logo"
+          />
         </a>
         {#if hover}
           <Tooltip offset="{-5}" text="Meetup"/>

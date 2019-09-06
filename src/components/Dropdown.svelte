@@ -1,21 +1,20 @@
 <script>
 import { createEventDispatcher } from 'svelte';
-import { capitalise } from '../../util/string'
+import { capitalise } from '../util/string'
 
-export let indices;
+export let options;
 export let index;
 const dispatch = createEventDispatcher();
-
 </script>
 
 <div >
   <select
     bind:value={index}
     on:change={() =>
-    dispatch('indexchange', index.toLowerCase())}
+    dispatch('change', index.toLowerCase())}
   >
-    {#each indices as index}
-      <option value="{index}">{capitalise(index)}</option>
+    {#each options as item}
+      <option value="{item}">{capitalise(item)}</option>
     {/each}
   </select>
 </div>
@@ -28,7 +27,7 @@ const dispatch = createEventDispatcher();
     &::after {
       content: ' ';
       width: 34px;
-      height: 95%;
+      height: 90%;
       right: 1px;
       top: 1px;
       background: #fff url('../arrow.svg') no-repeat center/60%;

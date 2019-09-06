@@ -2,8 +2,8 @@
   import * as _ from 'lamb';
   import { stores } from '@sapper/app';
 
-  import { project_title } from '../config.js';
   import { ArrowDown } from '../components/Icons/';
+  import { project_title } from '../config.js';
 
   const { page } = stores();
   const navLinks = [
@@ -34,7 +34,7 @@
 </script>
 
 <div class="container">
-  <a href="">
+  <a href="/">
     <div class="home">
       <img
         src="/logo_mosaic_64.png"
@@ -101,7 +101,6 @@
 
     padding: var(--size-bars-padding);
     position: relative;
-    z-index: 1;
     background: #fff;
 
     a {

@@ -68,25 +68,50 @@ code {
 
 :root {
   /* colors */
-  --color-rjwf-darker-blue: rgb(15, 51, 102);
-  --color-rjwf-lighter-blue: rgb(89, 122, 156);
+
+  --color-blue-crunchbase: rgb(56, 136, 203);
   --color-blue-dark-pastel: rgb(106, 146, 187);
   --color-light-blue: rgb(210, 237, 253);
-  /* --color-text: #384c58; */
-  /* --color-text: #30526b; */
+  --color-rjwf-darker-blue: rgb(15, 51, 102);
+  --color-rjwf-lighter-blue: rgb(89, 122, 156);
 
-  /* theme: colors */
-  --color-type-company: rgb(56, 136, 203); /* logo_cb.svg */
+  /* theme: colors & gradients */
+
+  --color-button-background-hover: #e6ebf1;
+  --color-button-background: #eff3f6;
+  --color-button-border: #cececf;
+  --color-facet-background: white;
+  --color-highlight: var(--color-light-blue);
+  --color-nav-current: var(--color-blue-dark-pastel);
+  --color-ruleset-icon-hover: #333;
+  --color-ruleset-icon: #777;
+  --color-selections-selected-bg: #384c58;
+  --color-selections-selected-text: #fff;
+  --color-sidebar-background: #fafbfc;
+  --color-sidebar-border: #e1e4e8;
+  --color-text-highlight-bkg-hover: var(--color-blue-dark-pastel);
+  --color-text-highlight-bkg: var(--color-light-blue);
+  --color-text: var(--color-rjwf-darker-blue);
+  --color-type-company: var(--color-blue-crunchbase); /* logo_cb.svg */
   --color-type-event: rgb(237, 28, 64); /* logo_meetup.svg */
   --color-type-paper: rgb(101, 102, 106); /* logo_nih.png */
-  --color-text: var(--color-rjwf-darker-blue);
-  --color-text-highlight-bkg: var(--color-light-blue);
-  --color-text-highlight-bkg-hover: var(--color-blue-dark-pastel);
-  --color-nav-current: var(--color-blue-dark-pastel);
   --color-ui-border: lightgrey;
   --color-ui-shadow: darkgrey;
 
+  --gradient-button-background: linear-gradient(-180deg, #fafbfc, #eff3f6 90%);
+  --gradient-button-background-hover: linear-gradient(
+    -180deg,
+    #f0f3f6,
+    #e6ebf1 90%
+  );
+
+  /* theme: borders */
+
+  --border-button: 1px solid var(--color-button-border);
+  --border-sidebar: 1px solid var(--color-sidebar-border);
+
   /* theme: sizes */
+
   --size-bars-padding: 12px;
   --size-header-height: 70px;
   --size-header-innerheight: calc(
@@ -99,21 +124,19 @@ code {
   --size-main-height: calc(
     100% - var(--size-header-height) - var(--size-footer-height)
   );
+  --size-sidebar-width: 25rem;
 
-  /* z-index */
+  /* flow: z-index */
+
   --z-index-menu: 100;
-  /* TODO centralize all `z-index`s in here when it makes sense */
-  --color-type-company: rgb(56, 136, 203); /* logo_cb.svg */
-  --color-type-event: rgb(237, 28, 64); /* logo_meetup.svg */
-  --color-type-paper: rgb(101, 102, 106); /* logo_nih.png */
-  --sidebar-width: 25rem;
-  --sidebar-width: 20rem;
-  --sidebar-width: 23rem;
-  --sidebar-bg: #fafbfc;
-  --button-bg: #eff3f6;
-  --button-bg-image: linear-gradient(-180deg, #fafbfc, #eff3f6 90%);
-  --button-hover-bg: #e6ebf1;
-  --button-hover-bg-image: linear-gradient(-180deg, #f0f3f6, #e6ebf1 90%);
-  --button-border: 1px solid #cececf;
-  --highlight: rgb(210, 237, 253);
+}
+
+span.highlighted {
+  padding: 0.2em 0.4em;
+  background-color: var(--color-text-highlight-bkg);
+}
+
+span.highlighted:hover {
+  background-color: var(--color-text-highlight-bkg-hover);
+  color: white;
 }

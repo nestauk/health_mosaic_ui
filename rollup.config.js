@@ -56,6 +56,8 @@ function transformLess() {
 }
 
 const onwarn = (message, warn) => {
+  if (/@sapper\/app/.test(message)) return;
+  if (/ForceWithDistributions/.test(message)) return;
   if (/xstate/.test(message)) return;
   if (/d3/.test(message)) return;
   if (/Histogram/.test(message)) return;

@@ -3,14 +3,12 @@
   import { writable } from 'svelte/store';
   import { scale } from 'svelte/transition';
 
-
   import { PlusCircleIcon } from 'svelte-feather-icons';
   import { Sync } from '../Icons';
   import Switch from '../Switch.svelte';
 
   import { ESIndices } from '../../config';
-  import MultiToggle from '../MultiToggle.svelte';
-  import { SearchDropdown } from './index.js';
+  import Dropdown from '../Dropdown.svelte';
 
   export let index;
   export let logic;
@@ -19,7 +17,6 @@
 
   const dispatch = createEventDispatcher();
   const search_indices= ['Research', 'Companies', 'Events'];
-
 </script>
 
 <div class="container">
@@ -43,8 +40,6 @@
 
   <slot></slot>
 
-
-
   <div class="search">
     {#if mode === 'complex'}
       <div transition:scale class="logic">
@@ -57,12 +52,11 @@
       </div>
     {/if}
     <div>
-      <SearchDropdown
+      <Dropdown
         {index}
-        indices="{ESIndices}"
-        on:indexchange
+        options="{ESIndices}"
+        on:change
       />
-
       <button class="search-button" on:click|stopPropagation>Search</button>
       <button class="reset-button" on:click={() => dispatch('reset')}><Sync /></button>
     </div>
@@ -109,13 +103,13 @@
     }
 
     button {
-      background: var(--button-bg);
-      background-image: var(--button-bg-image);
-      border: var(--button-border);
+      background: var(--color-button-background);
+      background-image: var(--gradient-button-background);
+      border: var(--border-button);
 
       &:hover {
-        background-color:var(--button-hover-bg);
-        background-image: var(--button-hover-bg-image);
+        background-color:var(--color-button-background-hover);
+        background-image: var(--gradient-button-background-hover);
       }
     }
 
@@ -173,5 +167,4 @@
       }
     }
   }
-
 </style>

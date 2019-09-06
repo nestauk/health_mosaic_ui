@@ -1,19 +1,11 @@
-
-
 <script>
   import { tick, createEventDispatcher } from 'svelte';
+  import { isIterableEmpty } from '@svizzle/utils';
   import { Edit } from '../Icons';
 
   export let disabled;
   export let isEditing = true;
-  export let queries = [
-    { query: 'Heart', status: 'and' },
-    { query: 'Disease', status: 'not' },
-    { query: 'Heart', status: 'and' },
-    { query: 'Disease', status: 'not' },
-    { query: 'Heart', status: 'and' },
-    { query: 'Disease', status: 'not' },
-  ];
+  export let queries = [];
 
   const dispatch = createEventDispatcher();
 
@@ -24,7 +16,6 @@
   let input;
   let padbottom = false;
   let currentInput = '';
-
 
   $: pills = _pills && _pills.filter(v => v !== null);
 
@@ -65,15 +56,13 @@
 
   const handleKeydown = event => {
     if (event.key === 'Backspace' && currentInput.length === 0) {
-      if (!queries[queries.length-1]) return;
+      if (isIterableEmpty(queries)) return;
       event.preventDefault();
       const { term, status } = queries[queries.length-1];
       currentInput = `${status === 'not' ? '-' : ''}${term}`;
       dispatch('change', textQuery.slice(0, -1).join(','));
     }
   }
-
-  const removeQuery = i => queries = queries.filter((_pills, _i) => i !== _i)
 
   const fitContent = node => {
     const fakeInput = document.createElement('span');
@@ -97,53 +86,50 @@
   }
 
   const autofocus = async node => node.focus();
-
 </script>
 
 <svelte:body on:click={addQuery}/>
 
+<div
+  class:disabled
+  class:editing={isEditing}
+  class="query-container"
+  on:click|stopPropagation={() => input && input.focus()}
+>
   <div
-    class:disabled
-    class:editing={isEditing}
-    class="query-container"
-    on:click|stopPropagation={() => input && input.focus()}
-
+    class="query-labels"
+    bind:this={pillContainer}
   >
-    <div
-      class="query-labels"
-      bind:this={pillContainer}
-    >
-      <ul class:padbottom>
-        {#each queries.filter(({term}) => term.length) as { term, status }, i}
-          <li
-            class={status}
-            bind:this={_pills[i]}
-            on:click|stopPropagation={() => dispatch('toggle', i)}
+    <ul class:padbottom>
+      {#each queries.filter(({term}) => term.length) as { term, status }, i}
+        <li
+          class={status}
+          bind:this={_pills[i]}
+          on:click|stopPropagation={() => dispatch('toggle', i)}
+        >
+          {term}
+          <span
+            class="close"
+            on:click|stopPropagation={() => dispatch('change', textQuery.filter((_, _i) => i !== _i ).join(','))}
           >
-            {term}
-            <span
-              class="close"
-              on:click|stopPropagation={() => dispatch('change', textQuery.filter((_, _i) => i !== _i ).join(','))}
-            >
-                x
-            </span>
-          </li>
-        {/each}
-      </ul>
-      {#if isEditing}
-        <input
-          bind:this={input}
-          bind:value={currentInput}
-          style="transform: translate({inputCoords.right}px, {inputCoords.top}px)"
-          use:fitContent
-          use:autofocus
-          on:keyup={handleKeyup}
-          on:keydown={handleKeydown}
-        />
-      {/if}
-    </div>
+            x
+          </span>
+        </li>
+      {/each}
+    </ul>
+    {#if isEditing}
+      <input
+        bind:this={input}
+        bind:value={currentInput}
+        style="transform: translate({inputCoords.right}px, {inputCoords.top}px)"
+        use:fitContent
+        use:autofocus
+        on:keyup={handleKeyup}
+        on:keydown={handleKeydown}
+      />
+    {/if}
   </div>
-
+</div>
 
 <style lang="less">
   .query-container {
@@ -169,24 +155,6 @@
         span::after {
           background: #8cc1c1;
         }
-      }
-    }
-
-    button {
-      padding: 0;
-      width: 30px;
-      height: 30px;
-      border: none;
-      cursor: pointer;
-      color: #999;
-
-      &:inactive {
-        opacity: 0.6;
-
-      }
-
-      &:hover {
-        color: #333;
       }
     }
 
@@ -233,23 +201,6 @@
     display: flex;
     justify-content: space-between;
     flex-wrap: wrap;
-    button {
-      padding: 0;
-      width: 30px;
-      height: 30px;
-      border: none;
-      cursor: pointer;
-      color: #999;
-      transform: translateY(5px);
-
-      &:inactive {
-        opacity: 0.6;
-      }
-
-      &:hover {
-        color: #333;
-      }
-    }
   }
 
   input {

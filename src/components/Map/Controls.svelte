@@ -76,11 +76,6 @@
 </div>
 
 <style lang="less">
-  .control-button {
-    user-select: none;
-    cursor: pointer;
-  }
-
   .controls {
     position: absolute;
     bottom: 0;
@@ -106,8 +101,6 @@
     align-items: center;
     /* padding: 5px; */
     padding: 12px;
-
-    .control-button();
   }
 
 
@@ -137,7 +130,6 @@
     align-items: center;
     padding: 0 10px;
     margin: 0 10px;
-    .control-button();
   }
 
   .selected {

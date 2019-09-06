@@ -185,10 +185,7 @@
       stroke-width: 0.5px;
       shape-rendering: crispEdges;
     }
-    rect.box {
-      fill: white;
-      fill-opacity: 0.75;
-    }
+
     text {
       stroke: none;
       dominant-baseline: middle;

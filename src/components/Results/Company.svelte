@@ -103,7 +103,10 @@
           target="_blank"
           href="{url_source}"
         >
-          <img src="/logo_cb.jpg"/>
+          <img
+            src="/logo_cb.jpg"
+            alt="Crunchbase logo"
+          />
         </a>
         {#if hover}
           <Tooltip offset="{-5}" text="Crunchbase"/>

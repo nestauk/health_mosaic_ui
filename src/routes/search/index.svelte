@@ -3,8 +3,6 @@
   import { screenStore, currentTab } from '../../stores/search.ts';
 
   $: selectedItems = $screenStore[$currentTab].selected || [];
-
-
 </script>
 
 <div class="content">

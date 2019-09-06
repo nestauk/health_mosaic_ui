@@ -1,7 +1,8 @@
+
 <script>
   import { createEventDispatcher, tick, onMount } from 'svelte';
-  import Spinner from './Spinner.svelte';
-  import Alert from './Icons/Alert.svelte';
+  import Spinner from '../Spinner.svelte';
+  import Alert from '../Icons/Alert.svelte';
   import { EditIcon, CopyIcon, PlusCircleIcon, Trash2Icon } from 'svelte-feather-icons';
 
   import addIcon from 'ionicons/dist/ionicons/svg/ios-add-circle-outline.svg';
@@ -11,20 +12,10 @@
   export let activeTab;
   export let isError;
   export let isLoading;
-  export let tabHeight = 0;
   export let tabs;
 
   let editedTarget = null;
-  let isFullWidth = false;
-  let isLeft;
-  let isRight;
-  let navEl;
-  let tabEls = [];
-  let tabWidth;
-  let windowWidth;
   let tab_status = [];
-
-
 
   const dispatch = createEventDispatcher();
 
@@ -114,15 +105,13 @@
 
 <svelte:window
   on:click|stopPropagation="{stopEdit}"
-  bind:innerWidth={windowWidth}
 />
 
-<nav bind:offsetHeight="{tabHeight}">
+<nav>
   <h2>Tabs</h2>
-  <ul bind:this={navEl} >
+  <ul>
     {#each tabs as { id, name, isLoading, hovering }, i (id)}
       <li
-        bind:this={tabEls[i]}
         class:selected={parseInt(id, 10) === activeTab}
         on:click|preventDefault={() => dispatch('changetab', parseInt(id, 10))}
       >
@@ -169,13 +158,6 @@
     margin-top: -0.25rem;
   }
 
-  .error {
-    height: 2rem;
-    width: 2rem;
-    align-self: center;
-    margin-right: 15px;
-  }
-
   h2 {
     margin: 1rem;
   }
@@ -184,14 +166,8 @@
     border-bottom: 1px solid rgba(170, 30, 30, 0.1);
     font-weight: 300;
     display: flex;
-    justify-content: space-between;
     flex-direction: column;
-    margin: 0 -1em;
-    width: calc(100% + 2em);
-    position: fixed;
-    top: var(--size-header-height);
-    width: var(--sidebar-width);
-    background: var(--sidebar-bg);
+    background: var(--color-sidebar-background);
   }
 
   ul {
@@ -230,7 +206,7 @@
   }
 
   .selected {
-    background: var(--highlight)!important;
+    background: var(--color-highlight)!important;
   }
 
   .button {
@@ -260,11 +236,6 @@
     &:hover {
       opacity: 1;
     }
-
-    img {
-      width: 100%;
-      height: 100%;
-    }
   }
 
   .close-container {
@@ -274,15 +245,6 @@
     margin-left: 10px;
     border-right: none;
     margin: 15px 0;
-
-
-    &.sticky {
-      right: 0;
-      top: 0;
-      width: 50px;
-      background: #fff;
-      border-left: 1px solid #ccc;
-    }
   }
 
 </style>

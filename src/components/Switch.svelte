@@ -6,14 +6,13 @@
   export let current;
   export let values;
 
-	$: toggle = current;
+  $: toggle = current;
 
-	function toggleSelection() {
-		toggle = toggle === values[0] ? values[1] : values[0];
-	}
+  function toggleSelection() {
+    toggle = toggle === values[0] ? values[1] : values[0];
+  }
 
   $: dispatch('toggle', toggle);
-
 </script>
 
 <fieldset role="radiogroup" >
@@ -31,86 +30,83 @@
 
 <style lang="less">
 .c-toggle {
-	cursor: pointer;
+  cursor: pointer;
 
-	label {
-		font-size: 16px;
-		margin: 0 .5em 0;
-		opacity: 0.6;
-		cursor: pointer;
+  label {
+    font-size: 16px;
+    margin: 0 .5em 0;
+    opacity: 0.6;
+    cursor: pointer;
 
-		&.active {
-			opacity: 1;
-		}
-	}
+    &.active {
+      opacity: 1;
+    }
+  }
 
-	input[type="radio"] {
-		display: inline-block;
-		margin-right: -2px;
-		width: 50%;
-		height: 100%;
-		opacity: 0;
-		position: relative;
-		z-index: 1;
-		cursor: pointer;
-
-	}
+  input[type="radio"] {
+    display: inline-block;
+    margin-right: -2px;
+    width: 50%;
+    height: 100%;
+    opacity: 0;
+    position: relative;
+    z-index: 1;
+    cursor: pointer;
+  }
 }
 
 .c-toggle__wrapper {
-	font-size: var(--baseSize); /* FIXME this var doesn't exist */
-	display: inline-block;
-	vertical-align: middle;
-	width: 4em;
-	height: 2em;
-	border-radius: 3.5em;
-	border: 1px solid #ddd;
-	position: relative;
+  font-size: var(--baseSize); /* FIXME this var doesn't exist */
+  display: inline-block;
+  vertical-align: middle;
+  width: 4em;
+  height: 2em;
+  border-radius: 3.5em;
+  border: 1px solid #ddd;
+  position: relative;
 }
 .c-toggle__switcher {
-	display: block;
-	position: absolute;
-	top: 0;
-	left: 0;
-	right: 100%;
-	width: 50%;
-	height: 100%;
-	border-radius: 50%;
-	transition: all 0.2s ease-out;
-	z-index: 2;
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 100%;
+  width: 50%;
+  height: 100%;
+  border-radius: 50%;
+  transition: all 0.2s ease-out;
+  z-index: 2;
   background: #fa99ff;
 }
 
 .c-toggle__background {
-	display: block;
-	position: absolute;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-	z-index: 0;
-	border-radius: 2em;
-	background-color: #fff;
-	transition: all 0.2s ease-out;
-	cursor: pointer;
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  border-radius: 2em;
+  background-color: #fff;
+  transition: all 0.2s ease-out;
+  cursor: pointer;
 }
 
-
-
 #two:checked ~ .c-toggle__switcher {
-	right: 0;
-	left: 50%;
-	background: #66c9ff;
+  right: 0;
+  left: 50%;
+  background: #66c9ff;
 }
 
 #two:checked ~ .c-toggle__background {
-	background-color: #fff;
+  background-color: #fff;
 }
 
 fieldset {
-	border: none;
-	user-select: none;
-	width: 12em;
+  border: none;
+  user-select: none;
+  width: 12em;
   padding: 0;
 }
 
