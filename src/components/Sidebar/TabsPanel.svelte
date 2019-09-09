@@ -10,6 +10,7 @@
   import closeIcon from 'ionicons/dist/ionicons/svg/ios-close-circle-outline.svg';
 
   export let activeTab;
+  export let editingTab;
   export let isError;
   export let isLoading;
   export let tabs;
@@ -37,14 +38,22 @@
       editedTarget.blur();
       editedTarget.style.cursor = 'pointer';
       editedTarget.contentEditable = false;
+
+      if (editedTarget.innerText === '') {
+        editedTarget.innerText = `Tab ${+editingTab + 1}`;
+        dispatch('textchange', { value:`Tab ${+editingTab + 1}`, id: editingTab });
+      }
+
       editedTarget = null;
     }
   };
 
-  const handleClick = e => {
+  const handleClick = async (e, id) => {
     const { target } = e;
 
     if (editedTarget === target) return;
+    editingTab = id;
+
     stopEdit(e);
 
     editedTarget = target;
@@ -123,7 +132,7 @@
           </span>
         {/if}
         <div
-          on:click|stopPropagation={handleClick}
+          on:click|stopPropagation={e => handleClick(e, id)}
           on:keydown={stopEdit}
           on:input={ e => textChange(e, id) }
           on:mouseenter={() => tabs[i].hovering = true}
@@ -234,6 +243,8 @@
     font-size: 1.1em;
     white-space: nowrap;
     overflow: hidden;
+    height: 2.1rem;
+    min-width: 3rem;
   }
 
 

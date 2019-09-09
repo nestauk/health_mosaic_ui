@@ -12,7 +12,7 @@ export const newTab = (
   logic: 'AND' | 'OR' = 'AND'
 ): Tab => ({
   index,
-  name: 'Tab' + id,
+  name: 'Tab ' + (id + 1),
   results: {
     data: [],
     queryObj: [],

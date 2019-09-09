@@ -161,7 +161,6 @@ export const form_options = {
     deleteRule: ({ screenStore }, { tabId, ruleIndex }) => {
       const uiQuery = get(screenStore)[tabId].uiQuery;
       const currentSelection = uiQuery.findIndex(({ selected }) => selected);
-      console.log(uiQuery);
 
       if (uiQuery.length <= 1) return;
 
