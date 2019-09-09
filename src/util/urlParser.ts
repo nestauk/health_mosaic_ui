@@ -8,7 +8,7 @@ import {
 } from './transform';
 import { nullString } from './urlBuilder';
 
-export const extractParenContents = str => {
+export const extractParentContents = str => {
   const re = /\((.*?)\)/g;
   let matchArray = [];
   let match;
@@ -16,7 +16,7 @@ export const extractParenContents = str => {
     matchArray.push(match[1]);
   }
 
-  return matchArray;
+  return matchArray.map(s => s.replace(/\s*,\s*/g, ','));
 };
 
 export const extractTermsFields = str => {
@@ -43,7 +43,7 @@ export const makeRuleset = ([terms, fields]) => [
 ];
 
 export const makeRulesetObject = _.pipe([
-  extractParenContents,
+  extractParentContents,
   _.mapWith(extractTermsFields),
   _.mapWith(makeRuleset),
 ]);
@@ -81,16 +81,16 @@ const splitByColon = selectString => selectString.split(':');
 
 export const detectType = ([key, value]) => {
   if (key.startsWith('-')) {
-    return [key.substring(1), value, 'exclude']
+    return [key.substring(1), value, 'exclude'];
   }
   if (key.startsWith('!')) {
-    return [key.substring(1), value, 'ignore']
+    return [key.substring(1), value, 'ignore'];
   }
   if (value.match(/.+\.\..+/)) {
     return [key, value, 'within'];
   }
   if (value.match(/.+,.+/)) {
-    return [key, value, 'include']
+    return [key, value, 'include'];
   }
 
   return [key, value, 'include'];
@@ -106,8 +106,8 @@ const parseNumericList = _.pipe([
   _.mapWith(
     _.condition(
       isListString,
-      parseNumbersList,  // bounds
-      stringToNumber  // range
+      parseNumbersList, // bounds
+      stringToNumber // range
     )
   ),
 ]);
@@ -120,13 +120,10 @@ export const convertNumericList = ([key, value, type]) => [
   },
 ];
 
-const convertIfNullString = _.condition(_.is(nullString), _.always(null), _.identity);
+const convertIfNullString = _.when(_.is(nullString), _.always(null));
 const parseStringList = _.pipe([
   splitByComma,
-  _.mapWith(_.pipe([
-    convertPlusToSpace,
-    convertIfNullString,
-  ]))
+  _.mapWith(_.pipe([convertPlusToSpace, convertIfNullString])),
 ]);
 export const convertStringList = ([key, value, type]) => [
   key,
@@ -146,7 +143,7 @@ const handleTypes = _.pipe([
 const parseSelection = _.pipe([splitByColon, detectType, handleTypes]);
 
 export const parseSelectionUrl = _.pipe([
-  extractParenContents,
+  extractParentContents,
   _.mapWith(parseSelection),
   _.fromPairs,
 ]);

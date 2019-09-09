@@ -2,7 +2,7 @@ import {
   applyRulesFromQuery,
   createTerms,
   createFields,
-  extractParenContents,
+  extractParentContents,
   extractTermsFields,
   makeRuleset,
   parseQueryUrl,
@@ -12,9 +12,16 @@ import {
   convertStringList,
 } from './urlParser.ts';
 
-test('extractParenContents', () => {
+test('extractParentContents', () => {
   const queryString = '(one,-two,in:one,-two)(three,-four,in:one,-two)';
-  const rulesets = extractParenContents(queryString);
+  const rulesets = extractParentContents(queryString);
+
+  expect(rulesets).toEqual(['one,-two,in:one,-two', 'three,-four,in:one,-two']);
+});
+
+test('extractParentContents', () => {
+  const queryString = '(one,-two, in:one,-two)(three,-four,in:one,-two)';
+  const rulesets = extractParentContents(queryString);
 
   expect(rulesets).toEqual(['one,-two,in:one,-two', 'three,-four,in:one,-two']);
 });
@@ -242,7 +249,7 @@ test('detectType', () => {
   const types = [
     ['key1', 'one,two and a,three'],
     ['key2', '10..20'],
-    ['key3', '1,2..3,4']
+    ['key3', '1,2..3,4'],
   ];
 
   const expected = [
@@ -255,13 +262,10 @@ test('detectType', () => {
 });
 
 test('convertNumericList', () => {
-  const inputs = [
-    ['key2', '10..20', 'within'],
-    ['key3', '1,2..3,4', 'within'],
-  ];
+  const inputs = [['key2', '10..20', 'within'], ['key3', '1,2..3,4', 'within']];
   const expected = [
-    ['key2', {type: 'within', value: [10, 20]}],
-    ['key3', {type: 'within', value: [[1, 2], [3, 4]]}],
+    ['key2', { type: 'within', value: [10, 20] }],
+    ['key3', { type: 'within', value: [[1, 2], [3, 4]] }],
   ];
   expect(inputs.map(v => convertNumericList(v))).toEqual(expected);
 });
