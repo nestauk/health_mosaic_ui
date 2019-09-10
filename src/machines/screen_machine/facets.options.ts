@@ -2,6 +2,7 @@ import { get } from 'svelte/store';
 //@ts-ignore
 import { goto } from '@sapper/app';
 import * as _ from 'lamb';
+import { isKeyValue, mergeObj } from '@svizzle/utils';
 
 import { makePath } from '../../util/config';
 import { version } from '../../../package.json';
@@ -50,7 +51,10 @@ export const facets_options = {
         )
       );
     },
-    applySelections: ({ screenStore }, { tabId }) => {
+    applySelections: (
+      { screenStore },
+      { tabId }
+    ) => {
       screenStore.update(
         _.updatePath(`${tabId}`, tab => {
           const { results, selections } = tab;
@@ -60,6 +64,35 @@ export const facets_options = {
             selected: filter(results.data),
           };
         })
+      );
+    },
+
+    /* list view */
+
+    // TODO tabId
+    listUpdateSortBy: (
+      { listSortingStore, screenStore },
+      { sortOptions, tabId }
+    ) => {
+      listSortingStore.update(mergeObj(sortOptions));
+      console.log('sortOptions', sortOptions);
+
+      const { by, direction } = sortOptions;
+      const isDirectionAscending = isKeyValue(['direction', 'ascending']);
+      const isAscending = isDirectionAscending(sortOptions)
+      const accessor = _.condition(
+        _.hasKey(by),
+        _.getKey(by),
+        _.always(undefined),
+      );
+      const sorter = _.sortWith([
+        isAscending
+          ? accessor
+          : _.sorterDesc(accessor)
+      ]);
+
+      screenStore.update(
+        _.updatePath(`${tabId}.selected`, sorter)
       );
     },
   },

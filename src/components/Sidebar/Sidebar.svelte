@@ -39,6 +39,7 @@
     flex-direction: column;
   }
 
+  /* div[slot="scrollable"] { */
   .scrollable {
     flex: 1;
     overflow-y: scroll;

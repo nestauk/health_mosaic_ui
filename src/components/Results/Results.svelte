@@ -13,14 +13,17 @@
   })
 </script>
 
-<div bind:this="{container}">
+<div
+  class="Results"
+  bind:this="{container}"
+>
   <ul class:dirty="{dirty}">
     <slot></slot>
   </ul>
 </div>
 
 <style>
-  div {
+  .Results {
     width: 100%;
     height: 100%;
     display: flex;

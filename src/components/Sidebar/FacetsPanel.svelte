@@ -14,7 +14,7 @@
   $: currentFacet = $page.path.split('/').filter(Boolean)[1] || '';
 </script>
 
-<div class="FacetPanel">
+<div class="FacetsPanel">
   <h2>Facets</h2>
   <ul>
     {#each facets as { id, label }}
@@ -32,8 +32,8 @@
 </div>
 
 <style lang="less">
-  .FacetPanel {
-    margin: 2rem 0;
+  .FacetsPanel {
+    /* margin: 2rem 0; */
   }
   h2 {
     font-size: var(--size-sidebar-panel-title);

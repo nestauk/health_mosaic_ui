@@ -35,6 +35,7 @@
     funders,
     id_source,
     name,
+    novelty,
     sdg_labels,
     start,
     state,
@@ -61,6 +62,9 @@
       <h2>{title}</h2>
     {/if}
     <ul>
+      <li>
+        <strong>Novelty:</strong> {Math.round(novelty)}
+      </li>
       <li>
         <strong>Start:</strong> {start}
         {#if end}

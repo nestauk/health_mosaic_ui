@@ -11,7 +11,6 @@ const countByAsKeyValue = key =>
     objectToKeyValueArray,
     sortValueDescKeyAsc
   ]);
-export const isNotNull = _.not(_.isNull);
 
 export const noneLabel = 'none';
 
@@ -32,6 +31,28 @@ export const getIdsByTerms = arr => _.reduce(arr, (acc, item) => {
 
   return acc;
 }, {});
+
+export const fieldToLabel = {
+  city: 'City',
+  continent: 'Continent',
+  cost_ref: 'Funding',
+  countries_ids: 'Mentioned countries',
+  country_id: 'Country',
+  end: 'End',
+  funders: 'Funders',
+  location: 'Location',
+  name: 'Name',
+  novelty: 'Novelty',
+  region: 'Region',
+  sdg_labels: 'SDG Labels',
+
+  start: 'Start',
+  state_id: 'State',
+  summary: 'Summary',
+  terms: 'Terms',
+  title: 'Title',
+  type: 'Type',
+};
 
 // TODO use from svizzle next release
 // lookups to split metrics by item type

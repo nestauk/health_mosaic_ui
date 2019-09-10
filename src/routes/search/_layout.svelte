@@ -10,16 +10,18 @@
   import { stores } from '@sapper/app';
   import DirtyOverlay from '../../components/DirtyOverlay.svelte'
   import ItemsFigures from '../../components/ItemsFigures.svelte'
+  import { ListControls } from '../../components/Results/';
+  import FacetControls from '../../components/Sidebar/FacetControls.svelte';
   import FacetsPanel from '../../components/Sidebar/FacetsPanel.svelte';
-  import TabsPanel from '../../components/Sidebar/TabsPanel.svelte';
-  import SelectionsPanel from '../../components/Sidebar/SelectionsPanel.svelte';
   import {
     SearchPanelContainer,
     Rule,
     RuleQueries,
     RuleFields
   } from '../../components/Sidebar/SearchPanel';
+  import SelectionsPanel from '../../components/Sidebar/SelectionsPanel.svelte';
   import Sidebar from '../../components/Sidebar/Sidebar.svelte';
+  import TabsPanel from '../../components/Sidebar/TabsPanel.svelte';
 
   import {
     CB_type,
@@ -105,6 +107,7 @@
   $: selectedFacet = $page.params.facet || '';
   $: queryTitle = renderTitle($page.query.q, $page.query.i);
   $: facetTitle = selectedFacet ? `- ${titleCase(selectedFacet.replace('_', ' '))}` : '';
+  $: isListFacet = selectedFacet === '';
 
   $: currentScreen = $screenStore[$currentTab];
   $: isSingleQuery = uiQuery && uiQuery.length === 1;
@@ -131,7 +134,7 @@
   $: rulesetIndex = uiQuery!== undefined
     ? uiQuery.findIndex(( { selected } ) => selected)
     : false;
-
+  $: listSortingStore = $screenMachine.context.listSortingStore;
   $: mode = $screenMachine.matches('Form.Simple') ? 'simple' : 'complex';
 
   //  History
@@ -390,6 +393,24 @@
     })
     checkQuery();
   }
+
+  /* sorting */
+
+  const sendListUpdateSortBy = ({ detail }) => {
+    console.log('sendListUpdateSortBy', detail);
+    screenMachine.send({
+      type: 'LIST_SORT_BY_UPDATED',
+      tabId: $currentTab,
+      sortOptions: detail
+    });
+  }
+
+  const sendListUpdateSortOrder = ({ detail }) =>
+    screenMachine.send({
+      type: 'LIST_SORT_ORDER_UPDATED',
+      tabId: $currentTab,
+      order: detail
+    });
 </script>
 
 <svelte:options immutable={true} />
@@ -421,6 +442,14 @@
           on:link="{sendRouteChanged}"
           facets="{facetPills}"
         />
+        <FacetControls>
+          {#if isListFacet}
+            <ListControls
+              {listSortingStore}
+              on:sortedBy={sendListUpdateSortBy}
+            />
+          {/if}
+        </FacetControls>
         <SearchPanelContainer
           on:reset="{handleReset}"
           on:edit="{({detail}) => selectRuleset(detail)}"

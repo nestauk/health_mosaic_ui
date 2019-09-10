@@ -23,6 +23,9 @@ export const facets_config = {
       target: '#Disabled',
       actions: ['changeRoute'],
     },
+    LIST_SORT_BY_UPDATED: {
+      actions: ['listUpdateSortBy'],
+    },
   },
   states: {
     Interactive: {

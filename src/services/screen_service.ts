@@ -12,16 +12,18 @@ import {
   queryObj,
   routeStore,
 } from '../stores/search';
+import { listSortingStore } from '../stores/facetControls';
 
 export const screenService = interpret(
   screen_machine.withContext({
-    screenStore,
+    currentTab,
     idStore,
     historyStore,
-    currentTab,
+    listSortingStore,
     queryObj,
     routeStore,
     searchMachines: {},
+    screenStore,
   })
 );
 
