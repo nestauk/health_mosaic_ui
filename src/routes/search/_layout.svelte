@@ -34,6 +34,7 @@
   const { page } = stores();
 
   let query = [];
+  let isSidebarLeft = true;
 
   onMount(() => {
 
@@ -339,8 +340,11 @@
   <title>{project_title} {queryTitle}</title>
 </svelte:head>
 
-<div class="col col1">
-  <Sidebar>
+<div class="col {isSidebarLeft ? 'col1' : 'col3'}">
+  <Sidebar
+    on:position={({detail}) => isSidebarLeft = detail }
+    {isSidebarLeft}
+  >
     <div slot="sticky">
       <TabsPanel
         {isLoading}
@@ -409,7 +413,7 @@
   </Sidebar>
 </div>
 
-<div class="col col2-3">
+<div class="col {isSidebarLeft ? 'col2-3' : 'col1-2'}">
   <div class="content">
     <slot></slot>
   </div>
@@ -418,10 +422,19 @@
 <style lang="less">
   .col {
     height: 100%;
+    grid-row: 1;
   }
   .col1 {
     grid-column: 1 / span 1;
     border-right: var(--border-sidebar);
+  }
+
+  .col3 {
+    grid-column: 3 / span 1;
+    border-left: var(--border-sidebar);
+  }
+  .col1-2 {
+    grid-column: 1 / span 2;
   }
 
   .col2-3 {

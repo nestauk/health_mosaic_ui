@@ -1,8 +1,10 @@
 <script>
   import { stores } from '@sapper/app';
-  import { tick } from 'svelte';
+  import { tick, createEventDispatcher } from 'svelte';
   import compare from 'just-compare';
   import * as _ from 'lamb';
+  import { ArrowDown } from '../Icons/'
+
 
   import { SearchPanelContainer, Rule, RuleQueries, RuleFields } from './SearchPanel';
   import SelectionsPanel from './SelectionsPanel.svelte';
@@ -15,8 +17,10 @@
   } from '../../stores/search.ts'
 
   const { page } = stores();
+  const dispatch = createEventDispatcher();
 
   let query = [];
+  export let isSidebarLeft = true;
 
   $: searchMachine = $screenMachine.context.searchMachines[$currentTab];
   $: uiQuery = $screenStore[$currentTab] && $screenStore[$currentTab].uiQuery;
@@ -211,6 +215,22 @@
   <div class="scrollable">
     <slot name="scrollable"></slot>
   </div>
+  <div class="controls">
+    <span
+      class="left"
+      class:active={!isSidebarLeft}
+      on:click|stopPropagation={() => !isSidebarLeft && dispatch('position', true)}
+    >
+      <ArrowDown />
+    </span>
+    <span
+      class="right"
+      class:active={isSidebarLeft}
+      on:click|stopPropagation={() => isSidebarLeft && dispatch('position', false)}
+    >
+      <ArrowDown />
+    </span>
+  </div>
 </div>
 
 <style lang="less">
@@ -227,6 +247,36 @@
       flex: 1;
       overflow-y: scroll;
       padding: 15px;
+    }
+
+    .controls {
+      height: 2rem;
+      display: flex;
+      justify-content: space-between;
+      margin: var(--size-bars-padding);
+
+      span {
+        display: block;
+        height: 2rem;
+        width: 2rem;
+        opacity: 0.2;
+
+        &.left {
+          transform: rotate(90deg)
+        }
+
+        &.right {
+          transform: rotate(-90deg)
+        }
+
+        &.active {
+          cursor: pointer;
+          opacity: 0.5;
+          &:hover {
+            opacity: 1;
+          }
+        }
+      }
     }
   }
 </style>

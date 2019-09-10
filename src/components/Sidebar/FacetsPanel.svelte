@@ -52,8 +52,7 @@
       background: #eee;
 
       &.selected {
-        background: var(--color-selections-selected-bg)!important;
-        color: var(--color-selections-selected-text)!important;
+        background: var(--color-highlight)!important;
         font-weight: 400!important;
       }
 
