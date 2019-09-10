@@ -144,12 +144,14 @@
         {#if isLoading}
           <Spinner />
         {/if}
-        <input
-          title="Select tab"
-          on:click|stopPropagation
-          use:registerTabs={id}
-          type="checkbox"
-        />
+        {#if tabs.length > 1}
+          <input
+            title="Select tab"
+            on:click|stopPropagation
+            use:registerTabs={id}
+            type="checkbox"
+          />
+        {/if}
       </li>
     {/each}
 
