@@ -423,13 +423,7 @@
     grid-column: 1 / span 1;
     border-right: var(--border-sidebar);
   }
-  .col3 {
-    grid-column: 3 / span 1;
-    border-left: var(--border-sidebar);
-  }
-  .col1-2 {
-    grid-column: 1 / span 2;
-  }
+
   .col2-3 {
     grid-column: 2 / span 2;
   }

@@ -11,6 +11,7 @@ src/node_modules/
 # build
 dist
 /lambda/
+/static/mapbox-gl.css
 
 # logs
 logs
@@ -34,4 +35,3 @@ coverage
 # sapper
 /cypress/screenshots/
 /__sapper__/
-
