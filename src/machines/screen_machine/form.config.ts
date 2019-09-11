@@ -41,7 +41,7 @@ export const form_config = {
   states: {
     Simple: {
       on: {
-        CHANGE_SEARCH_MODE: {
+        CHANGE_SEARCH_COMPLEX: {
           target: 'Complex',
         },
       },
@@ -51,7 +51,7 @@ export const form_config = {
         RULE_EDITED: {
           actions: ['editRuleset'],
         },
-        CHANGE_SEARCH_MODE: {
+        CHANGE_SEARCH_SIMPLE: {
           target: 'Simple',
           actions: ['activateSimpleSearch'],
         },
