@@ -16,6 +16,9 @@ export const tabs_config = {
             'setUrlQuery',
           ],
         },
+        TAB_RESTORED: {
+          actions: ['restoreTab', 'createSearchMachine'],
+        },
         TAB_SELECTED: {
           actions: ['setCurrentTab', 'pushHistory', 'setUrlQuery'],
         },

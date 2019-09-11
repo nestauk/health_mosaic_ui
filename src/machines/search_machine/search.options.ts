@@ -23,7 +23,7 @@ export const search_options: any = {
     shareDirty: sendParent('DIRTY'),
     updateData: (
       { screenStore, queryObj, currentTab, routeStore },
-      { data: { id, results } }
+      { data: { id, results, restore } }
     ) => {
       const screen = get(screenStore);
 
@@ -35,7 +35,7 @@ export const search_options: any = {
       const responseTabQueryObject = get(queryObj)[id];
       const tabId: number = get(currentTab);
 
-      if (tabId === id) {
+      if (tabId === id && !restore) {
         const currentQuery = screen[tabId];
         const urlQuery = {
           v: version,
@@ -69,14 +69,15 @@ export const search_options: any = {
     },
   },
   services: {
-    apiRequest: ({ queryObj }, { tabId }) => {
+    apiRequest: ({ queryObj }, { tabId, restore }) => {
       const currentQuery = get(queryObj)[tabId];
 
       return query(
         currentQuery.query,
         currentQuery.index,
         currentQuery.logic,
-        tabId
+        tabId,
+        restore
       );
     },
   },

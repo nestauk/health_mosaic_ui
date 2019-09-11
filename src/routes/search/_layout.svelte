@@ -30,12 +30,15 @@
     queryObj
   } from '../../stores/search.ts';
   import { shouldResizeStore } from '../../stores/';
-  import { capitalise } from '../../util/string';
+  import { capitalise, titleCase } from '../../util/string';
 
   const { page } = stores();
 
-  let query = [];
+
   let isSidebarLeft = true;
+  let popped = false;
+  let query = [];
+  let searchMachine;
 
   onMount(() => {
 
@@ -74,8 +77,6 @@
     shouldResizeStore.set(false);
   }
 
-  let searchMachine;
-
   $: uiQuery = $screenStore[$currentTab] ? $screenStore[$currentTab].uiQuery : [];
   $: hasNoQuery = uiQuery[0] && uiQuery[0].terms.length && uiQuery[0].terms[0].term.length;
   $: withSelections = $screenStore[$currentTab] && isObjNotEmpty($screenStore[$currentTab].selections);
@@ -99,13 +100,41 @@
   };
   $: data = $screenStore[$currentTab] && $screenStore[$currentTab].results.data
   $: isDirty = searchMachine && searchMachine.state.matches('Search.NotEmpty.Dirty');
-  // $: tabs_formatted = Object.entries($screenStore);
   $: isEmptyQuery = uiQuery && uiQuery[0] && uiQuery[0].terms && uiQuery[0].terms.length && uiQuery[0].terms[0].term;
   $: hasPreviousQuery = $screenStore[$currentTab] && $screenStore[$currentTab].results.prevQuery;
   $: selections = $screenStore[$currentTab] ? $screenStore[$currentTab].selections : [];
   $: logic = $screenStore[$currentTab] && $screenStore[$currentTab].logic;
   $: mode = $screenMachine.matches('Form.Simple') ? 'simple' : 'complex';
   $: isOnly = uiQuery && uiQuery.length === 1;
+
+  const pop_callback = async (page) => {
+    if (!popped) return;
+    await tick();
+    screenMachine.send({
+      type: 'TAB_RESTORED',
+      route: page.path,
+      queryParams: page.query && page.query.q,
+      selectionParams: page.query && page.query.s,
+      ESIndex: page.query && page.query.i,
+      ESLogic: page.query && page.query.o,
+      currentTab: $currentTab,
+      isPageInit: true
+    });
+
+    if (page.query.q) {
+      searchMachine.send('QUERY_CHANGED');
+      searchMachine.send({ type:'SEARCHED', tabId: $currentTab, restore: true });
+    }
+
+    popped = false;
+  };
+
+  $: pop_callback($page);
+
+  if (process.browser) {
+    window.onpopstate =  () =>  popped = true;
+  }
+
 
   setContext(SEARCH, {
     transitionComplete:
@@ -122,6 +151,7 @@
       }),
     shouldResize: shouldResizeStore
   });
+
   const sendTabCreated = () =>  screenMachine.send({
     type: 'TAB_CREATED',
     tabId: $idStore,
@@ -335,10 +365,13 @@
 
   $: selectedFacet = $page.params.facet || '';
   $: queryTitle = renderTitle($page.query.q, $page.query.i);
+  $: facetTitle = selectedFacet ? `- ${titleCase(selectedFacet.replace('_', ' '))}` : ''
 </script>
 
+<svelte:options immutable={true} />
+
 <svelte:head>
-  <title>{project_title} {queryTitle}</title>
+  <title>{project_title} {facetTitle} {queryTitle}</title>
 </svelte:head>
 
 <div class="SearchLayout">

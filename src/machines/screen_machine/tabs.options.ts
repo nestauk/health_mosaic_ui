@@ -23,6 +23,25 @@ import { newTab, removeHistoryEntries } from './utils';
 
 export const tabs_options = {
   actions: {
+    restoreTab: (
+      { screenStore },
+      { queryParams, selectionParams, ESIndex, ESLogic, isPageInit, currentTab }
+    ) => {
+      screenStore.update(
+        _.setKey(
+          currentTab,
+          newTab(
+            currentTab,
+            queryParams && isPageInit
+              ? parseQueryUrl(queryParams)
+              : [newRuleset(true)],
+            ESIndex ? ESIndex : 'all',
+            selectionParams && parseSelectionUrl(selectionParams),
+            ESLogic
+          )
+        )
+      );
+    },
     createTab: (
       { screenStore, idStore },
       { queryParams, selectionParams, ESIndex, ESLogic, isPageInit }
@@ -87,7 +106,10 @@ export const tabs_options = {
 
       currentTab.set(ids.includes(current) ? prev : current);
     },
-    setUrlQuery: ({ screenStore, currentTab, routeStore }, { route: path }) => {
+    setUrlQuery: (
+      { screenStore, currentTab, routeStore },
+      { route: path, isPageInit }
+    ) => {
       const tab: any = get(currentTab);
       const currentQuery = get(screenStore)[tab];
       routeStore.set(makePath(path));
@@ -103,7 +125,7 @@ export const tabs_options = {
       const newPath = makeRouteUrl(makePath(path), urlQuery);
       //@ts-ignore
       if (process.browser) {
-        goto(newPath);
+        goto(newPath, { replaceState: isPageInit });
       }
     },
     setTabLabel: ({ screenStore }, { labelText, id }) => {
