@@ -1,10 +1,10 @@
 <script>
-  import { project_title } from '../config.js';
-  import RouterLink from '../components/RouterLink.svelte';
   import Youtube from '../components/Youtube.svelte';
+  import { project_title } from '../config.js';
 </script>
 
 <svelte:head>
+  <!-- TODO get the page title from a config /about -> "About" -->
   <title>{project_title} – Features</title>
 </svelte:head>
 
@@ -13,45 +13,75 @@
     <h1>What can you do with this tool?</h1>
 
     <div class="feature">
-      <h2>A simple search</h2>
+      <h2>The workplace</h2>
       <p>
-        is a free, open tool that can be used by anyone to explore key dimensions of the health innovation ecosystem, including research, startups and social activity. We aim to shed light on hidden innovations by bringing together previously siloed datasets, cutting edge data science techniques, and interactive visualisations into a platform that can be accessed by anyone, anywhere.
+        HealthMosaic's workplace is divided into three main areas: the sidebar, the facet and the footer.
+        The sidebar lets you control your exploration, the facet area gives you options for how to display your results, and the footer contains information about the tool such as the version number.
       </p>
-      <Youtube id="M5JFeTtSS3c" />
+      <Youtube
+        height="450"
+        id="UX5v_XfndpE"
+        width="800"
+      />
     </div>
 
     <div class="feature">
-      <h2>A more advanced search</h2>
+      <h2>Simple search</h2>
       <p>
-        is a free, open tool that can be used by anyone to explore key dimensions of the health innovation ecosystem, including research, startups and social activity. We aim to shed light on hidden innovations by bringing together previously siloed datasets, cutting edge data science techniques, and interactive visualisations into a platform that can be accessed by anyone, anywhere.
+        HealthMosaic has a simple search function that lets you enter single or multiple-word queries. You can also easily edit your query or restore your previous query.
       </p>
-      <Youtube id="OiuQ_rVM-WE" />
-    </div>
-    <div class="feature">
-      <h2>Select results in the countries of your interest</h2>
-      <p>
-        is a free, open tool that can be used by anyone to explore key dimensions of the health innovation ecosystem, including research, startups and social activity. We aim to shed light on hidden innovations by bringing together previously siloed datasets, cutting edge data science techniques, and interactive visualisations into a platform that can be accessed by anyone, anywhere.
-      </p>
-      <Youtube id="4Pnv8m4FF-k" />
+      <Youtube
+        height="450"
+        id="VyDTl_UAx0s"
+        width="800"
+      />
     </div>
 
     <div class="feature">
-      <h2>Navigate the terms </h2>
+      <h2>The facets panel</h2>
       <p>
-        is a free, open tool that can be used by anyone to explore key dimensions of the health innovation ecosystem, including research, startups and social activity. We aim to shed light on hidden innovations by bringing together previously siloed datasets, cutting edge data science techniques, and interactive visualisations into a platform that can be accessed by anyone, anywhere.
+        HealthMosaic has multiple facets, each of which allows you to display your query in a different way.
+        You can explore the geography of the results, as well as the terms that are used and information about funding. You can always refer to the list view to see what companies, research projects and social activities align with your search.
       </p>
-      <Youtube id="vl-PcTA9HHg" />
+      <Youtube
+        height="450"
+        id="9aVRbrKIzi8"
+        width="800"
+      />
+    </div>
+
+    <div class="feature">
+      <h2>The tabs panel</h2>
+      <p>
+        HealthMosaic lets you have multiple tabs, so you can do multiple searches.
+      </p>
+      <Youtube
+        height="450"
+        id="U36EktrDZdI"
+        width="800"
+      />
+    </div>
+
+    <div class="feature">
+      <h2>The selections</h2>
+      <p>
+        As you interact with the results of HealthMosaic, you can narrow the results by excluding certain terms or countries. Each time you do this, the list updates in the background.
+      </p>
+      <Youtube
+        height="450"
+        id="1BC5eB9bUAw"
+        width="800"
+      />
     </div>
 
     <div class="cta">
-      <RouterLink href="search">
+      <a href="search">
         <div class="button">
           <span>Try it now!</span>
         </div>
-      </RouterLink>
+      </a>
     </div>
   </div>
-
 </div>
 
 <style lang="less">
@@ -67,7 +97,7 @@
     grid-column: 2;
   }
   .copy {
-    max-width: 800px;
+    max-width: var(--size-copy-column-max-width);
     margin: auto;
   }
 

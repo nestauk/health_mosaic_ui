@@ -14,7 +14,10 @@ import {
 
 export const facets_options = {
   actions: {
-    changeRoute: ({ screenStore, currentTab, routeStore }, { route: path }) => {
+    changeRoute: (
+      { screenStore, currentTab, routeStore },
+      { route: path }
+    ) => {
       const tab: number = get(currentTab);
       const currentQuery = get(screenStore)[tab];
       routeStore.set(makePath(path));

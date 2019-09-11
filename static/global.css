@@ -147,6 +147,7 @@ code {
   /* theme: sizes */
 
   --size-bars-padding: var(--size-global-padding);
+  --size-copy-column-max-width: 800px;
   --size-header-height: 70px;
   --size-header-innerheight: calc(
     var(--size-header-height) - 2 * var(--size-bars-padding)

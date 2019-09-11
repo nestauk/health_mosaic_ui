@@ -1,6 +1,5 @@
 <script>
   import { project_title } from '../config.js';
-  import RouterLink from '../components/RouterLink.svelte';
 </script>
 
 <svelte:head>
@@ -13,7 +12,7 @@
 
     <h2>Data Enrichment</h2>
 
-    <h3>Novelty Score</h3>
+    <!-- <h3>Novelty Score</h3>
     <p>
       We have applied a novelty score to each entity in the three datasets to allow you to find innovative companies, research projects, and social activity. The novelty score we are currently using is a placeholder until the more robust version is applied in fall 2019.
     </p>
@@ -30,7 +29,7 @@
       <li>
         Novelty is then defined as (1 - Q1), where Q1 is the 25th percentile of the distribution of the 1000 document scores.
       </li>
-    </ul>
+    </ul> -->
 
     <h3>MeSH Labels</h3>
     <p>
@@ -54,36 +53,26 @@
         <span class="highlight">here</span>
       </a>.
     </p>
-    <p>
+    <!-- <p>
       The source code used to calculate the novelty score can be found
       <a href="https://www.github.com/nestauk/rhodonite" target="_blank">
         <span class="highlight">here</span>
       </a>.
-    </p>
+    </p> -->
     <p>
       The source code of this website can be found
       <a href="https://www.github.com/nestauk/{project_title}_ui" target="_blank">
         <span class="highlight">here</span>
       </a>.
     </p>
-
-    <h2>Glossary</h2>
-
-    <h3>MeSH Labels</h3>
-
-    <p>
-      Medical Subject Heading (MeSH) Labels are a set of biomedical vocabulary that are compiled by the NIH’s National Library of Medicine.
-    </p>
-    <p>
-      ... (to be continued)
-    </p>
   </div>
+
   <div class="cta">
-    <RouterLink href="features">
+    <a href="features">
       <div class="button">
         <span>Learn the tool!</span>
       </div>
-    </RouterLink>
+    </a>
   </div>
 </div>
 
@@ -100,7 +89,7 @@
     grid-column: 2;
   }
   .copy {
-    max-width: 800px;
+    max-width: var(--size-copy-column-max-width);
     margin: auto;
   }
 

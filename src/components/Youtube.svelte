@@ -1,6 +1,15 @@
 <script>
+  export let height = 315;
   export let id;
+  export let isPlaylist = false;
   export let title = 'Youtube video';
+  export let width = 560;
+
+  const embedBase = `https://www.youtube.com/embed/`;
+
+  $: src = isPlaylist
+    ? embedBase + 'videoseries?list=' + id + '&cc_load_policy=1'
+    : embedBase + id + '?cc_load_policy=1';
 </script>
 
 <div class="youtube">
@@ -8,14 +17,14 @@
     allow="accelerometer; encrypted-media; gyroscope; picture-in-picture"
     allowfullscreen
     frameborder="0"
-    height="315"
-    src="https://www.youtube.com/embed/{id}"
+    {height}
+    {src}
     {title}
-    width="560"
+    {width}
   ></iframe>
 </div>
 
-<style lang="less">
+<style>
   .youtube {
     display: flex;
     align-items: center;

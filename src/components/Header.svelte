@@ -2,16 +2,15 @@
   import * as _ from 'lamb';
   import { stores } from '@sapper/app';
 
-  import { ArrowDown } from '../components/Icons/';
   import { project_title } from '../config.js';
+  import { ArrowDown } from './Icons/';
 
   const { page } = stores();
   const navLinks = [
-    {type: 'text', href: 'about', text: 'About'},
-    {type: 'text', href: 'data', text: 'Data'},
-    {type: 'text', href: 'methodology', text: 'Methodology'},
-    {type: 'text', href: 'features', text: 'Features'},
-    {type: 'text', href: 'search', text: 'Search'},
+    {type: 'text', href: '/data', text: 'Data'},
+    {type: 'text', href: '/methodology', text: 'Methodology'},
+    {type: 'text', href: '/features', text: 'Features'},
+    {type: 'text', href: '/search', text: 'Search'},
   ];
 
   export let matchingMqStore;
@@ -24,7 +23,7 @@
       (key === 'lt' && value <= 640)
   }
 
-  $: pageId = $page.path.split('/')[1];
+  $: pageId = `/${$page.path.split('/')[1]}`;
   $: menuHeadItem = isNarrow && _.find(navLinks, x => x.href === pageId);
   $: showMenu = isNarrow && false; // hide the menu when `isNarrow` changes
 
@@ -43,12 +42,12 @@
       <span>HealthMosaic</span>
     </div>
   </a>
-  {#if isNarrow}
-    <div class="nav">
+  <div class="nav">
+    {#if isNarrow}
       {#if menuHeadItem}
-      <div class="navLink {menuHeadItem.type}">
-        <span>{menuHeadItem.text}</span>
-      </div>
+        <div class="navLink {menuHeadItem.type}">
+          <span>{menuHeadItem.text}</span>
+        </div>
       {/if}
 
       <div
@@ -60,33 +59,31 @@
       </div>
 
       {#if showMenu}
-      <div class="menu">
-        {#each navLinks as {href, text, type}}
-        <a {href} style="width:100%">
-          <div class="navLink hoverable {type}">
+        <div class="menu">
+          {#each navLinks as {href, text, type}}
+          <a {href} style="width:100%">
+            <div class="navLink hoverable {type}">
+              <span>{text}</span>
+            </div>
+          </a>
+          {/each}
+        </div>
+      {/if}
+    {:else}
+      {#each navLinks as {href, text, type}}
+        <a {href}>
+          <div
+            class="navLink {type}"
+            class:hoverable="{href !== pageId}"
+            class:highlighted="{href === pageId}"
+          >
             <span>{text}</span>
+            <div class="mark"></div>
           </div>
         </a>
-        {/each}
-      </div>
-      {/if}
-    </div>
-  {:else}
-    <div class="nav">
-      {#each navLinks as {href, text, type}}
-      <a {href}>
-        <div
-          class="navLink {type}"
-          class:hoverable="{href !== pageId}"
-          class:highlighted="{href === pageId}"
-        >
-          <span>{text}</span>
-          <div class="mark"></div>
-        </div>
-      </a>
       {/each}
-    </div>
-  {/if}
+    {/if}
+  </div>
 </div>
 
 <style lang="less">

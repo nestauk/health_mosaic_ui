@@ -1,6 +1,5 @@
 <script>
   import { project_title } from '../config.js';
-  import RouterLink from '../components/RouterLink.svelte';
 </script>
 
 <svelte:head>
@@ -53,11 +52,11 @@
   </div>
 
   <div class="cta">
-    <RouterLink href="methodology">
+    <a href="methodology">
       <div class="button">
         <span>Read more about our methodology</span>
       </div>
-    </RouterLink>
+    </a>
   </div>
 </div>
 
@@ -74,7 +73,7 @@
     grid-column: 2;
   }
   .copy {
-    max-width: 800px;
+    max-width: var(--size-copy-column-max-width);
     margin: auto;
   }
 

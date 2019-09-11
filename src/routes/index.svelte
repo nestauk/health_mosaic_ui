@@ -1,11 +1,10 @@
 <script>
+  import Youtube from '../components/Youtube.svelte';
   import { project_title } from '../config.js';
-  import RouterLink from '../components/RouterLink.svelte';
 </script>
 
 <svelte:head>
-  <!-- TODO get the page title from a config /about -> "About" -->
-  <title>{project_title} – About</title>
+  <title>{project_title}</title>
 </svelte:head>
 
 <div class="container">
@@ -16,6 +15,13 @@
     <p>
       {project_title} is a free, open tool that can be used by anyone to explore key dimensions of the health innovation ecosystem, including research, startups and social activity. We aim to shed light on hidden innovations by bringing together previously siloed datasets, cutting edge data science techniques, and interactive visualisations into a platform that can be accessed by anyone, anywhere.
     </p>
+
+    <Youtube
+      height="450"
+      id="PL646-lmmSW9ec8aht2ean1Jh4MzNpcxNe"
+      isPlaylist="{true}"
+      width="800"
+    />
 
     <h2>Who</h2>
     <p>
@@ -60,11 +66,11 @@
   </div>
 
   <div class="cta">
-    <RouterLink href="data">
+    <a href="data">
       <div class="button">
         <span>Read more about the data sources</span>
       </div>
-    </RouterLink>
+    </a>
   </div>
 </div>
 
@@ -81,7 +87,7 @@
     grid-column: 2;
   }
   .copy {
-    max-width: 800px;
+    max-width: var(--size-copy-column-max-width);
     margin: auto;
   }
 
