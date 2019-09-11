@@ -4,6 +4,7 @@ import { goto } from '@sapper/app';
 import * as _ from 'lamb';
 import { assign, spawn } from 'xstate';
 
+import { makePath } from '../../util/config';
 import { search_machine } from '../search_machine/';
 import { parseQueryUrl, parseSelectionUrl } from '../../util/urlParser';
 import {
@@ -19,7 +20,6 @@ import {
 } from '../../util/transform';
 import { newTab, removeHistoryEntries } from './utils';
 import { newRuleset } from '../../util/query';
-import { tabs_config } from './tabs.config';
 
 export const tabs_options = {
   actions: {
@@ -90,7 +90,7 @@ export const tabs_options = {
     setUrlQuery: ({ screenStore, currentTab, routeStore }, { route: path }) => {
       const tab: any = get(currentTab);
       const currentQuery = get(screenStore)[tab];
-      routeStore.set(path);
+      routeStore.set(makePath(path));
 
       const urlQuery = {
         q: uiQueryToUrlString(currentQuery.uiQuery),
@@ -99,7 +99,7 @@ export const tabs_options = {
         o: currentQuery.logic,
       };
 
-      const newPath = makeRouteUrl(path, urlQuery);
+      const newPath = makeRouteUrl(makePath(path), urlQuery);
       //@ts-ignore
       if (process.browser) {
         goto(newPath);

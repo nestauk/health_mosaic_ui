@@ -2,8 +2,8 @@ import { get } from 'svelte/store';
 //@ts-ignore
 import { goto } from '@sapper/app';
 import * as _ from 'lamb';
-import { send } from 'xstate';
 
+import { makePath } from '../../util/config';
 import {
   uiQueryToUrlString,
   selectionToUrlString,
@@ -211,7 +211,7 @@ export const form_options = {
     setUrlQuery: ({ screenStore, currentTab, routeStore }, { route: path }) => {
       const tab: any = get(currentTab);
       const currentQuery = get(screenStore)[tab];
-      routeStore.set(path);
+      routeStore.set(makePath(path));
 
       const urlQuery = {
         q: uiQueryToUrlString(currentQuery.uiQuery),
@@ -220,7 +220,7 @@ export const form_options = {
         o: currentQuery.logic,
       };
 
-      const newPath = makeRouteUrl(path, urlQuery);
+      const newPath = makeRouteUrl(makePath(path), urlQuery);
       //@ts-ignore
       if (process.browser && newPath !== path) {
         goto(newPath);

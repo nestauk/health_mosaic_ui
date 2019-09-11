@@ -3,6 +3,7 @@ import { get } from 'svelte/store';
 import { goto } from '@sapper/app';
 import * as _ from 'lamb';
 
+import { makePath } from '../../util/config';
 import { makeSelectionFilter } from '../../util/object';
 import { makeRouteUrl, removeEmpty } from '../../util/transform';
 import {
@@ -15,11 +16,11 @@ export const facets_options = {
     changeRoute: ({ screenStore, currentTab, routeStore }, { route: path }) => {
       const tab: number = get(currentTab);
       const currentQuery = get(screenStore)[tab];
-      routeStore.set(path);
+      routeStore.set(makePath(path));
 
       if (path) {
         screenStore.update(_.setPath(`${tab}.route`, path));
-        routeStore.set(path);
+        routeStore.set(makePath(path));
       }
 
       const urlQuery = {
