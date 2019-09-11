@@ -215,21 +215,21 @@
   <div class="scrollable">
     <slot name="scrollable"></slot>
   </div>
-  <div class="controls">
-    <span
-      class="left"
-      class:active={!isSidebarLeft}
-      on:click|stopPropagation={() => !isSidebarLeft && dispatch('position', true)}
-    >
-      <ArrowDown />
-    </span>
-    <span
-      class="right"
-      class:active={isSidebarLeft}
-      on:click|stopPropagation={() => isSidebarLeft && dispatch('position', false)}
-    >
-      <ArrowDown />
-    </span>
+  <div
+    class="left button"
+    class:active={!isSidebarLeft}
+    class:selected={isSidebarLeft}
+    on:click|stopPropagation={() => !isSidebarLeft && dispatch('position', true)}
+  >
+    <ArrowDown />
+  </div>
+  <div
+    class="right button"
+    class:active={isSidebarLeft}
+    class:selected={!isSidebarLeft}
+    on:click|stopPropagation={() => isSidebarLeft && dispatch('position', false)}
+  >
+    <ArrowDown />
   </div>
 </div>
 
@@ -239,6 +239,7 @@
     height: 100%;
     box-sizing: border-box;
     background: var(--color-sidebar-background);
+    position: relative;
 
     display: flex;
     flex-direction: column;
@@ -249,33 +250,41 @@
       padding: 15px;
     }
 
-    .controls {
-      height: 2rem;
-      display: flex;
-      justify-content: space-between;
+    .button {
+      height: 1.6rem;
+      width: 1.6rem;
+      position: absolute;
+      bottom: 0;
       margin: var(--size-bars-padding);
+      border: var(--border-sidebar);
+      border-radius: 1rem;
+      background-color: var(--color-button-background);
+      box-shadow: var(--shadow-overlay);
 
-      span {
-        display: block;
-        height: 2rem;
-        width: 2rem;
-        opacity: 0.2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
 
-        &.left {
-          transform: rotate(90deg)
+      &.left {
+        left: 0;
+        transform: rotate(90deg);
+      }
+
+      &.right {
+        right: 0;
+        transform: rotate(-90deg);
+      }
+
+      &.active {
+        cursor: pointer;
+
+        &:hover {
+          background-color: var(--color-highlight-hover);
         }
+      }
 
-        &.right {
-          transform: rotate(-90deg)
-        }
-
-        &.active {
-          cursor: pointer;
-          opacity: 0.5;
-          &:hover {
-            opacity: 1;
-          }
-        }
+      &.selected {
+        background-color: var(--color-highlight);
       }
     }
   }

@@ -72,6 +72,7 @@ code {
   --color-blue-crunchbase: rgb(56, 136, 203);
   --color-blue-dark-pastel: rgb(106, 146, 187);
   --color-light-blue: rgb(210, 237, 253);
+  --color-lighter-blue: rgb(228, 242, 251);
   --color-rjwf-darker-blue: rgb(15, 51, 102);
   --color-rjwf-lighter-blue: rgb(89, 122, 156);
 
@@ -82,6 +83,7 @@ code {
   --color-button-border: #cececf;
   --color-facet-background: white;
   --color-highlight: var(--color-light-blue);
+  --color-highlight-hover: var(--color-lighter-blue);
   --color-nav-current: var(--color-blue-dark-pastel);
   --color-ruleset-icon-hover: #333;
   --color-ruleset-icon: #777;
@@ -105,6 +107,10 @@ code {
     #f0f3f6,
     #e6ebf1 90%
   );
+
+  /* theme: shadows */
+
+  --shadow-overlay: 0px 0px 6px 1px lightgrey;
 
   /* theme: borders */
 
