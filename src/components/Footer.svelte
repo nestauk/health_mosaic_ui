@@ -1,7 +1,12 @@
+<script>
+  import { version } from '../../package.json';
+</script>
+
 <div class="container">
   <span class="legal">
     © 2019 Nesta
   </span>
+  <span>Version {version}</span>
   <a href="https://www.nesta.org.uk" target="_blank">
     <div class="logo">
       <img

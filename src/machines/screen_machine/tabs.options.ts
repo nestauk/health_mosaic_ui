@@ -4,22 +4,22 @@ import { goto } from '@sapper/app';
 import * as _ from 'lamb';
 import { assign, spawn } from 'xstate';
 
+import { version } from '../../../package.json';
 import { makePath } from '../../util/config';
-import { search_machine } from '../search_machine/';
-import { parseQueryUrl, parseSelectionUrl } from '../../util/urlParser';
-import {
-  uiQueryToUrlString,
-  selectionToUrlString,
-} from '../../util/urlBuilder';
-
+import { newRuleset } from '../../util/query';
 import {
   add1,
   makeRouteUrl,
   removeLast,
   removeEmpty,
 } from '../../util/transform';
+import {
+  uiQueryToUrlString,
+  selectionToUrlString,
+} from '../../util/urlBuilder';
+import { parseQueryUrl, parseSelectionUrl } from '../../util/urlParser';
+import { search_machine } from '../search_machine/';
 import { newTab, removeHistoryEntries } from './utils';
-import { newRuleset } from '../../util/query';
 
 export const tabs_options = {
   actions: {
@@ -93,6 +93,7 @@ export const tabs_options = {
       routeStore.set(makePath(path));
 
       const urlQuery = {
+        v: version,
         q: uiQueryToUrlString(currentQuery.uiQuery),
         s: selectionToUrlString(removeEmpty(currentQuery.selections)),
         i: currentQuery.index && currentQuery.index,

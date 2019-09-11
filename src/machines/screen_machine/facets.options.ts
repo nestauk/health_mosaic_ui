@@ -4,6 +4,7 @@ import { goto } from '@sapper/app';
 import * as _ from 'lamb';
 
 import { makePath } from '../../util/config';
+import { version } from '../../../package.json';
 import { makeSelectionFilter } from '../../util/object';
 import { makeRouteUrl, removeEmpty } from '../../util/transform';
 import {
@@ -24,6 +25,7 @@ export const facets_options = {
       }
 
       const urlQuery = {
+        v: version,
         q: uiQueryToUrlString(currentQuery.uiQuery),
         s: selectionToUrlString(removeEmpty(currentQuery.selections)),
         i: currentQuery.index && currentQuery.index,

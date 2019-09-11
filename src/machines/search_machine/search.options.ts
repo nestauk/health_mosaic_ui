@@ -5,13 +5,14 @@ import * as _ from 'lamb';
 import { sendParent, Machine } from 'xstate';
 import { mergeObj } from '@svizzle/utils';
 
+import { version } from '../../../package.json';
+import { query } from '../../actions/queryApi';
 import { makeSelectionFilter } from '../../util/object';
+import { makeRouteUrl, removeEmpty } from '../../util/transform';
 import {
   uiQueryToUrlString,
   selectionToUrlString,
 } from '../../util/urlBuilder';
-import { makeRouteUrl, removeEmpty } from '../../util/transform';
-import { query } from '../../actions/queryApi';
 
 export const search_options: any = {
   actions: {
@@ -37,6 +38,7 @@ export const search_options: any = {
       if (tabId === id) {
         const currentQuery = screen[tabId];
         const urlQuery = {
+          v: version,
           q: uiQueryToUrlString(currentQuery.uiQuery),
           s: selectionToUrlString(removeEmpty(currentQuery.selections)),
           i: currentQuery.index.toLowerCase(),

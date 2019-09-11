@@ -1,5 +1,6 @@
 import * as _ from 'lamb';
 import { joinWith } from '@svizzle/utils';
+
 import { isValidField } from './transform';
 
 export const isValidRuleset = ruleset =>

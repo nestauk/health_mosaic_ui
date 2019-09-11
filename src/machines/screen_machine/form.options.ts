@@ -3,14 +3,14 @@ import { get } from 'svelte/store';
 import { goto } from '@sapper/app';
 import * as _ from 'lamb';
 
+import { version } from '../../../package.json';
 import { makePath } from '../../util/config';
+import { newRuleset } from '../../util/query';
+import { makeRouteUrl, toggleBoolean, removeEmpty } from '../../util/transform';
 import {
   uiQueryToUrlString,
   selectionToUrlString,
 } from '../../util/urlBuilder';
-import { newRuleset } from '../../util/query';
-
-import { makeRouteUrl, toggleBoolean, removeEmpty } from '../../util/transform';
 import {
   toggleLabelBinaryUpdater,
   toggleLabelTernaryUpdater,
@@ -214,6 +214,7 @@ export const form_options = {
       routeStore.set(makePath(path));
 
       const urlQuery = {
+        v: version,
         q: uiQueryToUrlString(currentQuery.uiQuery),
         s: selectionToUrlString(removeEmpty(currentQuery.selections)),
         i: currentQuery.index && currentQuery.index,
