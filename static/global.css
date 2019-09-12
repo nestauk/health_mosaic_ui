@@ -82,8 +82,8 @@ code {
   --color-blue-rjwf-darker: hsl(215, 74%, 23%);
   --color-blue-rjwf-lighter: hsl(210, 27%, 48%);
   --color-blue-whiteish: hsl(210, 25%, 98%);
-  --color-grey-3: hsl(0, 0%, 20%);
-  --color-grey-7: hsl(0, 0%, 47%);
+  --color-grey-20: hsl(0, 0%, 20%);
+  --color-grey-grey: hsl(0, 0%, 50%);
   --color-grey-darkgrey: hsl(0, 0%, 66%);
   --color-grey-lightgrey: hsl(0, 0%, 83%);
   --color-red-meetup: hsl(350, 85%, 52%); /* logo_meetup.svg */
@@ -91,7 +91,7 @@ code {
   /* theme: colors */
 
   --color-app-background: white;
-  --color-app-text: var(--color-grey-3);
+  --color-app-text: var(--color-grey-20);
   --color-button-background-hover: var(--color-blue-greyish-1);
   --color-button-background: var(--color-blue-greyish-3);
   --color-button-border: var(--color-grey-lightgrey);
@@ -101,8 +101,8 @@ code {
   --color-highlight: var(--color-blue-light);
   --color-highlight-hover: var(--color-blue-lighter);
   --color-nav-current: var(--color-blue-dark-pastel);
-  --color-ruleset-icon-hover: var(--color-grey-3);
-  --color-ruleset-icon: var(--color-grey-7);
+  --color-ruleset-icon-hover: var(--color-grey-20);
+  --color-ruleset-icon: var(--color-grey-grey);
   --color-selections-selected-bg: var(--color-blue-dark-blackish);
   --color-selections-selected-text: white;
   --color-sidebar-background: var(--color-blue-whiteish);
@@ -136,7 +136,9 @@ code {
   /* theme: borders */
 
   --border-button: 1px solid var(--color-button-border);
+  --border-sidebar: 1px solid var(--color-ui-border);
   --border-sidebar: 1px solid var(--color-sidebar-border);
+  --border-ui: 1px solid var(--color-ui-border);
 
   /* theme: sizes */
 

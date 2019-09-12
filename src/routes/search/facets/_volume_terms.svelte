@@ -210,7 +210,10 @@
   };
 </script>
 
-<div class="container" class:dirty="{isDirty}">
+<div
+  class="VolumeTerms"
+  class:dirty="{isDirty}"
+>
   {#if selectedItems.length}
   <div class="col col1">
     <BarchartV
@@ -268,7 +271,7 @@
 </div>
 
 <style lang="less">
-  .container {
+  .VolumeTerms {
     height: 100%;
     width: 100%;
     padding: 1em 1em 1em 1em;
@@ -319,7 +322,7 @@
     }
 
     &.dirty {
-      background-color: #fdfcef;
+      /* use to disable events or so */
     }
   }
 </style>

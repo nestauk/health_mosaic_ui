@@ -27,11 +27,12 @@
     justify-content: center;
     overflow-y: auto;
   }
-  .dirty {
-    color: grey;
-  }
   ul {
     height: 100%;
     width: 100%;
+  }
+
+  ul.dirty {
+    /* use to disable events or so */
   }
 </style>

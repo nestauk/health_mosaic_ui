@@ -31,19 +31,20 @@
       previousSelectedItems = selectedItems;
     }
   }
-
   $: volumes = _.map(
     countByTypeAsKeyValue(selectedItems),
     ({key, value}) => ({key, text: `${labels[key]} (${value})`})
   );
-
   $: isDirty = $screenStore && checkDirty();
 
   const openAll = () => items.forEach(v => v.open())
   const closeAll = () => items.forEach(v => v.close())
 </script>
 
-<div class="content">
+<div
+  class="List"
+  class:dirty="{isDirty}"
+>
   {#if selectedItems.length}
   <div class="header">
     <p>Showing: {selectedItems.length} items</p>
@@ -75,23 +76,28 @@
 
     {/each}
   </Results>
+
   {:else}
   <Fallback message="No results" />
   {/if}
 </div>
 
 <style lang="less">
-  .content {
+  .List {
     height: 100%;
     display: flex;
     flex-direction: column;
+
+    position: relative;
 
     .header {
       padding: 0.5em;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-bottom: 1px solid lightgrey;
+
+      border-bottom: var(--border-ui);
+
       .buttons {
         width: 56px;
         display: grid;
@@ -139,6 +145,10 @@
           background: var(--color-type-paper);
         }
       }
+    }
+
+    &.dirty {
+      /* use to disable events or so */
     }
   }
 </style>

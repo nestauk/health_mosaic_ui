@@ -9,6 +9,7 @@
   import compare from 'just-compare';
   import * as _ from 'lamb';
 
+  import Dirty from '../../components/Dirty.svelte'
   import FacetsPanel from '../../components/Sidebar/FacetsPanel.svelte';
   import TabsPanel from '../../components/Sidebar/TabsPanel.svelte';
   import SelectionsPanel from '../../components/Sidebar/SelectionsPanel.svelte';
@@ -340,89 +341,110 @@
   <title>{project_title} {queryTitle}</title>
 </svelte:head>
 
-<div class="col {isSidebarLeft ? 'col1' : 'col3'}">
-  <Sidebar
-    on:position={({detail}) => isSidebarLeft = detail }
-    {isSidebarLeft}
-  >
-    <div slot="sticky">
-      <TabsPanel
-        {isLoading}
-        {isError}
-        {tabs}
-        activeTab="{$currentTab}"
-        on:newtab="{sendTabCreated}"
-        on:changetab={({detail}) => changeTab(detail)}
-        on:deletetab={({detail}) => sendTab('TAB_DELETED', detail)}
-        on:duplicatetab={({detail}) => sendTab('TAB_DELETED', detail)}
-        on:textchange={sendTabRenamed}
-      />
-    </div>
-    <div slot="scrollable">
-      <FacetsPanel
-        on:link={sendRouteChanged}
-        facets={facetTabs}
-      />
-      <SearchPanelContainer
-        on:reset={handleReset}
-        on:edit={({detail}) => selectRuleset(detail)}
-        on:click={handleSend}
-        on:indexchange={({ detail }) => changeIndex(detail)}
-        on:newrule={newRuleset}
-        on:toggle={toggleSearchLogic}
-        on:modechange={({ detail }) => screenMachine.send({type: `CHANGE_SEARCH_${detail}`, tabId: $currentTab})}
-        index={$screenStore[$currentTab] && $screenStore[$currentTab].index}
-        {logic}
-        {mode}
-      >
-        {#each uiQuery as { options, disabled, selected, terms, fields, isEditing }, i}
-          <Rule
-            on:copy={() => copyRuleset(i)}
-            on:delete={() => sendRule('RULE_DELETED', i)}
-            on:disable={() => sendRule('RULE_DISABLED', i)}
-            on:edit={({detail}) => editRuleset(i, detail)}
-            hasContent={terms && terms.length && terms[0].term && terms[0].term.length}
-            {disabled}
-            {isEditing}
-            {mode}
-            {isOnly}
-          >
-            <RuleQueries
-              queries={terms}
-              on:change={({detail}) => handleChange(detail, i)}
-              on:toggle={({detail}) => toggleTermStatus(i, detail)}
-              bind:this={query[i]}
+<div class="SearchLayout">
+
+  <div class="col {isSidebarLeft ? 'col1' : 'col3'}">
+    <Sidebar
+      on:position={({detail}) => isSidebarLeft = detail }
+      {isSidebarLeft}
+    >
+      <div slot="sticky">
+        <TabsPanel
+          {isLoading}
+          {isError}
+          {tabs}
+          activeTab="{$currentTab}"
+          on:newtab="{sendTabCreated}"
+          on:changetab={({detail}) => changeTab(detail)}
+          on:deletetab={({detail}) => sendTab('TAB_DELETED', detail)}
+          on:duplicatetab={({detail}) => sendTab('TAB_DELETED', detail)}
+          on:textchange={sendTabRenamed}
+        />
+      </div>
+      <div slot="scrollable">
+        <FacetsPanel
+          on:link={sendRouteChanged}
+          facets={facetTabs}
+        />
+        <SearchPanelContainer
+          on:reset={handleReset}
+          on:edit={({detail}) => selectRuleset(detail)}
+          on:click={handleSend}
+          on:change={({ detail }) => changeIndex(detail)}
+          on:newrule={newRuleset}
+          on:toggle={toggleSearchLogic}
+          on:modechange={({ detail }) => screenMachine.send({type: `CHANGE_SEARCH_${detail}`, tabId: $currentTab})}
+          index={$screenStore[$currentTab] && $screenStore[$currentTab].index}
+          {logic}
+          {mode}
+        >
+          {#each uiQuery as { options, disabled, selected, terms, fields, isEditing }, i}
+            <Rule
+              on:copy={() => copyRuleset(i)}
+              on:delete={() => sendRule('RULE_DELETED', i)}
+              on:disable={() => sendRule('RULE_DISABLED', i)}
+              on:edit={({detail}) => editRuleset(i, detail)}
+              hasContent={terms && terms.length && terms[0].term && terms[0].term.length}
               {disabled}
               {isEditing}
-            />
-            {#if mode === 'complex'}
-              <RuleFields
-                on:toggle={({ detail }) => sendRuleLabel('LABEL_TOGGLED', detail, i)}
-                on:disable={({ detail }) => sendRuleLabel('LABEL_DISABLED', detail, i)}
-                on:delete={({ detail }) => sendRuleLabel('LABEL_DELETED', detail, i)}
-                {fields}
+              {mode}
+              {isOnly}
+            >
+              <RuleQueries
+                queries={terms}
+                on:change={({detail}) => handleChange(detail, i)}
+                on:toggle={({detail}) => toggleTermStatus(i, detail)}
+                bind:this={query[i]}
                 {disabled}
                 {isEditing}
               />
-            {/if}
-          </Rule>
-        {/each}
-      </SearchPanelContainer>
-      <SelectionsPanel {selections} on:toggleselection={toggleSelection}/>
+              {#if mode === 'complex'}
+                <RuleFields
+                  on:toggle={({ detail }) => sendRuleLabel('LABEL_TOGGLED', detail, i)}
+                  on:disable={({ detail }) => sendRuleLabel('LABEL_DISABLED', detail, i)}
+                  on:delete={({ detail }) => sendRuleLabel('LABEL_DELETED', detail, i)}
+                  {fields}
+                  {disabled}
+                  {isEditing}
+                />
+              {/if}
+            </Rule>
+          {/each}
+        </SearchPanelContainer>
+        <SelectionsPanel {selections} on:toggleselection={toggleSelection}/>
+      </div>
+    </Sidebar>
+  </div>
+
+  <div class="col {isSidebarLeft ? 'col2-3' : 'col1-2'}">
+    <div class="Facet">
+      <slot></slot>
     </div>
-  </Sidebar>
+
+    {#if isDirty}
+    <Dirty/>
+    {/if}
+  </div>
+
 </div>
 
-<div class="col {isSidebarLeft ? 'col2-3' : 'col1-2'}">
-  <div class="content">
-    <slot></slot>
-  </div>
-</div>
 
 <style lang="less">
+  .SearchLayout {
+    width: 100%;
+    height: 100%;
+
+    display: grid;
+    grid-template-columns:
+      var(--size-sidebar-width)
+      1fr
+      var(--size-sidebar-width);
+    grid-template-rows: 100%;
+  }
   .col {
     height: 100%;
     grid-row: 1;
+    position: relative;
   }
   .col1 {
     grid-column: 1 / span 1;
@@ -441,7 +463,7 @@
     grid-column: 2 / span 2;
   }
 
-  .content {
+  .Facet {
     height: 100%;
     max-height: 100%;
     background-color: var(--color-facet-background);

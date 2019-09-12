@@ -11,7 +11,7 @@
     registerBreakpoints(widthBreakpoints, makeMatchingMqStore);
 </script>
 
-<div class="container">
+<div class="AppLayout">
   <header>
     <Header {matchingMqStore} />
   </header>
@@ -24,9 +24,10 @@
 </div>
 
 <style lang="less">
-  .container {
+  .AppLayout {
     height: 100%;
     width: 100%;
+
     display: grid;
     grid-template-rows:
       var(--size-header-height)
@@ -39,16 +40,11 @@
     grid-row: 1 / span 1;
   }
   main {
-    position: relative;
     width: 100%;
     grid-row: 2 / span 1;
+
     margin: 0;
-    display: grid;
-    grid-template-columns:
-      var(--size-sidebar-width)
-      1fr
-      var(--size-sidebar-width);
-    grid-template-rows: 100%;
+    position: relative;
 
     &::before {
       display: block;

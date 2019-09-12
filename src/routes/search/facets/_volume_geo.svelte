@@ -37,7 +37,10 @@
   );
 </script>
 
-<div class="container" class:dirty="{isDirty}">
+<div
+  class="VolumeGeo"
+  class:dirty="{isDirty}"
+>
   <div class="col col1">
     <WorldMapWithHistogramScaleHTML
       colors={schemeSet3}
@@ -66,8 +69,7 @@
 </div>
 
 <style lang="less">
-  .container {
-    /* padding-top: 16rem; */
+  .VolumeGeo {
     height: 100%;
     width: 100%;
     padding: 1em 1em 1em 1em;
@@ -103,7 +105,7 @@
     }
 
     &.dirty {
-      background-color: #fdfcef;
+      /* use to disable events or so */
     }
   }
 </style>

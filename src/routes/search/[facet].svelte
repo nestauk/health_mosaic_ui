@@ -3,7 +3,6 @@
   import { stores } from '@sapper/app';
 
   import { screenStore, currentTab } from '../../stores/search.ts';
-
   import { SEARCH } from './_layout.svelte';
   import {
     list,

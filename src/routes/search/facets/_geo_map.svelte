@@ -86,7 +86,10 @@
   );
 </script>
 
-<div class="container" class:dirty="{isDirty}">
+<div
+  class="Locations"
+  class:dirty="{isDirty}"
+>
   <div class="col col1">
     <Mapbox
       bounds="{ bounds || [[-180,-90], [180, 90]]}"
@@ -105,7 +108,7 @@
         <Layer layer="{unclusteredPoint}"/>
         <Layer
           layer="{cluster}"
-          on:clusterclick={selectBounds}
+          on:clusterclick="{selectBounds}"
         />
         <Layer layer="{clusterCount}"/>
       </Source>
@@ -125,7 +128,7 @@
 </div>
 
 <style lang="less">
-  .container {
+  .Locations {
     height: 100%;
     width: 100%;
     transform-origin: 0 0;
@@ -160,7 +163,7 @@
     }
 
     &.dirty {
-      border: 1px solid red;
+      /* use to disable events or so */
     }
   }
 </style>
