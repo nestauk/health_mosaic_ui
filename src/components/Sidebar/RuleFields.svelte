@@ -1,7 +1,8 @@
 <script>
   import { createEventDispatcher } from 'svelte';
   import { flip } from 'svelte/animate';
-  import { scale } from 'svelte/transition';
+
+  import { XCircleIcon } from 'svelte-feather-icons';
 
   const dispatch = createEventDispatcher();
 
@@ -56,13 +57,12 @@
 
 <div
   class="field-container"
-  class:isEditing class:disabled
+  class:isEditing
+  class:disabled
 >
   <ul>
     {#each current_fields as { field, status, section, disabled }, i (field)}
       <li
-        in:scale={{delay: 100}}
-        out:scale={{delay: 0}}
         animate:flip={{duration: 500}}
         class:disabled
         on:mousedown={handle_mousedown(section, field)}
@@ -70,7 +70,11 @@
         class="{status}"
       >
         {field}
-        <span on:click={deleteField(section, field)}>x</span>
+        {#if status !== 'default'}
+          <span on:click|stopPropagation={deleteField(section, field)}>
+            <XCircleIcon />
+          </span>
+        {/if}
       </li>
     {/each}
   </ul>
@@ -80,7 +84,6 @@
   .field-container {
     margin-bottom: 10px;
     transition: 0.2s;
-
     ul {
       margin: 0 10px;
       padding: 0;
@@ -88,7 +91,6 @@
       justify-content: flex-start;
       user-select: none;
       flex-wrap: wrap;
-
       li {
         display: flex;
         padding: 1px 10px;
@@ -97,22 +99,41 @@
         border-radius: 30px;
         font-size: 0.9rem;
         cursor: pointer;
-
         &.included {
-          border-color: red;
+          background: var(--color-highlight) !important;
+          color: #222 !important;
+          font-weight: 400!important;
+          border-color: var(--color-highlight);
+          padding: 1px 4px 1px 10px;
         }
         &.excluded {
-          border-color: green;
+          background: var(--color-excluded) !important;
+          font-weight: 400!important;
+          border-color: var(--color-excluded);
+          padding: 1px 4px 1px 10px;
+          color: #eee !important;
+          span {
+            color: #fff;
+          }
         }
-
+        &.default {
+          background: #eee;
+        }
         span {
           font-weight: 700;
-          margin-left: 5px;
+          margin-left: 10px;
+          color: #333;
+          width: 1.2em;
+          height: 1.2em;
+          transform: translateY(2px);
+          opacity: 0.6;
+          &:hover {
+            opacity: 1;
+          }
         }
       }
     }
   }
-
   .disabled {
     opacity: 0.6;
   }
