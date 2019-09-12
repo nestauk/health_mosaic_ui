@@ -27,8 +27,8 @@ body {
     Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
   font-size: 14px;
   line-height: 1.5;
-  color: #333;
-  background-color: white;
+  color: var(--color-app-text);
+  background-color: var(--color-app-background);
   /* FIXME use css vars and use this in canvas the cleanup draw call */
 }
 
@@ -69,48 +69,69 @@ code {
 :root {
   /* colors */
 
-  --color-blue-crunchbase: rgb(56, 136, 203);
-  --color-blue-dark-pastel: rgb(106, 146, 187);
-  --color-light-blue: rgb(210, 237, 253);
-  --color-lighter-blue: rgb(228, 242, 251);
-  --color-rjwf-darker-blue: rgb(15, 51, 102);
-  --color-rjwf-lighter-blue: rgb(89, 122, 156);
+  --color-blue-crunchbase: hsl(207, 59%, 51%); /* logo_cb.svg */
+  --color-blue-dark-blackish: hsl(203, 22%, 28%);
+  --color-blue-dark-water: hsl(202, 31%, 42%);
+  --color-blue-dark-pastel: hsl(210, 37%, 57%);
+  --color-blue-greyish-nih: hsl(228, 2%, 41%); /* logo_nih.png */
+  --color-blue-greyish-1: hsl(213, 28%, 92%);
+  --color-blue-greyish-2: hsl(214, 13%, 90%);
+  --color-blue-greyish-3: hsl(206, 28%, 95%);
+  --color-blue-light: hsl(202, 91%, 91%);
+  --color-blue-lighter: hsl(203, 74%, 94%);
+  --color-blue-rjwf-darker: hsl(215, 74%, 23%);
+  --color-blue-rjwf-lighter: hsl(210, 27%, 48%);
+  --color-blue-whiteish: hsl(210, 25%, 98%);
+  --color-grey-3: hsl(0, 0%, 20%);
+  --color-grey-7: hsl(0, 0%, 47%);
+  --color-grey-darkgrey: hsl(0, 0%, 66%);
+  --color-grey-lightgrey: hsl(0, 0%, 83%);
+  --color-red-meetup: hsl(350, 85%, 52%); /* logo_meetup.svg */
 
-  /* theme: colors & gradients */
+  /* theme: colors */
 
-  --color-button-background-hover: #e6ebf1;
-  --color-button-background: #eff3f6;
-  --color-button-border: #cececf;
+  --color-app-background: white;
+  --color-app-text: var(--color-grey-3);
+  --color-button-background-hover: var(--color-blue-greyish-1);
+  --color-button-background: var(--color-blue-greyish-3);
+  --color-button-border: var(--color-grey-lightgrey);
+  --color-excluded: var(--color-blue-dark-water);
+  --color-excluded-border: var(--color-blue-dark-water);
   --color-facet-background: white;
-  --color-highlight: var(--color-light-blue);
-  --color-highlight-hover: var(--color-lighter-blue);
+  --color-highlight: var(--color-blue-light);
+  --color-highlight-hover: var(--color-blue-lighter);
   --color-nav-current: var(--color-blue-dark-pastel);
-  --color-ruleset-icon-hover: #333;
-  --color-ruleset-icon: #777;
-  --color-selections-selected-bg: #384c58;
-  --color-selections-selected-text: #fff;
-  --color-sidebar-background: #fafbfc;
-  --color-sidebar-border: #e1e4e8;
+  --color-ruleset-icon-hover: var(--color-grey-3);
+  --color-ruleset-icon: var(--color-grey-7);
+  --color-selections-selected-bg: var(--color-blue-dark-blackish);
+  --color-selections-selected-text: white;
+  --color-sidebar-background: var(--color-blue-whiteish);
+  --color-sidebar-border: var(--color-blue-greyish-2);
   --color-text-highlight-bkg-hover: var(--color-blue-dark-pastel);
-  --color-text-highlight-bkg: var(--color-light-blue);
-  --color-text: var(--color-rjwf-darker-blue);
-  --color-type-company: var(--color-blue-crunchbase); /* logo_cb.svg */
-  --color-type-event: rgb(237, 28, 64); /* logo_meetup.svg */
-  --color-type-paper: rgb(101, 102, 106); /* logo_nih.png */
-  --color-ui-border: lightgrey;
-  --color-ui-shadow: darkgrey;
-  --color-excluded: hsla(202, 31%, 42%, 1);
-  --color-excluded-border: hsla(202, 31%, 42%, 1);
-  --gradient-button-background: linear-gradient(-180deg, #fafbfc, #eff3f6 90%);
+  --color-text-highlight-bkg: var(--color-blue-light);
+  --color-text: var(--color-blue-rjwf-darker);
+  --color-type-company: var(--color-blue-crunchbase);
+  --color-type-event: var(--color-red-meetup);
+  --color-type-paper: var(--color-blue-greyish-nih);
+  --color-ui-border: var(--color-grey-lightgrey);
+  --color-ui-shadow: var(--color-grey-darkgrey);
+
+  /* theme: gradients */
+
+  --gradient-button-background: linear-gradient(
+    -180deg,
+    var(--color-blue-whiteish),
+    var(--color-blue-greyish-3) 90%
+  );
   --gradient-button-background-hover: linear-gradient(
     -180deg,
     #f0f3f6,
-    #e6ebf1 90%
+    var(--color-blue-greyish-1) 90%
   );
 
   /* theme: shadows */
 
-  --shadow-overlay: 0px 0px 6px 1px lightgrey;
+  --shadow-overlay: 0px 0px 6px 1px var(--color-grey-lightgrey);
 
   /* theme: borders */
 
