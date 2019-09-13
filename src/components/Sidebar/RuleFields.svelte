@@ -2,13 +2,12 @@
   import { createEventDispatcher } from 'svelte';
   import { flip } from 'svelte/animate';
 
-  import { XCircleIcon } from 'svelte-feather-icons';
+  import { XIcon } from 'svelte-feather-icons';
 
   const dispatch = createEventDispatcher();
 
   export let disabled;
   export let fields;
-  export let isEditing;
 
   const makeFields = ({ subject, content }) => {
     let fields = [];
@@ -16,8 +15,8 @@
     content.forEach( v => fields.push({...v, section: 'content'}))
     return fields;
   }
+
   $: all_fields = makeFields(fields);
-  $: current_fields = isEditing ? all_fields : all_fields.filter(({ status }) => status !== 'default');
 
   const find_field = (section, field) => fields[section].findIndex(v => v.field === field);
 
@@ -57,11 +56,10 @@
 
 <div
   class="field-container"
-  class:isEditing
   class:disabled
 >
   <ul>
-    {#each current_fields as { field, status, section, disabled }, i (field)}
+    {#each all_fields as { field, status, section, disabled }, i (field)}
       <li
         animate:flip={{duration: 500}}
         class:disabled
@@ -72,7 +70,7 @@
         {field}
         {#if status !== 'default'}
           <span on:click|stopPropagation={deleteField(section, field)}>
-            <XCircleIcon />
+            <XIcon />
           </span>
         {/if}
       </li>
@@ -125,7 +123,7 @@
           color: #333;
           width: 1.2em;
           height: 1.2em;
-          transform: translateY(2px);
+          transform: translate(-1px, 3px);
           opacity: 0.6;
           &:hover {
             opacity: 1;

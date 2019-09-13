@@ -119,7 +119,7 @@
   $: searchMachines = $screenMachine.context.searchMachines;
   $: searchMachine = $screenMachine.context.searchMachines[$currentTab];
   $: isDirty = $screenStore && matchesDirty(searchMachine);
-  $: tabs =
+  $: tabs = $screenMachine &&
     Object.entries($screenStore)
     .map(([id, t]) => ({
       id,
@@ -132,7 +132,8 @@
     : false;
 
   $: mode = $screenMachine.matches('Form.Simple') ? 'simple' : 'complex';
-  /* history */
+
+  //  History
 
   const pop_callback = async (page) => {
     if (!popped) return;
@@ -379,6 +380,15 @@
     });
     checkQuery();
   }
+
+  const sendModeChange = ({ detail }) => {
+    screenMachine.send({
+      type: `CHANGE_SEARCH_${detail}`,
+      tabId: $currentTab,
+      editmode: false
+    })
+    checkQuery();
+  }
 </script>
 
 <svelte:options immutable={true} />
@@ -417,7 +427,7 @@
           on:change="{({ detail }) => changeIndex(detail)}"
           on:newrule="{newRuleset}"
           on:toggle="{toggleSearchLogic}"
-          on:modechange="{({ detail }) => screenMachine.send({type: `CHANGE_SEARCH_${detail}`, tabId: $currentTab})}"
+          on:modechange="{sendModeChange}"
           index="{currentScreen && currentScreen.index}"
           {logic}
           {mode}
@@ -437,6 +447,7 @@
               <RuleQueries
                 queries="{terms}"
                 on:change="{({detail}) => handleChange(detail, i, isEditing)}"
+                on:commit="{({detail}) => editRuleset(i, isEditing)}"
                 on:toggle="{({detail}) => toggleTermStatus(i, detail)}"
                 bind:this="{query[i]}"
                 {disabled}
@@ -449,7 +460,6 @@
                   on:delete="{({ detail }) => sendRuleLabel('LABEL_DELETED', detail, i)}"
                   {fields}
                   {disabled}
-                  {isEditing}
                 />
               {/if}
             </Rule>

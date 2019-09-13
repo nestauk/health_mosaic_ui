@@ -55,7 +55,7 @@ export const search_config = {
                     },
                     onError: {
                       target: '#Error',
-                      actions: ['refreshStore', (_, evt) => console.log(evt)],
+                      actions: [(_, evt) => console.log(evt)],
                     },
                   },
                 },

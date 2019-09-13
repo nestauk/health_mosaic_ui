@@ -1,6 +1,8 @@
 <script>
   import { tick, createEventDispatcher } from 'svelte';
+  import * as _ from 'lamb';
   import { isIterableEmpty } from '@svizzle/utils';
+  import { XIcon } from 'svelte-feather-icons';
   import { Edit } from '../Icons';
 
   export let disabled;
@@ -9,86 +11,37 @@
 
   const dispatch = createEventDispatcher();
 
-  let editing = false;
-  let pillContainer;
-  let _pills = [];
   let backspacing = false;
   let input;
-  let padbottom = false;
-  let currentInput = '';
 
-  $: pills = _pills && _pills.filter(v => v !== null);
-
-  $: inputCoords = calculateInputLocation(pills[pills.length - 1]);
+  $: currentInput = textQuery.join(', ');
 
   $: textQuery = queries.map(({ term, status }) =>
       `${status === 'not' ? '-' : ''}${term}`);
 
-  const calculateInputLocation = (lastPill, inputSize = 20) => {
-    if (!lastPill) return { top: 6, right: 0 };
-
-    const el = lastPill.getBoundingClientRect();
-    const container = pillContainer.getBoundingClientRect();
-    const inputFits = container.width - (el.right - container.left) > inputSize;
-    padbottom = !inputFits;
-
-    return {
-      top: inputFits ?
-        el.top - container.top :
-        (el.top - container.top) + el.height + 8,
-      right: inputFits ? el.right - container.left : 0
-    };
+  function textAreaResize(e) {
+    e.style.height = "1px";
+    e.style.height = (+e.scrollHeight)+"px";
   }
 
-  const addQuery = () => {
-    const status = currentInput.startsWith('-') ? 'not' : 'and';
-    const value = currentInput.replace(',', '');
-    dispatch('change', textQuery.concat(currentInput).join(','));
+  export const handleKeydown =  event => {
+    const content = event.target.value.split(",").map(s => s.trim()).join(',');
+    dispatch('change', content);
 
-    currentInput = '';
-  }
-
-  export const handleKeyup = event => {
-    if (event.key === ',' | event.key === 'Enter') {
-      addQuery();
+    if (event.key === 'Enter') {
+       event.preventDefault();
+       dispatch('commit');
     }
   }
 
-  const handleKeydown = event => {
-    if (event.key === 'Backspace' && currentInput.length === 0) {
-      if (isIterableEmpty(queries)) return;
-      event.preventDefault();
-      const { term, status } = queries[queries.length-1];
-      currentInput = `${status === 'not' ? '-' : ''}${term}`;
-      dispatch('change', textQuery.slice(0, -1).join(','));
-    }
-  }
-
-  const fitContent = node => {
-    const fakeInput = document.createElement('span');
-    fakeInput.style.opacity = 0;
-    fakeInput.style.position = 'absolute';
-    node.parentNode.insertBefore(fakeInput, node.nextSibling);
-
-    function resizeInput(event) {
-      const key = event.key === 'Backspace' ? '' : event.key;
-      fakeInput.innerText = event.target.value + key;
-      const { width } = fakeInput.getBoundingClientRect();
-      node.style.width = `${width + 15}px`;
-      inputCoords = calculateInputLocation(pills[pills.length - 1], width + 10);
-    }
-
-    node.addEventListener('keydown', resizeInput);
-
-    return {
-      destroy: () => node.removeEventListener('keydown', resizeInput)
-    }
+  const handleKeyup = event => {
+    textAreaResize(event.target)
   }
 
   const autofocus = async node => node.focus();
 </script>
 
-<svelte:body on:click={addQuery}/>
+<svelte:body />
 
 <div
   class:disabled
@@ -98,13 +51,12 @@
 >
   <div
     class="query-labels"
-    bind:this={pillContainer}
   >
-    <ul class:padbottom>
+    {#if !isEditing}
+    <ul>
       {#each queries.filter(({term}) => term.length) as { term, status }, i}
         <li
           class={status}
-          bind:this={_pills[i]}
           on:click|stopPropagation={() => dispatch('toggle', i)}
         >
           {term}
@@ -112,20 +64,20 @@
             class="close"
             on:click|stopPropagation={() => dispatch('change', textQuery.filter((_, _i) => i !== _i ).join(','))}
           >
-            x
+              <XIcon />
           </span>
         </li>
       {/each}
     </ul>
-    {#if isEditing}
-      <input
+    {:else}
+      <textarea
         bind:this={input}
-        bind:value={currentInput}
-        style="transform: translate({inputCoords.right}px, {inputCoords.top}px)"
-        use:fitContent
+        value={currentInput}
         use:autofocus
-        on:keyup={handleKeyup}
+        use:textAreaResize
         on:keydown={handleKeydown}
+        on:keyup={handleKeyup}
+        autocomplete="false"
       />
     {/if}
   </div>
@@ -141,6 +93,17 @@
       width: 100%;
       margin-right: 20px;
       min-height: 37px;
+
+      textarea {
+        border: none;
+        margin: 7px 10px 0px 10px;
+        background: none;
+        width: calc(100% - 20px);
+        font-size: 14px;
+        outline: none;
+        overflow: hidden;
+        resize: none;
+      }
     }
 
     &.editing {
@@ -165,9 +128,6 @@
       list-style: none;
       flex-wrap: wrap;
       user-select: none;
-      &.padbottom {
-        margin-bottom: 30px;
-      }
 
       li {
         padding: 2px 10px;
@@ -176,10 +136,22 @@
         font-size: 14px;
         user-select: none;
         cursor: pointer;
+        display: flex;
 
         .close {
           margin-left: 5px;
           cursor: pointer;
+          font-weight: 700;
+          margin-left: 10px;
+          color: #fff;
+          width: 1.2em;
+          height: 1.2em;
+          transform: translate(0px, 3px);
+          opacity: 0.7;
+          display: inline-block;
+          &:hover {
+            opacity: 1;
+          }
         }
 
         &.and {

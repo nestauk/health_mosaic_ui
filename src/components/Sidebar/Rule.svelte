@@ -4,21 +4,28 @@
 
 <script>
   import { createEventDispatcher } from 'svelte';
-  import { scale } from 'svelte/transition';
-  import { EditIcon, CopyIcon, PlusCircleIcon, ToggleLeftIcon, Trash2Icon } from 'svelte-feather-icons';
+  import {
+    CopyIcon,
+    EditIcon,
+    EyeIcon,
+    EyeOffIcon,
+    PlusCircleIcon,
+    Trash2Icon
+  } from 'svelte-feather-icons';
 
-  export let hasContent;
   export let disabled;
+  export let hasContent;
   export let isEditing;
   export let isOnly;
   export let mode;
+
   const dispatch = createEventDispatcher();
 </script>
 
 <div>
   <slot></slot>
   {#if mode === 'complex'}
-    <ul transition:scale>
+    <ul>
       {#if hasContent}
         <li on:click={() => dispatch('copy')}>
           <CopyIcon size={1.5} />
@@ -29,11 +36,13 @@
         >
           <Trash2Icon size={1.5} />
         </li>
-        <li
-          class:disabled
-          on:click={() => dispatch('disable')}
-        >
-          <ToggleLeftIcon size={1.5} />
+        <li on:click={() => dispatch('disable')}>
+          {#if disabled}
+            <EyeIcon />
+          {:else}
+            <EyeOffIcon />
+          {/if}
+
         </li>
         <li
           class:isEditing
@@ -44,6 +53,17 @@
       {/if}
 
 
+    </ul>
+  {:else}
+    <ul>
+      {#if hasContent}
+        <li
+          class:isEditing
+          on:click={() => dispatch('edit')}
+        >
+          <EditIcon size={1.5} />
+        </li>
+      {/if}
     </ul>
   {/if}
 </div>

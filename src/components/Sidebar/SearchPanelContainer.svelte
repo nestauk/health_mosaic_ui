@@ -1,7 +1,6 @@
 <script>
   import { createEventDispatcher } from 'svelte';
   import { writable } from 'svelte/store';
-  import { scale } from 'svelte/transition';
 
   import { PlusCircleIcon } from 'svelte-feather-icons';
   import { Sync } from '../Icons';
@@ -41,7 +40,7 @@
 
   <div class="search">
     {#if mode === 'complex'}
-      <div transition:scale class="logic">
+      <div class="logic">
         <Switch
           on:toggle
           values={["AND", "OR"]}

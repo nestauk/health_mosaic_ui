@@ -67,11 +67,13 @@ export const applyRulesFromQuery = array =>
   ])(newRuleset());
 
 const selectFirstRule = _.setPath(`0.selected`, true);
+const disableEdit = query => ({ ...query, isEditing: false });
 
 export const parseQueryUrl = _.pipe([
   makeRulesetObject,
   _.mapWith(applyRulesFromQuery),
   selectFirstRule,
+  _.mapWith(disableEdit),
 ]);
 
 // selection

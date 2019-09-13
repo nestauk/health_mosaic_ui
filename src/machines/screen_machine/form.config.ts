@@ -34,6 +34,9 @@ export const form_config = {
     RULE_SELECTED: {
       actions: ['selectRule'],
     },
+    RULE_EDITED: {
+      actions: ['editRuleset'],
+    },
   },
   states: {
     Simple: {
@@ -45,9 +48,6 @@ export const form_config = {
     },
     Complex: {
       on: {
-        RULE_EDITED: {
-          actions: ['editRuleset'],
-        },
         CHANGE_SEARCH_SIMPLE: {
           target: 'Simple',
           actions: ['activateSimpleSearch'],

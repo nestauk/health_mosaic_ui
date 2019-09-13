@@ -44,6 +44,8 @@ const reduceQueries = rulesets =>
     ),
   ])(rulesets);
 
+const toggleEditMode = editMode => rule => ({ ...rule, isEditing: editMode });
+
 export const form_options = {
   guards: {
     isComplex: ({ screenStore }, { tabId }) => {
@@ -57,11 +59,12 @@ export const form_options = {
     },
   },
   actions: {
-    activateSimpleSearch: ({ screenStore }, { tabId }) => {
+    activateSimpleSearch: ({ screenStore }, { tabId, editmode = true }) => {
       const updater = _.pipe([
         reduceQueries,
         setDefaultRuleset,
         setDefaultFields,
+        toggleEditMode(editmode),
         toArray,
       ]);
       const copyRule = _.pipe([_.updatePath(`${tabId}.uiQuery`, updater)]);

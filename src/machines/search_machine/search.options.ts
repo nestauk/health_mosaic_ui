@@ -67,10 +67,6 @@ export const search_options: any = {
         )
       );
     },
-    refreshStore: ({ screenStore, id }) => {
-      // we need to trigger an update on the tab to ensure that svelte is notified of the change in state of the searchMachine itself.
-      screenStore.update(_.setPath(id, get(screenStore)[id]));
-    },
   },
   services: {
     apiRequest: ({ queryObj }, { tabId, restore }) => {
