@@ -11,7 +11,7 @@
     {type: 'text', href: 'data', text: 'Data'},
     {type: 'text', href: 'methodology', text: 'Methodology'},
     {type: 'text', href: 'features', text: 'Features'},
-    {type: 'text', href: 'search', text: 'Search'},
+    {type: 'text', href: 'search/list', text: 'Search'},
   ];
 
   export let matchingMqStore;

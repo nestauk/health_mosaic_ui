@@ -3,7 +3,7 @@
 </script>
 
 <script>
-  import { stores } from '@sapper/app';
+  import { stores, goto } from '@sapper/app';
   import { tick, onMount, onDestroy, setContext } from 'svelte';
   import { isIterableEmpty, isObjNotEmpty } from '@svizzle/utils';
   import compare from 'just-compare';
@@ -33,7 +33,6 @@
   import { capitalise, titleCase } from '../../util/string';
 
   const { page } = stores();
-
 
   let isSidebarLeft = true;
   let popped = false;
@@ -132,6 +131,7 @@
   $: pop_callback($page);
 
   if (process.browser) {
+    goto('search/list', { replaceState: true });
     window.onpopstate =  () =>  popped = true;
   }
 
