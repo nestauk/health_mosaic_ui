@@ -93,12 +93,12 @@
     <p>
       {place.join(', ')}
     </p>
-    {#if url}
     <div class="icon">
       <span
         on:mouseenter={() => hover = true}
         on:mouseleave={() => hover = false}
       >
+        {#if url_source}
         <a
           target="_blank"
           href="{url_source}"
@@ -111,7 +111,9 @@
         {#if hover}
           <Tooltip offset="{-5}" text="Crunchbase"/>
         {/if}
+        {/if}
       </span>
+      {#if url}
       <span>
         <a
           target="_blank"
@@ -120,8 +122,8 @@
           <Link color='#aaa'/>
         </a>
       </span>
+      {/if}
     </div>
-    {/if}
   </div>
 </article>
 

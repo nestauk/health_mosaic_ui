@@ -79,9 +79,9 @@ Use the `BASE_URL` you find in the `src/config.js`, with the VPN enabled if you 
 
 ## Schema
 
-- [null mappings](https://github.com/nestauk/nesta/blob/dev/nesta/production/schemas/tier_1/field_null_mappings/health_scanner.json)
-- [fields aliases](https://github.com/nestauk/nesta/blob/dev/nesta/production/schemas/tier_1/aliases/health_scanner.json)
+- [null mappings](https://github.com/nestauk/nesta/blob/dev/nesta/core/schemas/tier_1/field_null_mappings/health_scanner.json)
+- [fields aliases](https://github.com/nestauk/nesta/blob/dev/nesta/core/schemas/tier_1/aliases/health_scanner.json)
 - field types:
-   - [Companies](https://github.com/nestauk/nesta/blob/dev/nesta/production/orms/crunchbase_es_config.json)
-   - [Meetup groups](https://github.com/nestauk/nesta/blob/dev/nesta/production/orms/meetup_es_config.json)
-   - [Research projects](https://github.com/nestauk/nesta/blob/dev/nesta/production/orms/nih_es_config.json)
+   - [Companies](https://github.com/nestauk/nesta/blob/dev/nesta/core/orms/crunchbase_es_config.json)
+   - [Meetup groups](https://github.com/nestauk/nesta/blob/dev/nesta/core/orms/meetup_es_config.json)
+   - [Research projects](https://github.com/nestauk/nesta/blob/dev/nesta/core/orms/nih_es_config.json)
