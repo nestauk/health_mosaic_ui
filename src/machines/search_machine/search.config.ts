@@ -49,7 +49,6 @@ export const search_config = {
                   invoke: {
                     id: 'Pending',
                     src: 'apiRequest',
-
                     onDone: {
                       target: '#Matching',
                       actions: ['updateData', 'shareSuccess'],

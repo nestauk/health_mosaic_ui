@@ -2,19 +2,20 @@ export const form_config = {
   id: 'Form',
   initial: 'Simple',
   on: {
-    TAB_DELETED: {
-      target: 'Form.Simple',
-    },
     TAB_CREATED: {
       target: 'Form.Simple',
     },
+    TAB_DELETED: [
+      { target: 'Form.Complex', cond: 'isComplex' },
+      { target: 'Form.Simple' },
+    ],
     TAB_SELECTED: [
       { target: 'Form.Complex', cond: 'isComplex' },
       { target: 'Form.Simple' },
     ],
-    TAB_RENAMED: {
-      target: 'Form.Simple',
-    },
+    // TAB_RENAMED: {
+    //   target: 'Form.Simple',
+    // },
     // I don't know if this is needed
     TAB_VISIBILITY_TOGGLED: {
       actions: ['toggleTabVisibility'],
