@@ -21,7 +21,6 @@ export const newTab = (
   selections,
   route: `/${searchRouteName}`,
   uiQuery,
-  visible: true,
   logic,
 });
 

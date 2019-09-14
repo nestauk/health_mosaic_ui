@@ -204,10 +204,6 @@ export const form_options = {
 
       screenStore.update(newRule);
     },
-    toggleTabVisibility: ({ screenStore }, { id }) => {
-      screenStore.update(_.updatePath(`${id}.visible`, toggleBoolean));
-    },
-
     setUrlQuery: ({ screenStore, currentTab, routeStore }, { route: path }) => {
       const tab: any = get(currentTab);
       const currentQuery = get(screenStore)[tab];

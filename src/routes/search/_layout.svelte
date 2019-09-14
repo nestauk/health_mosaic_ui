@@ -5,8 +5,8 @@
 <script>
   import { stores } from '@sapper/app';
   import { tick, onMount, onDestroy, setContext } from 'svelte';
-  import { isIterableEmpty, isObjNotEmpty } from '@svizzle/utils';
-  import compare from 'just-compare';
+  import { isObjNotEmpty } from '@svizzle/utils';
+  import isEqual from 'just-compare';
   import * as _ from 'lamb';
 
   import Dirty from '../../components/Dirty.svelte'
@@ -93,34 +93,28 @@
   $: facetTitle = selectedFacet ? `- ${titleCase(selectedFacet.replace('_', ' '))}` : '';
 
   $: uiQuery = $screenStore[$currentTab] ? $screenStore[$currentTab].uiQuery : [];
-  $: hasNoQuery = uiQuery[0] && uiQuery[0].terms.length && uiQuery[0].terms[0].term.length;
-  $: withSelections = $screenStore[$currentTab] && isObjNotEmpty($screenStore[$currentTab].selections);
-  $: visible = $screenStore[$currentTab] && $screenStore[$currentTab].visible;
   $: searchMachines = $screenMachine.context.searchMachines;
   $: searchMachine = $screenMachine.context.searchMachines[$currentTab];
   $: isLoading = searchMachine && searchMachine.state.matches('Search.NotEmpty.Dirty.Pending');
   $: isError = searchMachine && searchMachine.state.matches('Search.NotEmpty.Dirty.Error');
-  $: tabs = Object.entries($screenStore).map(([id, t]) => ({id, name: t.name, isLoading: searchMachines[id] && searchMachines[id].state.matches('Search.NotEmpty.Dirty.Pending')}));
-
-  // From sidebar
-  $: ruleset = uiQuery !== undefined
-    ? uiQuery.find(( { selected } ) => selected)
-    : false;
+  $: tabs =
+    Object.entries($screenStore)
+    .map(([id, t]) => ({
+      id,
+      name: t.name,
+      isLoading:
+        searchMachines[id] &&
+        searchMachines[id].state.matches('Search.NotEmpty.Dirty.Pending')
+    }));
   $: rulesetIndex = uiQuery!== undefined
     ? uiQuery.findIndex(( { selected } ) => selected)
     : false;
-  $: labels = ruleset && {
-    Subject: ruleset.fields.subject,
-    Content: ruleset.fields.content
-  };
-  $: data = $screenStore[$currentTab] && $screenStore[$currentTab].results.data
   $: isDirty = searchMachine && searchMachine.state.matches('Search.NotEmpty.Dirty');
-  $: isEmptyQuery = uiQuery && uiQuery[0] && uiQuery[0].terms && uiQuery[0].terms.length && uiQuery[0].terms[0].term;
   $: hasPreviousQuery = $screenStore[$currentTab] && $screenStore[$currentTab].results.prevQuery;
   $: selections = $screenStore[$currentTab] ? $screenStore[$currentTab].selections : [];
   $: logic = $screenStore[$currentTab] && $screenStore[$currentTab].logic;
   $: mode = $screenMachine.matches('Form.Simple') ? 'simple' : 'complex';
-  $: isOnly = uiQuery && uiQuery.length === 1;
+  $: isSingleQuery = uiQuery && uiQuery.length === 1;
 
   /* history */
 
@@ -227,7 +221,7 @@
         query: stripEmpties(currentQ.query)
       };
 
-    if (currentQ.query && compare(cachedQuery, newQuery)) {
+    if (currentQ.query && isEqual(cachedQuery, newQuery)) {
       searchMachine.send('QUERY_MATCHED')
     } else {
       searchMachine.send('QUERY_CHANGED')
@@ -376,7 +370,7 @@
 
   <div class="col {isSidebarLeft ? 'col1' : 'col3'}">
     <Sidebar
-      on:position={({detail}) => isSidebarLeft = detail }
+      on:shift={() => isSidebarLeft = !isSidebarLeft }
       {isSidebarLeft}
     >
       <div slot="sticky">
@@ -386,54 +380,54 @@
           {tabs}
           activeTab="{$currentTab}"
           on:newtab="{sendTabCreated}"
-          on:changetab={({detail}) => changeTab(detail)}
-          on:deletetab={({detail}) => sendTab('TAB_DELETED', detail)}
-          on:duplicatetab={({detail}) => sendTab('TAB_DELETED', detail)}
-          on:textchange={sendTabRenamed}
+          on:changetab="{({detail}) => changeTab(detail)}"
+          on:deletetab="{({detail}) => sendTab('TAB_DELETED', detail)}"
+          on:duplicatetab="{({detail}) => sendTab('TAB_DELETED', detail)}"
+          on:textchange="{sendTabRenamed}"
         />
       </div>
       <div slot="scrollable">
         <FacetsPanel
-          on:link={sendRouteChanged}
-          facets={facetPills}
+          on:link="{sendRouteChanged}"
+          facets="{facetPills}"
         />
         <SearchPanelContainer
-          on:reset={handleReset}
-          on:edit={({detail}) => selectRuleset(detail)}
-          on:click={handleSend}
-          on:change={({ detail }) => changeIndex(detail)}
-          on:newrule={newRuleset}
-          on:toggle={toggleSearchLogic}
-          on:modechange={({ detail }) => screenMachine.send({type: `CHANGE_SEARCH_${detail}`, tabId: $currentTab})}
-          index={$screenStore[$currentTab] && $screenStore[$currentTab].index}
+          on:reset="{handleReset}"
+          on:edit="{({detail}) => selectRuleset(detail)}"
+          on:click="{handleSend}"
+          on:change="{({ detail }) => changeIndex(detail)}"
+          on:newrule="{newRuleset}"
+          on:toggle="{toggleSearchLogic}"
+          on:modechange="{({ detail }) => screenMachine.send({type: `CHANGE_SEARCH_${detail}`, tabId: $currentTab})}"
+          index="{$screenStore[$currentTab] && $screenStore[$currentTab].index}"
           {logic}
           {mode}
         >
           {#each uiQuery as { options, disabled, selected, terms, fields, isEditing }, i}
             <Rule
-              on:copy={() => copyRuleset(i)}
-              on:delete={() => sendRule('RULE_DELETED', i)}
-              on:disable={() => sendRule('RULE_DISABLED', i)}
-              on:edit={({detail}) => editRuleset(i, detail)}
-              hasContent={terms && terms.length && terms[0].term && terms[0].term.length}
+              on:copy="{() => copyRuleset(i)}"
+              on:delete="{() => sendRule('RULE_DELETED', i)}"
+              on:disable="{() => sendRule('RULE_DISABLED', i)}"
+              on:edit="{({detail}) => editRuleset(i, detail)}"
+              hasContent="{terms && terms.length && terms[0].term && terms[0].term.length}"
               {disabled}
               {isEditing}
               {mode}
-              {isOnly}
+              isOnly="{isSingleQuery}"
             >
               <RuleQueries
-                queries={terms}
-                on:change={({detail}) => handleChange(detail, i)}
-                on:toggle={({detail}) => toggleTermStatus(i, detail)}
-                bind:this={query[i]}
+                queries="{terms}"
+                on:change="{({detail}) => handleChange(detail, i)}"
+                on:toggle="{({detail}) => toggleTermStatus(i, detail)}"
+                bind:this="{query[i]}"
                 {disabled}
                 {isEditing}
               />
               {#if mode === 'complex'}
                 <RuleFields
-                  on:toggle={({ detail }) => sendRuleLabel('LABEL_TOGGLED', detail, i)}
-                  on:disable={({ detail }) => sendRuleLabel('LABEL_DISABLED', detail, i)}
-                  on:delete={({ detail }) => sendRuleLabel('LABEL_DELETED', detail, i)}
+                  on:toggle="{({ detail }) => sendRuleLabel('LABEL_TOGGLED', detail, i)}"
+                  on:disable="{({ detail }) => sendRuleLabel('LABEL_DISABLED', detail, i)}"
+                  on:delete="{({ detail }) => sendRuleLabel('LABEL_DELETED', detail, i)}"
                   {fields}
                   {disabled}
                   {isEditing}
@@ -442,7 +436,10 @@
             </Rule>
           {/each}
         </SearchPanelContainer>
-        <SelectionsPanel {selections} on:toggleselection={toggleSelection}/>
+        <SelectionsPanel
+          {selections}
+          on:toggleselection="{toggleSelection}"
+        />
       </div>
     </Sidebar>
   </div>
