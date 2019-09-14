@@ -1,27 +1,29 @@
 <script>
   import { createEventDispatcher } from 'svelte';
+
   import { stores } from '@sapper/app';
 
-  import RouterLink from '../RouterLink.svelte';
   import { project_title, searchRouteName } from '../../config.js';
-
-  export let facets;
+  import RouterLink from '../RouterLink.svelte';
 
   const { page } = stores();
   const dispatch = createEventDispatcher();
 
-  $: current_facet = $page.path.split('/').filter(Boolean)[1];
+  export let facets;
+
+  $: currentFacet = $page.path.split('/').filter(Boolean)[1] || '';
 </script>
-<div class="container">
+
+<div class="FacetPanel">
   <h2>Facets</h2>
   <ul>
     {#each facets as { id, label }}
-    <li class:selected={id === current_facet}>
+    <li class:selected={id === currentFacet}>
       <RouterLink
-          on:navigate={() => dispatch('link', id)}
-          base={searchRouteName}
-          href={id}
-        >
+        on:navigate="{() => dispatch('link', id)}"
+        base={searchRouteName}
+        href={id}
+      >
         <div>{label}</div>
       </RouterLink>
       </li>
@@ -30,7 +32,7 @@
 </div>
 
 <style lang="less">
-  .container {
+  .FacetPanel {
     margin: 2rem 0;
   }
   h2 {

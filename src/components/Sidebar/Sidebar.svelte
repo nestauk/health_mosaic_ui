@@ -5,7 +5,6 @@
   import * as _ from 'lamb';
   import { ArrowDown } from '../Icons/'
 
-
   import { SearchPanelContainer, Rule, RuleQueries, RuleFields } from './SearchPanel';
   import SelectionsPanel from './SelectionsPanel.svelte';
   import { screenMachine } from '../../services/screen_service.ts';

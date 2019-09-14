@@ -1,23 +1,40 @@
 <script>
+  import { getContext } from 'svelte';
+  import { isObjEmpty } from '@svizzle/utils';
+
+  import { stores } from '@sapper/app';
+
   import Fallback from '../../components/Fallback.svelte';
   import { screenStore, currentTab } from '../../stores/search.ts';
+  import { SEARCH } from './_layout.svelte';
+  import { list } from './facets';
 
-  $: selectedItems = $screenStore[$currentTab].selected || [];
+  const { checkDirty, shouldResize } = getContext(SEARCH);
+  const { page } = stores();
+
+  $: isDirty = $screenStore && checkDirty();
+  $: selectedItems = $screenStore[$currentTab].selected;
 </script>
 
-<div class="content">
-  {#if selectedItems.length}
-    <Fallback message="Select a facet." />
+<div class="SearchIndex">
+  {#if isObjEmpty($page.query)}
+    <Fallback message="Please make a new search" />
   {:else}
-    <Fallback message="No results. Make a new search." />
+    {#if selectedItems.length}
+      <svelte:component
+        this={list}
+        {isDirty}
+        {shouldResize}
+      />
+    {:else}
+      <Fallback message="No results" />
+    {/if}
   {/if}
 </div>
 
 <style lang="less">
-  .content {
+  .SearchIndex {
     width: 100%;
     height: 100%;
-    display: flex;
-    flex-direction: column;
   }
 </style>

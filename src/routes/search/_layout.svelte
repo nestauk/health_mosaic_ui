@@ -33,7 +33,25 @@
   import { capitalise, titleCase } from '../../util/string';
 
   const { page } = stores();
+  const facetPills = [
+    {id: '', label: 'List'},
+    {id: 'volume_geo', label: 'Volume by Country'},
+    {id: 'map_geo', label: 'Locations'},
+    {id: 'volume_terms', label: 'Volume by Term'},
+    {id: 'volume_countries', label: 'Volume by Mentioned Countries'},
+    {id: 'volume_funders', label: 'Volume by Funder'},
+  ];
 
+  const renderTitle = (query = '', type = '') => {
+    let typeTitle;
+    if (!type) {
+      typeTitle = '';
+    } else {
+      typeTitle = capitalise(type);
+    }
+
+    return query ? `- ${typeTitle} ${query}` : '';
+  }
 
   let isSidebarLeft = true;
   let popped = false;
@@ -41,7 +59,6 @@
   let searchMachine;
 
   onMount(() => {
-
     if($page.query && $page.query.q) {
       const hasLabels = !!$page.query.q.match(/\(.+,in:.+\)/);
       const hasRulesets = !!$page.query.q.match(/(?:\(.+\)){2,}/);
@@ -70,12 +87,10 @@
     isPageInit: true
   });
 
-  const transitionended = () => {
-    shouldResizeStore.set(true);
-  }
-  const transitionstarted = () => {
-    shouldResizeStore.set(false);
-  }
+  // page
+  $: selectedFacet = $page.params.facet || '';
+  $: queryTitle = renderTitle($page.query.q, $page.query.i);
+  $: facetTitle = selectedFacet ? `- ${titleCase(selectedFacet.replace('_', ' '))}` : '';
 
   $: uiQuery = $screenStore[$currentTab] ? $screenStore[$currentTab].uiQuery : [];
   $: hasNoQuery = uiQuery[0] && uiQuery[0].terms.length && uiQuery[0].terms[0].term.length;
@@ -107,6 +122,8 @@
   $: mode = $screenMachine.matches('Form.Simple') ? 'simple' : 'complex';
   $: isOnly = uiQuery && uiQuery.length === 1;
 
+  /* history */
+
   const pop_callback = async (page) => {
     if (!popped) return;
     await tick();
@@ -135,6 +152,7 @@
     window.onpopstate =  () =>  popped = true;
   }
 
+  /* context */
 
   setContext(SEARCH, {
     transitionComplete:
@@ -151,6 +169,8 @@
       }),
     shouldResize: shouldResizeStore
   });
+
+  /* machine events */
 
   const sendTabCreated = () =>  screenMachine.send({
     type: 'TAB_CREATED',
@@ -172,30 +192,8 @@
   const sendRouteChanged = ({detail}) =>
     screenMachine.send({
       type: 'ROUTE_CHANGED',
-      route: `/${searchRouteName}/${detail}`
-    })
-
-  /* facets */
-
-  const facetTabs = [
-    {id: 'list', label: 'List'},
-    {id: 'volume_geo', label: 'Volume by Country'},
-    {id: 'map_geo', label: 'Locations'},
-    {id: 'volume_terms', label: 'Volume by Term'},
-    {id: 'volume_countries', label: 'Volume by Mentioned Countries'},
-    {id: 'volume_funders', label: 'Volume by Funder'},
-  ];
-
-  const renderTitle = (query = '', type = '') => {
-    let typeTitle;
-    if (!type) {
-      typeTitle = '';
-    } else {
-      typeTitle = capitalise(type);
-    }
-
-    return query ? `- ${typeTitle} ${query}` : '';
-  }
+      route: detail ? `/${searchRouteName}/${detail}` : `/${searchRouteName}`
+    });
 
   const changeTab = detail => {
     sendTab('TAB_SELECTED', detail);
@@ -236,7 +234,11 @@
     }
   }
 
-  const newTab = () =>  screenMachine.send({type: 'TAB_CREATED', id: $idStore });
+  const newTab = () =>
+    screenMachine.send({
+      type: 'TAB_CREATED',
+      id: $idStore
+    });
 
   //const sendTab_2 = (type, id) =>  screenMachine.send({type, id: parseInt(id, 10) });
   const sendTabEdit = ({detail: { value, id }}) =>
@@ -362,10 +364,6 @@
     })
     checkDirty();
   }
-
-  $: selectedFacet = $page.params.facet || '';
-  $: queryTitle = renderTitle($page.query.q, $page.query.i);
-  $: facetTitle = selectedFacet ? `- ${titleCase(selectedFacet.replace('_', ' '))}` : ''
 </script>
 
 <svelte:options immutable={true} />
@@ -397,7 +395,7 @@
       <div slot="scrollable">
         <FacetsPanel
           on:link={sendRouteChanged}
-          facets={facetTabs}
+          facets={facetPills}
         />
         <SearchPanelContainer
           on:reset={handleReset}
@@ -460,7 +458,6 @@
   </div>
 
 </div>
-
 
 <style lang="less">
   .SearchLayout {

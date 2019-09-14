@@ -5,7 +5,7 @@
   import { screenStore, currentTab } from '../../stores/search.ts';
   import { SEARCH } from './_layout.svelte';
   import {
-    list,
+    // list,
     map_geo,
     volume_countries,
     volume_funders,
@@ -14,7 +14,7 @@
   } from './facets';
 
   const facets = {
-    list,
+    // list,
     map_geo,
     volume_countries,
     volume_funders,
