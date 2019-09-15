@@ -1,13 +1,20 @@
 
 <script>
-  import { createEventDispatcher, tick, onMount } from 'svelte';
+  import { createEventDispatcher, onMount, tick } from 'svelte';
   import Spinner from '../Spinner.svelte';
   import Alert from '../Icons/Alert.svelte';
-  import { EditIcon, CopyIcon, PlusCircleIcon, Trash2Icon } from 'svelte-feather-icons';
+  import {
+    CopyIcon,
+    EditIcon,
+    PlusCircleIcon,
+    Trash2Icon
+  } from 'svelte-feather-icons';
 
   import addIcon from 'ionicons/dist/ionicons/svg/ios-add-circle-outline.svg';
   import arrowForward from 'ionicons/dist/ionicons/svg/ios-arrow-forward.svg';
   import closeIcon from 'ionicons/dist/ionicons/svg/ios-close-circle-outline.svg';
+
+  const dispatch = createEventDispatcher();
 
   export let activeTab;
   export let editingTab;
@@ -16,9 +23,7 @@
   export let tabs;
 
   let editedTarget = null;
-  let tab_status = [];
-
-  const dispatch = createEventDispatcher();
+  let tabStatus = [];
 
   // various keypresses trigger window click events for accessibility reasons
   // we need to check to ensure the click event is coming from an actual click rather than a keypress
@@ -78,14 +83,13 @@
 
     function toggleChecked(e) {
       if (e.target.checked) {
-        tab_status.push(parseInt(id, 10));
-        tab_status = tab_status;
+        tabStatus.push(parseInt(id, 10));
+        tabStatus = tabStatus;
       } else {
-        let el = tab_status.findIndex(_id =>_id === parseInt(id, 10));
-        tab_status.splice(el, 1);
-        tab_status = tab_status;
+        let el = tabStatus.findIndex(_id =>_id === parseInt(id, 10));
+        tabStatus.splice(el, 1);
+        tabStatus = tabStatus;
       }
-
     }
 
     node.addEventListener('change', toggleChecked);
@@ -96,7 +100,7 @@
   }
 
   const newTab = async () => {
-    dispatch('newtab')
+    dispatch('newtab');
     await tick();
   }
 
@@ -105,26 +109,24 @@
   }
 
   const duplicateTabs = async id => {
-    dispatch('duplicatetab', tab_status)
+    dispatch('duplicatetab', tabStatus)
   }
 
   const deleteTabs = async id => {
-    dispatch('deletetab', tab_status)
-    tab_status = tab_status.length === tabs.length ? [tab_status[0]] : [];
+    dispatch('deletetab', tabStatus)
+    tabStatus = tabStatus.length === tabs.length ? [tabStatus[0]] : [];
   }
 </script>
 
-<svelte:window
-  on:click|stopPropagation="{stopEdit}"
-/>
+<svelte:window on:click|stopPropagation="{stopEdit}"/>
 
 <nav>
   <h2>Tabs</h2>
   <ul>
-    {#each tabs as { id, name, isLoading, hovering }, i (id)}
+    {#each tabs as { hovering, id, isError, isLoading, name }, i (id)}
       <li
-        class:selected={parseInt(id, 10) === activeTab}
-        on:click|preventDefault={() => dispatch('changetab', parseInt(id, 10))}
+        class:selected="{parseInt(id, 10) === activeTab}"
+        on:click|preventDefault="{() => dispatch('changetab', parseInt(id, 10))}"
       >
         {#if hovering}
           <span>
@@ -132,11 +134,11 @@
           </span>
         {/if}
         <div
-          on:click|stopPropagation={e => handleClick(e, id)}
-          on:keydown={stopEdit}
-          on:input={ e => textChange(e, id) }
-          on:mouseenter={() => tabs[i].hovering = true}
-          on:mouseleave={() => tabs[i].hovering = false}
+          on:click|stopPropagation="{e => handleClick(e, id)}"
+          on:keydown="{stopEdit}"
+          on:input="{ e => textChange(e, id) }"
+          on:mouseenter="{() => tabs[i].hovering = true}"
+          on:mouseleave="{() => tabs[i].hovering = false}"
           class="button"
         >
           {name}
@@ -148,7 +150,7 @@
           <input
             title="Select tab"
             on:click|stopPropagation
-            use:registerTabs={id}
+            use:registerTabs="{id}"
             type="checkbox"
           />
         {/if}
@@ -156,24 +158,22 @@
     {/each}
 
   </ul>
-  <div
-    class="close-container"
-  >
+  <div class="close-container">
     <span
       title="New tab"
-      on:click={newTab}
+      on:click="{newTab}"
       class="icon"
     >
-      <PlusCircleIcon size={1.5}/>
+      <PlusCircleIcon size="{1.5}"/>
     </span>
     {#if tabs.length > 1}
     <span
       title="Delete selected tab(s)"
-      class:no-tabs={tab_status.length === 0}
-      on:click={() => deleteTabs(activeTab)}
+      class:no-tabs="{tabStatus.length === 0}"
+      on:click="{() => deleteTabs(activeTab)}"
       class="icon"
     >
-      <Trash2Icon size={1.5}/>
+      <Trash2Icon size="{1.5}"/>
     </span>
     {/if}
   </div>

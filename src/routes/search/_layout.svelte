@@ -3,13 +3,12 @@
 </script>
 
 <script>
-  import { stores } from '@sapper/app';
   import { tick, onMount, onDestroy, setContext } from 'svelte';
-  import { isObjNotEmpty } from '@svizzle/utils';
   import isEqual from 'just-compare';
   import * as _ from 'lamb';
 
-  import Dirty from '../../components/Dirty.svelte'
+  import { stores } from '@sapper/app';
+  import DirtyOverlay from '../../components/DirtyOverlay.svelte'
   import FacetsPanel from '../../components/Sidebar/FacetsPanel.svelte';
   import TabsPanel from '../../components/Sidebar/TabsPanel.svelte';
   import SelectionsPanel from '../../components/Sidebar/SelectionsPanel.svelte';
@@ -22,6 +21,11 @@
   import Sidebar from '../../components/Sidebar/Sidebar.svelte';
 
   import { project_title, searchRouteName } from '../../config.js';
+  import {
+    matchesDirty,
+    matchesError,
+    matchesPending
+  } from '../../machines/search_machine/utils.ts';
   import { screenMachine } from '../../services/screen_service.ts';
   import {
     screenStore,
@@ -92,29 +96,27 @@
   $: queryTitle = renderTitle($page.query.q, $page.query.i);
   $: facetTitle = selectedFacet ? `- ${titleCase(selectedFacet.replace('_', ' '))}` : '';
 
-  $: uiQuery = $screenStore[$currentTab] ? $screenStore[$currentTab].uiQuery : [];
+  $: currentScreen = $screenStore[$currentTab];
+  $: selections = currentScreen ? currentScreen.selections : [];
+  $: logic = currentScreen && currentScreen.logic;
+  $: uiQuery = currentScreen ? currentScreen.uiQuery : [];
+  $: isSingleQuery = uiQuery && uiQuery.length === 1;
   $: searchMachines = $screenMachine.context.searchMachines;
   $: searchMachine = $screenMachine.context.searchMachines[$currentTab];
-  $: isLoading = searchMachine && searchMachine.state.matches('Search.NotEmpty.Dirty.Pending');
-  $: isError = searchMachine && searchMachine.state.matches('Search.NotEmpty.Dirty.Error');
+  $: isDirty = $screenStore && matchesDirty(searchMachine);
   $: tabs =
     Object.entries($screenStore)
     .map(([id, t]) => ({
       id,
       name: t.name,
-      isLoading:
-        searchMachines[id] &&
-        searchMachines[id].state.matches('Search.NotEmpty.Dirty.Pending')
+      isError: matchesError(searchMachines[id]),
+      isLoading: matchesPending(searchMachines[id])
     }));
   $: rulesetIndex = uiQuery!== undefined
     ? uiQuery.findIndex(( { selected } ) => selected)
     : false;
-  $: isDirty = searchMachine && searchMachine.state.matches('Search.NotEmpty.Dirty');
-  $: hasPreviousQuery = $screenStore[$currentTab] && $screenStore[$currentTab].results.prevQuery;
-  $: selections = $screenStore[$currentTab] ? $screenStore[$currentTab].selections : [];
-  $: logic = $screenStore[$currentTab] && $screenStore[$currentTab].logic;
+
   $: mode = $screenMachine.matches('Form.Simple') ? 'simple' : 'complex';
-  $: isSingleQuery = uiQuery && uiQuery.length === 1;
 
   /* history */
 
@@ -152,8 +154,7 @@
     transitionComplete:
       () => screenMachine.send({ type: 'ROUTE_CHANGE_COMPLETED' }),
     data: screenStore,
-    checkDirty: () =>
-      searchMachine && !searchMachine.state.matches('Search.NotEmpty.Matching'),
+    checkDirty: () => matchesDirty(searchMachine),
     select: (selection, tabId) =>
       screenMachine.send({
         type: 'SELECTION_UPDATED',
@@ -181,7 +182,11 @@
   });
 
   const sendTabRenamed = ({detail: { value, id }}) =>
-    screenMachine.send({type: 'TAB_RENAMED', labelText: value , id: parseInt(id, 10)});
+    screenMachine.send({
+      type: 'TAB_RENAMED',
+      labelText: value,
+      id: parseInt(id, 10)
+    });
 
   const sendRouteChanged = ({detail}) =>
     screenMachine.send({
@@ -201,9 +206,15 @@
     _.getPath('values.0.query.length')
   ]));
 
-  function checkDirty() {
+  /*
+  We could make this a derived([screenStore, currentTab, queryObj], ...)
+  and when we spawn searchMachine in `createSearchMachine` we could subscribe
+  to the derived and send searchMachine `QUERY_*` events so this is embedded
+  in the form and does not have to be set up in the route.
+  */
+  function checkQuery() {
     const currentQ = $queryObj[$currentTab];
-    const lastQ = $screenStore[$currentTab].results.queryObj;
+    const lastQ = currentScreen.results.queryObj;
 
     const cachedQuery =
       lastQ.query
@@ -228,16 +239,6 @@
     }
   }
 
-  const newTab = () =>
-    screenMachine.send({
-      type: 'TAB_CREATED',
-      id: $idStore
-    });
-
-  //const sendTab_2 = (type, id) =>  screenMachine.send({type, id: parseInt(id, 10) });
-  const sendTabEdit = ({detail: { value, id }}) =>
-    screenMachine.send({type: 'TAB_RENAMED', labelText: value , id: parseInt(id, 10)});
-
   const handleChange = (text, i) => {
     screenMachine.send({
       type: 'TEXT_CHANGED',
@@ -252,7 +253,7 @@
       searchMachine.send('QUERY_CLEARED')
     }
 
-    checkDirty();
+    checkQuery();
   }
 
   const handleSend = event => {
@@ -263,17 +264,19 @@
 
   const handleReset = event => {
     event.preventDefault();
-    screenMachine.send({ type:'QUERY_RESET', tab: $currentTab });
-    checkDirty();
+    screenMachine.send({
+      type:'QUERY_RESET',
+      tab: $currentTab
+    });
+    checkQuery();
   };
 
-  const newRuleset = () => {
+  const newRuleset = () =>
     screenMachine.send({
       type: 'RULESET_CREATED',
       tabId: $currentTab,
       targetIndex: uiQuery.length
-    })
-  }
+    });
 
   const toggleTermStatus = (ruleIndex, termIndex) => {
     screenMachine.send({
@@ -281,8 +284,8 @@
       tabId: $currentTab,
       ruleIndex,
       termIndex
-    })
-    checkDirty();
+    });
+    checkQuery();
   }
 
   const sendRule = (type, ruleIndex) => {
@@ -291,7 +294,7 @@
       tabId: $currentTab,
       ruleIndex
     });
-    checkDirty();
+    checkQuery();
   }
 
   const sendRuleLabel = (type, { section, status, index: labelIndex }, ruleIndex = rulesetIndex ) =>{
@@ -302,7 +305,7 @@
       section: section.toLowerCase(),
       labelIndex,
     });
-    checkDirty();
+    checkQuery();
   }
 
   const copyRuleset = ruleIndex => {
@@ -311,8 +314,8 @@
       tabId: $currentTab,
       ruleIndex,
       targetIndex: uiQuery.length
-    })
-    checkDirty();
+    });
+    checkQuery();
   }
 
   const editRuleset = (ruleIndex, isEditing) => {
@@ -321,8 +324,8 @@
       tabId: $currentTab,
       ruleIndex,
       isEditing
-    })
-    checkDirty();
+    });
+    checkQuery();
   }
 
   const selectRuleset = targetIndex =>
@@ -330,15 +333,15 @@
       type: 'RULE_SELECTED',
       tabId: $currentTab,
       targetIndex
-    })
+    });
 
   const changeIndex = ESIndex => {
     screenMachine.send({
       type: 'INDEX_CHANGED',
       tabId: $currentTab,
       ESIndex
-    })
-    checkDirty();
+    });
+    checkQuery();
   }
 
   const toggleSelection = ({ detail }) =>
@@ -347,7 +350,7 @@
       tabId: $currentTab,
       selection: detail,
       route: $page.path
-    })
+    });
 
   const toggleSearchLogic = ({ detail }) => {
     screenMachine.send({
@@ -355,8 +358,8 @@
       tabId: $currentTab,
       logic: detail,
       route: $page.path
-    })
-    checkDirty();
+    });
+    checkQuery();
   }
 </script>
 
@@ -375,14 +378,12 @@
     >
       <div slot="sticky">
         <TabsPanel
-          {isLoading}
-          {isError}
           {tabs}
           activeTab="{$currentTab}"
-          on:newtab="{sendTabCreated}"
           on:changetab="{({detail}) => changeTab(detail)}"
           on:deletetab="{({detail}) => sendTab('TAB_DELETED', detail)}"
           on:duplicatetab="{({detail}) => sendTab('TAB_DELETED', detail)}"
+          on:newtab="{sendTabCreated}"
           on:textchange="{sendTabRenamed}"
         />
       </div>
@@ -399,7 +400,7 @@
           on:newrule="{newRuleset}"
           on:toggle="{toggleSearchLogic}"
           on:modechange="{({ detail }) => screenMachine.send({type: `CHANGE_SEARCH_${detail}`, tabId: $currentTab})}"
-          index="{$screenStore[$currentTab] && $screenStore[$currentTab].index}"
+          index="{currentScreen && currentScreen.index}"
           {logic}
           {mode}
         >
@@ -450,7 +451,7 @@
     </div>
 
     {#if isDirty}
-    <Dirty/>
+    <DirtyOverlay/>
     {/if}
   </div>
 
