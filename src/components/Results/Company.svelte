@@ -94,6 +94,16 @@
       {place.join(', ')}
     </p>
     <div class="icon">
+      {#if url}
+      <span>
+        <a
+          target="_blank"
+          href="{url}"
+        >
+          <Link color='#aaa'/>
+        </a>
+      </span>
+      {/if}
       <span
         on:mouseenter={() => hover = true}
         on:mouseleave={() => hover = false}
@@ -113,16 +123,6 @@
         {/if}
         {/if}
       </span>
-      {#if url}
-      <span>
-        <a
-          target="_blank"
-          href="{url}"
-        >
-          <Link color='#aaa'/>
-        </a>
-      </span>
-      {/if}
     </div>
   </div>
 </article>
@@ -158,10 +158,12 @@
       .icon {
         display: flex;
         justify-content: flex-end;
+
         span {
           width: 28px;
           transform: translateY(5px);
           margin-left: 10px;
+
           img {
             width: 100%;
             transform: translateY(2px);
