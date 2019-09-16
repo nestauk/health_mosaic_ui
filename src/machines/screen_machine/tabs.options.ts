@@ -70,11 +70,14 @@ export const tabs_options = {
     },
     createSearchMachine: assign((ctx: any) => {
       const id: string = get(ctx.idStore);
-      return _.setPathIn(
-        ctx,
-        `searchMachines.${id}`,
-        spawn(search_machine, id)
+      const machine = spawn(
+        search_machine.withContext({
+          ...ctx,
+          id,
+        }),
+        id
       );
+      return _.setPathIn(ctx, `searchMachines.${id}`, machine);
     }),
     popHistory: ({ historyStore }) => {
       historyStore.update(removeLast);

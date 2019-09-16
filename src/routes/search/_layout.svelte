@@ -117,7 +117,6 @@
     : false;
 
   $: mode = $screenMachine.matches('Form.Simple') ? 'simple' : 'complex';
-
   /* history */
 
   const pop_callback = async (page) => {

@@ -4,6 +4,7 @@
   import Spinner from '../Spinner.svelte';
   import Alert from '../Icons/Alert.svelte';
   import {
+    AlertTriangleIcon,
     CopyIcon,
     EditIcon,
     PlusCircleIcon,
@@ -129,7 +130,7 @@
         on:click|preventDefault="{() => dispatch('changetab', parseInt(id, 10))}"
       >
         {#if hovering}
-          <span>
+          <span class="edittab">
             <EditIcon />
           </span>
         {/if}
@@ -145,6 +146,14 @@
         </div>
         {#if isLoading}
           <Spinner />
+        {/if}
+        {#if isError}
+          <span
+            on:click|stopPropagation={() => {}}
+            class="error"
+          >
+            <AlertTriangleIcon />
+          </span>
         {/if}
         {#if tabs.length > 1}
           <input
@@ -215,7 +224,16 @@
     cursor: pointer;
     position: relative;
 
-    span {
+    .error {
+      height: 1.5rem;
+      width: 1.5rem;
+      margin-top: -0.25rem;
+      margin-right: 8px;
+      margin-top: 1px;
+      cursor: auto;
+    }
+
+    .edittab {
       position: absolute;
       left: 9px;
       width: 15px;

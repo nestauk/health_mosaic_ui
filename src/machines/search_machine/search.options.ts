@@ -22,7 +22,7 @@ export const search_options: any = {
     shareMatching: sendParent('MATCHING'),
     shareDirty: sendParent('DIRTY'),
     updateData: (
-      { screenStore, queryObj, currentTab, routeStore },
+      { screenStore, queryObj, currentTab, routeStore, id: _id },
       { data: { id, results, restore } }
     ) => {
       const screen = get(screenStore);
@@ -66,6 +66,10 @@ export const search_options: any = {
           })
         )
       );
+    },
+    refreshStore: ({ screenStore, id }) => {
+      // we need to trigger an update on the tab to ensure that svelte is notified of the change in state of the searchMachine itself.
+      screenStore.update(_.setPath(id, get(screenStore)[id]));
     },
   },
   services: {
