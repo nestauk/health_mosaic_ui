@@ -81,7 +81,6 @@ export const form_options = {
       ]);
 
       const newRule = _.updatePath(`${tabId}.uiQuery`, updater);
-
       screenStore.update(newRule);
     },
     toggleLabelBinary: (

@@ -239,7 +239,11 @@
     }
   }
 
-  const handleChange = (text, i) => {
+  const handleChange = (text, i, isEditing) => {
+    if (text === '' && !isEditing) {
+      editRuleset(i, isEditing);
+    }
+
     screenMachine.send({
       type: 'TEXT_CHANGED',
       tabId: $currentTab,
@@ -418,7 +422,7 @@
             >
               <RuleQueries
                 queries="{terms}"
-                on:change="{({detail}) => handleChange(detail, i)}"
+                on:change="{({detail}) => handleChange(detail, i, isEditing)}"
                 on:toggle="{({detail}) => toggleTermStatus(i, detail)}"
                 bind:this="{query[i]}"
                 {disabled}
