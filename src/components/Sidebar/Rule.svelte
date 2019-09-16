@@ -35,11 +35,15 @@
         >
           <ToggleLeftIcon size={1.5} />
         </li>
+        <li
+          class:isEditing
+          on:click={() => dispatch('edit')}
+        >
+          <EditIcon size={1.5} />
+        </li>
       {/if}
 
-      <li class:isEditing on:click={() => dispatch('edit')}>
-        <EditIcon size={1.5} />
-      </li>
+
     </ul>
   {/if}
 </div>
