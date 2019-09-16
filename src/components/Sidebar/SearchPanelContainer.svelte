@@ -10,13 +10,12 @@
   import { ESIndices } from '../../config';
   import Dropdown from '../Dropdown.svelte';
 
+  const dispatch = createEventDispatcher();
+
   export let index;
   export let logic;
-  export let rulesets;
   export let mode;
-
-  const dispatch = createEventDispatcher();
-  const search_indices= ['Research', 'Companies', 'Events'];
+  export let rulesets;
 </script>
 
 <div class="container">

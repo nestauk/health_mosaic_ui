@@ -8,9 +8,14 @@ export const project_title = kebabcaseToCamelcase(name);
 export const BASE_URL =
   'https://search-health-scanner-5cs7g52446h7qscocqmiky5dn4.eu-west-2.es.amazonaws.com';
 
-export const NIH_type = 'paper';
 export const CB_type = 'company';
 export const MU_type = 'meetup';
+export const NIH_type = 'paper';
+export const typeLabels = {
+  [CB_type]: 'Companies',
+  [MU_type]: 'Social',
+  [NIH_type]: 'Research',
+};
 
 export const NIH_index = 'nih_v5';
 export const endpointNIH = `${BASE_URL}/${NIH_index}`;

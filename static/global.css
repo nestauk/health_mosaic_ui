@@ -88,6 +88,10 @@ code {
   --color-grey-lightgrey: hsl(0, 0%, 83%);
   --color-red-meetup: hsl(350, 85%, 52%); /* logo_meetup.svg */
 
+  /* sizes */
+
+  --size-global-padding: 16px;
+
   /* theme: colors */
 
   --color-app-background: white;
@@ -142,11 +146,12 @@ code {
 
   /* theme: sizes */
 
-  --size-bars-padding: 12px;
+  --size-bars-padding: var(--size-global-padding);
   --size-header-height: 70px;
   --size-header-innerheight: calc(
     var(--size-header-height) - 2 * var(--size-bars-padding)
   );
+  --size-facet-padding: var(--size-global-padding);
   --size-footer-height: 50px;
   --size-footer-innerheight: calc(
     var(--size-footer-height) - 2 * var(--size-bars-padding)

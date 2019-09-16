@@ -9,6 +9,7 @@
 
   import { stores } from '@sapper/app';
   import DirtyOverlay from '../../components/DirtyOverlay.svelte'
+  import ItemsFigures from '../../components/ItemsFigures.svelte'
   import FacetsPanel from '../../components/Sidebar/FacetsPanel.svelte';
   import TabsPanel from '../../components/Sidebar/TabsPanel.svelte';
   import SelectionsPanel from '../../components/Sidebar/SelectionsPanel.svelte';
@@ -20,7 +21,14 @@
   } from '../../components/Sidebar/SearchPanel';
   import Sidebar from '../../components/Sidebar/Sidebar.svelte';
 
-  import { project_title, searchRouteName } from '../../config.js';
+  import {
+    CB_type,
+    project_title,
+    MU_type,
+    NIH_type,
+    searchRouteName,
+    typeLabels,
+  } from '../../config.js';
   import {
     matchesDirty,
     matchesError,
@@ -34,6 +42,7 @@
     queryObj
   } from '../../stores/search.ts';
   import { shouldResizeStore } from '../../stores/';
+  import { countByTypeAsKeyValue } from '../../util/domain';
   import { capitalise, titleCase } from '../../util/string';
 
   const { page } = stores();
@@ -97,10 +106,16 @@
   $: facetTitle = selectedFacet ? `- ${titleCase(selectedFacet.replace('_', ' '))}` : '';
 
   $: currentScreen = $screenStore[$currentTab];
-  $: selections = currentScreen ? currentScreen.selections : [];
-  $: logic = currentScreen && currentScreen.logic;
-  $: uiQuery = currentScreen ? currentScreen.uiQuery : [];
   $: isSingleQuery = uiQuery && uiQuery.length === 1;
+  $: logic = currentScreen && currentScreen.logic;
+  $: selectedItems = (currentScreen && currentScreen.selected) || [];
+  $: selectedItemsVolume = selectedItems.length;
+  $: selectedItemsVolumes = _.map(
+    countByTypeAsKeyValue(selectedItems),
+    ({key, value}) => ({key, text: `${typeLabels[key]} (${value})`})
+  );
+  $: selections = currentScreen ? currentScreen.selections : [];
+  $: uiQuery = currentScreen ? currentScreen.uiQuery : [];
   $: searchMachines = $screenMachine.context.searchMachines;
   $: searchMachine = $screenMachine.context.searchMachines[$currentTab];
   $: isDirty = $screenStore && matchesDirty(searchMachine);
@@ -450,14 +465,23 @@
 
   <div class="col {isSidebarLeft ? 'col2-3' : 'col1-2'}">
     <div class="Facet">
-      <slot></slot>
+      {#if selectedItemsVolume}
+      <header>
+        <ItemsFigures
+          total={selectedItemsVolume}
+          parts={selectedItemsVolumes}
+        />
+      </header>
+      {/if}
+      <main>
+        <slot></slot>
+      </main>
+
+      {#if isDirty}
+        <DirtyOverlay/>
+      {/if}
     </div>
-
-    {#if isDirty}
-    <DirtyOverlay/>
-    {/if}
   </div>
-
 </div>
 
 <style lang="less">
@@ -475,7 +499,6 @@
   .col {
     height: 100%;
     grid-row: 1;
-    position: relative;
   }
   .col1 {
     grid-column: 1 / span 1;
@@ -495,8 +518,32 @@
   }
 
   .Facet {
+    width: 100%;
     height: 100%;
     max-height: 100%;
+
     background-color: var(--color-facet-background);
+    position: relative;
+
+    --header-height: 3em;
+
+    display: grid;
+    grid-template-rows: var(--header-height) calc(100% - var(--header-height));
+    grid-template-columns: 100%;
+
+    header {
+      grid-row: 1 / span 1;
+      width: 100%;
+      border-bottom: var(--border-ui);
+
+      padding: var(--size-facet-padding);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    main {
+      grid-row: 2 / span 1;
+      width: 100%;
+    }
   }
 </style>

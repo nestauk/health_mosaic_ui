@@ -10,15 +10,8 @@
   import { screenStore, currentTab } from '../../../stores/search.ts';
   import { SEARCH } from '../_layout.svelte';
   import { NIH_type, CB_type, MU_type } from '../../../config';
-  import { countByTypeAsKeyValue } from '../../../util/domain';
 
   const { checkDirty } = getContext(SEARCH);
-
-  const labels = {
-    [CB_type]: 'Companies',
-    [MU_type]: 'Social',
-    [NIH_type]: 'Research',
-  };
 
   let previousSelectedItems;
   let changed;
@@ -31,14 +24,10 @@
       previousSelectedItems = selectedItems;
     }
   }
-  $: volumes = _.map(
-    countByTypeAsKeyValue(selectedItems),
-    ({key, value}) => ({key, text: `${labels[key]} (${value})`})
-  );
   $: isDirty = $screenStore && checkDirty();
 
-  const openAll = () => items.forEach(v => v.open())
-  const closeAll = () => items.forEach(v => v.close())
+  const openAll = () => items.forEach(v => v.open());
+  const closeAll = () => items.forEach(v => v.close());
 </script>
 
 <div
@@ -47,7 +36,6 @@
 >
   {#if selectedItems.length}
   <div class="header">
-    <p>Showing: {selectedItems.length} items</p>
     <div class="buttons">
       <span on:click={openAll}>
         <AddCircle />
@@ -56,11 +44,6 @@
         <RemoveCircle />
         </span>
       </div>
-    <ul>
-      {#each volumes as {key, text}}
-      <li class="{key}">{text}</li>
-      {/each}
-    </ul>
   </div>
 
   <Results dirty="{isDirty}" {changed}>
@@ -93,56 +76,22 @@
     .header {
       padding: 0.5em;
       display: flex;
-      justify-content: space-between;
+      justify-content: center;
       align-items: center;
-
-      border-bottom: var(--border-ui);
 
       .buttons {
         width: 56px;
         display: grid;
         height: 25px;
         grid-template-columns: 1fr 1fr;
+
         span {
           opacity: 0.6;
           cursor: pointer;
+
           &:hover {
             opacity: 1;
           }
-        }
-      }
-    }
-
-    ul {
-      display: flex;
-      list-style: none;
-      padding: 0;
-      margin: 0;
-
-      li {
-        margin-left: 2.4em;
-        position: relative;
-
-        &::before {
-          content: '';
-          position: absolute;
-          width: 10px;
-          height: 10px;
-          border-radius: 5px;
-          left: -20px;
-          top: 7px
-        }
-
-        &.company::before {
-          background: var(--color-type-company);
-        }
-
-        &.meetup::before {
-          background: var(--color-type-event);
-        }
-
-        &.paper::before {
-          background: var(--color-type-paper);
         }
       }
     }

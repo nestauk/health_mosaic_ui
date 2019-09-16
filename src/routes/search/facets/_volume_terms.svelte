@@ -272,9 +272,9 @@
 
 <style lang="less">
   .VolumeTerms {
-    height: 100%;
     width: 100%;
-    padding: 1em 1em 1em 1em;
+    height: 100%;
+    padding: var(--size-global-padding);
 
     flex: 1;
     height: 100%;

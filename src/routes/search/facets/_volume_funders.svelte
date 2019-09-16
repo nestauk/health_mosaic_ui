@@ -278,7 +278,7 @@
   .VolumeFunders {
     height: 100%;
     width: 100%;
-    padding: 1em 1em 1em 1em;
+    padding: var(--size-global-padding);
 
     flex: 1;
     height: 100%;
