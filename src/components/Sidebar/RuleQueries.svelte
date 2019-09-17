@@ -29,8 +29,11 @@
     dispatch('change', content);
 
     if (event.key === 'Enter') {
-       event.preventDefault();
-       dispatch('commit');
+      event.preventDefault();
+      if (!event.target.value) {
+        return
+      }
+      dispatch('commit');
     }
   }
 

@@ -80,6 +80,15 @@
     }
   };
 
+  const removeTab = id => {
+    let el = tabStatus.findIndex(_id =>_id === parseInt(id, 10));
+    if (el < 0) {
+      return
+    };
+    tabStatus.splice(el, 1);
+    tabStatus = tabStatus;
+  }
+
   const registerTabs = (node, id) => {
 
     function toggleChecked(e) {
@@ -87,9 +96,7 @@
         tabStatus.push(parseInt(id, 10));
         tabStatus = tabStatus;
       } else {
-        let el = tabStatus.findIndex(_id =>_id === parseInt(id, 10));
-        tabStatus.splice(el, 1);
-        tabStatus = tabStatus;
+        removeTab(id);
       }
     }
 
@@ -117,6 +124,21 @@
     dispatch('deletetab', tabStatus)
     tabStatus = tabStatus.length === tabs.length ? [tabStatus[0]] : [];
   }
+
+  const deleteTab = (id) => {
+    removeTab(+id);
+    dispatch('deletetab', [+id]);
+  }
+
+  const hoverOn = i => {
+    tabs[i].hoveringTitle = true;
+    tabs[i].hovering = false;
+  }
+
+  const hoverOff = i => {
+    tabs[i].hoveringTitle = false;
+    tabs[i].hovering = true;
+  }
 </script>
 
 <svelte:window on:click|stopPropagation="{stopEdit}"/>
@@ -124,12 +146,14 @@
 <nav>
   <h2>Tabs</h2>
   <ul>
-    {#each tabs as { hovering, id, isError, isLoading, name }, i (id)}
+    {#each tabs as { hovering, hoveringTitle, id, isError, isLoading, name }, i (id)}
       <li
         class:selected="{parseInt(id, 10) === activeTab}"
         on:click|preventDefault="{() => dispatch('changetab', parseInt(id, 10))}"
+        on:mouseenter="{() => tabs[i].hovering = true}"
+        on:mouseleave="{() => tabs[i].hovering = false}"
       >
-        {#if hovering}
+        {#if hoveringTitle}
           <span class="edittab">
             <EditIcon />
           </span>
@@ -138,21 +162,30 @@
           on:click|stopPropagation="{e => handleClick(e, id)}"
           on:keydown="{stopEdit}"
           on:input="{ e => textChange(e, id) }"
-          on:mouseenter="{() => tabs[i].hovering = true}"
-          on:mouseleave="{() => tabs[i].hovering = false}"
+          on:mouseenter="{() => hoverOn(i)}"
+          on:mouseleave="{() => hoverOff(i)}"
           class="button"
         >
           {name}
         </div>
-        {#if isLoading}
-          <Spinner />
-        {/if}
-        {#if isError}
-          <span
-            on:click|stopPropagation={() => {}}
-            class="error"
-          >
+        <span
+          on:click|stopPropagation={() => {}}
+          class="error icon"
+        >
+          {#if isLoading}
+            <Spinner />
+          {/if}
+          {#if isError}
             <AlertTriangleIcon />
+          {/if}
+        </span>
+
+        {#if hovering && tabs.length > 1}
+          <span
+            class="icon delete"
+            on:click|stopPropagation={() => hovering && deleteTab(id)}
+          >
+            <Trash2Icon />
           </span>
         {/if}
         {#if tabs.length > 1}
@@ -224,12 +257,20 @@
     cursor: pointer;
     position: relative;
 
-    .error {
+    .icon {
       height: 1.5rem;
       width: 1.5rem;
-      margin-top: -0.25rem;
       margin-right: 8px;
-      margin-top: 1px;
+      margin: 1px 8px 0 0;
+    }
+
+    .delete {
+      height: 18px;
+      width: 18px;
+    }
+
+    .error {
+      margin-left: auto;
       cursor: auto;
     }
 
@@ -255,7 +296,6 @@
   }
 
   .button {
-    padding: 0.2em 0em;
     display: block;
     cursor: pointer;
     background: none;
@@ -265,6 +305,8 @@
     overflow: hidden;
     height: 2.1rem;
     min-width: 3rem;
+    display: flex;
+    align-items: center;
   }
 
 

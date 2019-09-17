@@ -5,7 +5,7 @@ export const tabs_config = {
     Idle: {
       on: {
         TAB_DELETED: {
-          actions: ['deleteTab', 'popHistory', 'setUrlQuery'],
+          actions: ['deleteTab', 'setUrlQuery'],
         },
         TAB_CREATED: {
           actions: [
