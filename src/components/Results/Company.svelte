@@ -1,8 +1,10 @@
 <script>
   import { createEventDispatcher } from 'svelte';
   import { format } from 'd3-format';
-  import { Link, AddCircle, RemoveCircle } from '../Icons/'
+  import { Link } from '../Icons/'
+  import { EyeIcon, EyeOffIcon } from 'svelte-feather-icons';
   import { countries } from '../../../data/geo/iso_a2_to_name_by_type.json';
+  import { truncateText } from '../../util/string';
 
   import Tooltip from '../Tooltip.svelte';
 
@@ -66,27 +68,20 @@
     </ul>
 
     {#if summary}
-      <p><strong>Summary: </strong>{summary}</p>
+    <p><strong>Summary: </strong>{truncateText(summary, show)}</p>
     {/if}
 
     {#if body}
       <span
         class="more"
-        on:click={() => show = !show}
+        on:click={() => show ? close() : open()}
       >
-        {#if show}
-          <RemoveCircle color='#333' />
-        {:else}
-          <AddCircle color='#333' />
-        {/if}
       </span>
     {/if}
 
     {#if body}
-      {#if show}
-        <strong>Description</strong>
-        {body}<br>
-      {/if}
+        <strong>Body: </strong>
+        {truncateText(body, show)}<br>
     {/if}
   </div>
   <div class="subject">
@@ -124,6 +119,18 @@
         {#if hover}
           <Tooltip offset="{-5}" text="Crunchbase"/>
         {/if}
+        {/if}
+      </span>
+    </div>
+    <div class="icon">
+      <span
+        class="more"
+        on:click={() => show ? close() : open()}
+      >
+        {#if show}
+          <EyeOffIcon />
+        {:else}
+          <EyeIcon />
         {/if}
       </span>
     </div>
@@ -179,7 +186,7 @@
       cursor: pointer;
       display: block;
       width: 30px;
-      margin-left: 10px 0;
+      margin: 10px 0;
       user-select: none;
     }
   }

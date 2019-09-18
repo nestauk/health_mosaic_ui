@@ -3,6 +3,7 @@
   import * as _ from 'lamb';
   import compare from 'just-compare';
   import VirtualList from '@sveltejs/svelte-virtual-list';
+  import { EyeIcon, EyeOffIcon } from 'svelte-feather-icons';
 
   import Fallback from '../../../components/Fallback.svelte'
   import { AddCircle, RemoveCircle } from '../../../components/Icons/'
@@ -18,7 +19,7 @@
   let changed;
   let items = {};
 
-  $: selectedItems = $screenStore[$currentTab].selected.map(v =>({...v, show: false})) || [];
+  $: selectedItems = $screenStore[$currentTab].selected.map((v, index) =>({...v, show: false, index})) || [];
   $: {
     changed = selectedItems && !compare(previousSelectedItems, selectedItems);
     if (changed) {
@@ -27,8 +28,8 @@
   }
   $: isDirty = $screenStore && checkDirty();
 
-  const openAll = () => selectedItems = selectedItems.map(v => ({...v, show: true}));
-  const closeAll = () => selectedItems = selectedItems.map(v => ({...v, show: false}));
+  const openAll = () => selectedItems = selectedItems.map((v, index) => ({...v, show: true}));
+  const closeAll = () => selectedItems = selectedItems.map((v, index) => ({...v, show: false}));
 
 </script>
 
@@ -40,10 +41,10 @@
   <div class="header">
     <div class="buttons">
       <span on:click={openAll}>
-        <AddCircle />
+        <EyeIcon />
       </span>
       <span on:click={closeAll}>
-        <RemoveCircle />
+        <EyeOffIcon />
         </span>
       </div>
   </div>
@@ -54,22 +55,22 @@
         <Paper
           data={item}
           show={item.show}
-          on:show={() => item.show = true}
-          on:show={() => item.show = false}
+          on:show={() => selectedItems[item.index].show = true}
+          on:hide={() => selectedItems[item.index].show = false}
         />
       {:else if item.type === MU_type}
         <Event
           data={item}
           show={item.show}
-          on:show={() => item.show = true}
-          on:show={() => item.show = false}
+          on:show={() => selectedItems[item.index].show = true}
+          on:hide={() => selectedItems[item.index].show = false}
         />
       {:else if item.type === CB_type}
         <Company
           data={item}
           show={item.show}
-          on:show={() => item.show = true}
-          on:show={() => item.show = false}
+          on:show={() => selectedItems[item.index].show = true}
+          on:hide={() => selectedItems[item.index].show = false}
         />
       {/if}
     </VirtualList>
@@ -95,10 +96,11 @@
       align-items: center;
 
       .buttons {
-        width: 56px;
+        width: 66px;
         display: grid;
         height: 25px;
         grid-template-columns: 1fr 1fr;
+        grid-gap: 10px;
 
         span {
           opacity: 0.6;
