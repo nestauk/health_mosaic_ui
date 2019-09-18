@@ -49,6 +49,9 @@ const toggleEditMode = editMode => rule => ({ ...rule, isEditing: editMode });
 export const form_options = {
   guards: {
     isComplex: ({ screenStore }, { tabId }) => {
+      if (Array.isArray(tabId)) {
+        return;
+      }
       const currentQuery = get(screenStore)[tabId].uiQuery;
       const { fields } = currentQuery[0];
       const hasSelectedFields = fields.subject
