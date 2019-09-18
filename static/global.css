@@ -90,7 +90,7 @@ code {
 
   /* sizes */
 
-  --size-global-padding: 16px;
+  --size-global-padding: 12px;
 
   /* theme: colors */
 
@@ -159,6 +159,9 @@ code {
   --size-main-height: calc(
     100% - var(--size-header-height) - var(--size-footer-height)
   );
+
+  --size-sidebar-padding: 1rem;
+  --size-sidebar-panel-title: 1.3rem;
   --size-sidebar-width: 25rem;
 
   /* flow: z-index */

@@ -228,7 +228,8 @@
   }
 
   h2 {
-    margin: 1rem;
+    margin: var(--size-sidebar-padding);
+    font-size: var(--size-sidebar-panel-title);
   }
 
   nav {

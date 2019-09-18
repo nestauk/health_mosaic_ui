@@ -64,7 +64,7 @@
     margin-top: 2rem;
   }
   h2 {
-    font-size: 1.3rem;
+    font-size: var(--size-sidebar-panel-title);
   }
 
   .title {

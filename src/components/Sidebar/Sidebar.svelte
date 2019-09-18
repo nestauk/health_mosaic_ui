@@ -27,7 +27,7 @@
   </div>
 </div>
 
-<style lang="less">
+<style>
   .sidebar {
     width: 100%;
     height: 100%;
@@ -37,42 +37,49 @@
 
     display: flex;
     flex-direction: column;
+  }
 
-    .scrollable {
-      flex: 1;
-      overflow-y: scroll;
-      padding: 15px;
-    }
+  .scrollable {
+    flex: 1;
+    overflow-y: scroll;
+    padding: var(--size-sidebar-padding);
+  }
 
-    .button {
-      height: 1.6rem;
-      width: 1.6rem;
-      position: absolute;
-      bottom: 0;
-      margin: var(--size-bars-padding);
-      border: var(--border-sidebar);
-      border-radius: 1rem;
-      background-color: var(--color-button-background);
-      box-shadow: var(--shadow-overlay);
-      cursor: pointer;
+  :global(div[slot="scrollable"] > div:first-child) {
+    margin-top: var(--size-sidebar-padding);
+  }
+  :global(div[slot="scrollable"] > div:not(:first-child)) {
+    margin-top: calc(2* var(--size-sidebar-padding));
+  }
 
-      display: flex;
-      align-items: center;
-      justify-content: center;
+  .button {
+    height: 1.6rem;
+    width: 1.6rem;
+    position: absolute;
+    bottom: 0;
+    margin: var(--size-bars-padding);
+    border: var(--border-sidebar);
+    border-radius: 1rem;
+    background-color: var(--color-button-background);
+    box-shadow: var(--shadow-overlay);
+    cursor: pointer;
 
-      &.left {
-        left: 0;
-        transform: rotate(90deg);
-      }
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 
-      &.right {
-        right: 0;
-        transform: rotate(-90deg);
-      }
+  .button.left {
+    left: 0;
+    transform: rotate(90deg);
+  }
 
-      &:hover {
-        background-color: var(--color-highlight);
-      }
-    }
+  .button.right {
+    right: 0;
+    transform: rotate(-90deg);
+  }
+
+  .button:hover {
+    background-color: var(--color-highlight);
   }
 </style>

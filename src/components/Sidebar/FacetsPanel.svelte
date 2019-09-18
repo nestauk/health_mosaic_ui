@@ -36,7 +36,7 @@
     margin: 2rem 0;
   }
   h2 {
-    font-size: 1.3rem;
+    font-size: var(--size-sidebar-panel-title);
   }
   ul {
     padding: 0 0px;
