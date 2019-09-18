@@ -2,6 +2,7 @@
   import { getContext } from 'svelte';
   import * as _ from 'lamb';
   import compare from 'just-compare';
+  import VirtualList from '@sveltejs/svelte-virtual-list';
 
   import Fallback from '../../../components/Fallback.svelte'
   import { AddCircle, RemoveCircle } from '../../../components/Icons/'
@@ -15,9 +16,9 @@
 
   let previousSelectedItems;
   let changed;
-  let items = [];
+  let items = {};
 
-  $: selectedItems = $screenStore[$currentTab].selected || [];
+  $: selectedItems = $screenStore[$currentTab].selected.map(v =>({...v, show: false})) || [];
   $: {
     changed = selectedItems && !compare(previousSelectedItems, selectedItems);
     if (changed) {
@@ -26,8 +27,9 @@
   }
   $: isDirty = $screenStore && checkDirty();
 
-  const openAll = () => items.forEach(v => v.open());
-  const closeAll = () => items.forEach(v => v.close());
+  const openAll = () => selectedItems = selectedItems.map(v => ({...v, show: true}));
+  const closeAll = () => selectedItems = selectedItems.map(v => ({...v, show: false}));
+
 </script>
 
 <div
@@ -47,17 +49,30 @@
   </div>
 
   <Results dirty="{isDirty}" {changed}>
-    {#each selectedItems as item, i}
-
+    <VirtualList items={selectedItems} let:item>
       {#if item.type === NIH_type}
-        <Paper data={item} bind:this={items[i]}/>
+        <Paper
+          data={item}
+          show={item.show}
+          on:show={() => item.show = true}
+          on:show={() => item.show = false}
+        />
       {:else if item.type === MU_type}
-        <Event data={item} bind:this={items[i]}/>
+        <Event
+          data={item}
+          show={item.show}
+          on:show={() => item.show = true}
+          on:show={() => item.show = false}
+        />
       {:else if item.type === CB_type}
-        <Company data={item} bind:this={items[i]}/>
+        <Company
+          data={item}
+          show={item.show}
+          on:show={() => item.show = true}
+          on:show={() => item.show = false}
+        />
       {/if}
-
-    {/each}
+    </VirtualList>
   </Results>
 
   {:else}

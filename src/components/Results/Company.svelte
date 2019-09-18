@@ -1,4 +1,5 @@
 <script>
+  import { createEventDispatcher } from 'svelte';
   import { format } from 'd3-format';
   import { Link, AddCircle, RemoveCircle } from '../Icons/'
   import { countries } from '../../../data/geo/iso_a2_to_name_by_type.json';
@@ -6,15 +7,17 @@
   import Tooltip from '../Tooltip.svelte';
 
   export let data;
-  let show = false;
+  export let show = false;
   let hover = false;
 
+  const dispatch = createEventDispatcher();
+
   export function close() {
-    show = false;
+    dispatch('hide');
   }
 
   export function open() {
-    show = true;
+    dispatch('show');
   }
 
   $: ({
