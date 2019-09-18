@@ -10,6 +10,8 @@
 
   $: selectionsArray = _.pairs(selections);
 
+  const formatCoords = coords => parseFloat(coords).toFixed(2);
+
   const filterCurrent = ({ type, value }, current, selection) => {
     const newValue = value.filter(v => v !== current);
 
@@ -34,14 +36,24 @@
         </span>
       </div>
       <ul>
-        {#each selection.value as item}
+        {#if selection.type === 'within'}
           <li
             title="Remove selection"
-            on:click={() => dispatch('toggleselection',  filterCurrent(selection, item, key))}
+            on:click={() => dispatch('toggleselection',  {key, type:selection.type, value: undefined})}
           >
-            {item}
+            <p><strong>SW</strong> {formatCoords(selection.value[0][0])}°, {formatCoords(selection.value[0][1])}°
+            <strong>NE</strong> {formatCoords(selection.value[1][0])}°, {formatCoords(selection.value[1][1])}°</p>
           </li>
-        {/each}
+        {:else}
+          {#each selection.value as item}
+            <li
+              title="Remove selection"
+              on:click={() => dispatch('toggleselection',  filterCurrent(selection, item, key))}
+            >
+              {item}
+            </li>
+          {/each}
+        {/if}
       </ul>
     {/each}
   </div>
@@ -108,6 +120,10 @@
       margin: 3px;
       cursor: pointer;
       user-select: none;
+
+      p {
+        margin: 0;
+      }
 
       &:hover {
         background: #eee;
