@@ -4,6 +4,9 @@ export const tabs_config = {
   states: {
     Idle: {
       on: {
+        TAB_COPIED: {
+          actions: ['duplicateTabs'],
+        },
         TAB_DELETED: {
           actions: ['deleteTab', 'setUrlQuery'],
         },

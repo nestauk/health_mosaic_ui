@@ -24,7 +24,7 @@
   export let tabs;
 
   let editedTarget = null;
-  let tabStatus = [];
+  let selectedTabs = [];
 
 // various keypresses trigger window click events for accessibility reasons
   // we need to check to ensure the click event is coming from an actual click rather than a keypress
@@ -80,23 +80,23 @@
     }
   };
 
-  const removeTab = id => {
-    let el = tabStatus.findIndex(_id =>_id === parseInt(id, 10));
+  const deselectTab = id => {
+    let el = selectedTabs.findIndex(_id =>_id === parseInt(id, 10));
     if (el < 0) {
       return
     };
-    tabStatus.splice(el, 1);
-    tabStatus = tabStatus;
+    selectedTabs.splice(el, 1);
+    selectedTabs = selectedTabs;
   }
 
   const registerTabs = (node, id) => {
 
     function toggleChecked(e) {
       if (e.target.checked) {
-        tabStatus.push(parseInt(id, 10));
-        tabStatus = tabStatus;
+        selectedTabs.push(parseInt(id, 10));
+        selectedTabs = selectedTabs;
       } else {
-        removeTab(id);
+        deselectTab(id);
       }
     }
 
@@ -107,7 +107,7 @@
     }
   }
 
-  const newTab = async () => {
+  const createTab = async () => {
     dispatch('newtab');
     await tick();
   }
@@ -116,18 +116,14 @@
     dispatch('textchange', { value: target.innerText, id });
   }
 
-  const duplicateTabs = async id => {
-    dispatch('duplicatetab', tabStatus)
-  }
-
   const deleteTabs = async id => {
-    dispatch('deletetab', tabStatus)
-    tabStatus = [];
+    dispatch('deleteTabs', selectedTabs)
+    selectedTabs = [];
   }
 
   const deleteTab = (id) => {
-    removeTab(+id);
-    dispatch('deletetab', [+id]);
+    deselectTab(+id);
+    dispatch('deleteTabs', [+id]);
   }
 
   const hoverOn = i => {
@@ -138,6 +134,14 @@
   const hoverOff = i => {
     tabs[i].hoveringTitle = false;
     tabs[i].hovering = true;
+  }
+
+  const duplicateTabs = ({ detail }) => {
+    if (!selectedTabs.length) {
+      return;
+    }
+    dispatch('duplicatetabs', selectedTabs);
+    selectedTabs = [];
   }
 </script>
 
@@ -194,6 +198,7 @@
             on:click|stopPropagation
             use:registerTabs="{id}"
             type="checkbox"
+            checked={selectedTabs.includes(parseInt(id, 10))}
           />
         {/if}
       </li>
@@ -201,23 +206,32 @@
 
   </ul>
   <div class="close-container">
+    {#if tabs.length > 1}
+      <span
+        title="Duplicate Tabs"
+        class:no-tabs="{selectedTabs.length === 0}"
+        on:click="{duplicateTabs}"
+        class="icon"
+      >
+        <CopyIcon />
+      </span>
+
+      <span
+        title="Delete selected tab(s)"
+        class:no-tabs="{selectedTabs.length === 0}"
+        on:click="{() => deleteTabs(activeTab)}"
+        class="icon"
+      >
+        <Trash2Icon size="{1.5}"/>
+      </span>
+    {/if}
     <span
-      title="New tab"
-      on:click="{newTab}"
+      title="Create a new tab"
+      on:click="{createTab}"
       class="icon"
     >
       <PlusCircleIcon size="{1.5}"/>
     </span>
-    {#if tabs.length > 1}
-    <span
-      title="Delete selected tab(s)"
-      class:no-tabs="{tabStatus.length === 0}"
-      on:click="{() => deleteTabs(activeTab)}"
-      class="icon"
-    >
-      <Trash2Icon size="{1.5}"/>
-    </span>
-    {/if}
   </div>
 </nav>
 
@@ -325,10 +339,6 @@
 
     &.no-tabs {
       opacity: 0.5;
-    }
-
-    &:hover {
-      opacity: 1;
     }
   }
 

@@ -1,10 +1,13 @@
 import { get } from 'svelte/store';
+import { tick } from 'svelte';
 //@ts-ignore
 import { goto } from '@sapper/app';
 import * as _ from 'lamb';
 import { assign, spawn } from 'xstate';
+import { mergeWithMerge } from '@svizzle/utils';
 
 import { version } from '../../../package.json';
+import { copyObj } from '../../util/any';
 import { makePath } from '../../util/config';
 import { newRuleset } from '../../util/query';
 import {
@@ -64,7 +67,48 @@ export const tabs_options = {
       );
       idStore.update(add1);
     },
+    duplicateTabs: assign((ctx: any, { tabId }) => {
+      const newSearchMachines = {};
 
+      tabId.forEach(id => {
+        const newTabId = get(ctx.idStore);
+
+        const { index, logic, name, selections, uiQuery, results, route } =
+          get(ctx.screenStore)[id];
+
+        ctx.screenStore.update(
+          _.setKey(
+            newTabId,
+            newTab(
+              name,
+              copyObj(uiQuery),
+              index,
+              copyObj(selections),
+              logic,
+              route
+            )
+          )
+        );
+
+        newSearchMachines[newTabId] = spawn(
+          search_machine.withContext({
+            ...ctx,
+            id,
+          }),
+          id
+        );
+
+        if (results.data.length) {
+          newSearchMachines[newTabId].send('QUERY_ENTERED');
+          newSearchMachines[newTabId].send('QUERY_CHANGED');
+          newSearchMachines[newTabId].send('SEARCHED', { tabId: newTabId });
+        }
+
+        ctx.idStore.update(add1);
+      });
+
+      return mergeWithMerge(ctx, { searchMachines: newSearchMachines });
+    }),
     setCurrentTab: ({ currentTab }, { tabId = 0 }) => {
       currentTab.set(tabId);
     },

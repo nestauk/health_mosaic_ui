@@ -34,7 +34,7 @@
     box-sizing: border-box;
     background: var(--color-sidebar-background);
     position: relative;
-
+    user-select: none;
     display: flex;
     flex-direction: column;
   }
