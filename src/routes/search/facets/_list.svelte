@@ -2,22 +2,26 @@
   import { getContext } from 'svelte';
   import * as _ from 'lamb';
   import compare from 'just-compare';
+  import { EyeIcon, EyeOffIcon } from 'svelte-feather-icons';
 
   import Fallback from '../../../components/Fallback.svelte'
   import { AddCircle, RemoveCircle } from '../../../components/Icons/'
-  import { Results, Paper, Event, Company } from '../../../components/Results';
-
+  import { Results, Entity } from '../../../components/Results';
+  import { NIH_type, CB_type, MU_type } from '../../../config';
   import { screenStore, currentTab } from '../../../stores/search.ts';
   import { SEARCH } from '../_layout.svelte';
-  import { NIH_type, CB_type, MU_type } from '../../../config';
 
   const { checkDirty } = getContext(SEARCH);
+  const foldAll = _.mapWith(_.setKey('show', false));
+  const unfoldAll = _.mapWith(_.setKey('show', true));
+  const onFoldAll = () => selectedItems = foldAll(selectedItems);
+  const onUnfoldAll = () => selectedItems = unfoldAll(selectedItems);
 
   let previousSelectedItems;
   let changed;
-  let items = [];
+  let items = {};
 
-  $: selectedItems = $screenStore[$currentTab].selected || [];
+  $: selectedItems = $screenStore[$currentTab].selected.map((v, index) =>({...v, show: false, index})) || [];
   $: {
     changed = selectedItems && !compare(previousSelectedItems, selectedItems);
     if (changed) {
@@ -26,8 +30,6 @@
   }
   $: isDirty = $screenStore && checkDirty();
 
-  const openAll = () => items.forEach(v => v.open());
-  const closeAll = () => items.forEach(v => v.close());
 </script>
 
 <div
@@ -37,31 +39,28 @@
   {#if selectedItems.length}
   <div class="header">
     <div class="buttons">
-      <span on:click={openAll}>
-        <AddCircle />
+      <span on:click={onUnfoldAll}>
+        <EyeIcon />
       </span>
-      <span on:click={closeAll}>
-        <RemoveCircle />
+      <span on:click={onFoldAll}>
+        <EyeOffIcon />
         </span>
       </div>
   </div>
 
   <Results dirty="{isDirty}" {changed}>
     {#each selectedItems as item, i}
-
-      {#if item.type === NIH_type}
-        <Paper data={item} bind:this={items[i]}/>
-      {:else if item.type === MU_type}
-        <Event data={item} bind:this={items[i]}/>
-      {:else if item.type === CB_type}
-        <Company data={item} bind:this={items[i]}/>
-      {/if}
-
+      <Entity
+        data={item}
+        show={item.show}
+        on:show={() => selectedItems[item.index].show = true}
+        on:hide={() => selectedItems[item.index].show = false}
+      />
     {/each}
   </Results>
 
   {:else}
-  <Fallback message="No results" />
+    <Fallback message="No results" />
   {/if}
 </div>
 
@@ -70,7 +69,6 @@
     height: 100%;
     display: flex;
     flex-direction: column;
-
     position: relative;
 
     .header {
@@ -80,10 +78,11 @@
       align-items: center;
 
       .buttons {
-        width: 56px;
+        width: 66px;
         display: grid;
         height: 25px;
         grid-template-columns: 1fr 1fr;
+        grid-gap: 10px;
 
         span {
           opacity: 0.6;

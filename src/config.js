@@ -17,6 +17,12 @@ export const typeLabels = {
   [NIH_type]: 'Research',
 };
 
+export const typeNames = {
+  paper: 'The National Institute for Health',
+  meetup: 'Meetup',
+  company: 'Crunchbase',
+};
+
 export const NIH_index = 'nih_v5';
 export const endpointNIH = `${BASE_URL}/${NIH_index}`;
 export const endpointNIHCount = `${endpointNIH}/_count`;
@@ -140,7 +146,6 @@ export const testSource = {
   type: 'vector',
   url: 'mapbox://examples.8fgz4egr',
 };
-
 
 /*
 mediaqueries (the last one must be of type `lt`)

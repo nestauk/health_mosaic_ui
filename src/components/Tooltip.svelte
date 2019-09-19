@@ -18,7 +18,7 @@
     right: 0;
     top: 42px;
     max-width: 10vw;
-    z-index: 2;
+    z-index: var(--z-index-menu);
   }
 
   span::before {
