@@ -122,7 +122,7 @@
 
   const deleteTabs = async id => {
     dispatch('deletetab', tabStatus)
-    tabStatus = tabStatus.length === tabs.length ? [tabStatus[0]] : [];
+    tabStatus = [];
   }
 
   const deleteTab = (id) => {
