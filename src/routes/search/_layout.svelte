@@ -410,8 +410,8 @@
           {tabs}
           activeTab="{$currentTab}"
           on:changetab="{({detail}) => changeTab(detail)}"
-          on:deletetab="{({detail}) => sendTab('TAB_DELETED', detail)}"
-          on:duplicatetab="{({detail}) => sendTab('TAB_DELETED', detail)}"
+          on:deleteTabs="{({detail}) => sendTab('TAB_DELETED', detail)}"
+          on:duplicatetabs="{({detail}) => sendTab('TAB_COPIED', detail)}"
           on:newtab="{sendTabCreated}"
           on:textchange="{sendTabRenamed}"
         />

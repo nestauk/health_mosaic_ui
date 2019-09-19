@@ -9,17 +9,18 @@ export const newTab = (
   uiQuery,
   index,
   selections = {},
-  logic: 'AND' | 'OR' = 'AND'
+  logic: 'AND' | 'OR' = 'AND',
+  route = `/${searchRouteName}`
 ): Tab => ({
   index,
-  name: 'Tab ' + (id + 1),
+  name: !isNaN(+id) ? 'Tab ' + (id + 1) : id,
   results: {
     data: [],
     queryObj: [],
   },
   selected: [],
   selections,
-  route: `/${searchRouteName}`,
+  route,
   uiQuery,
   logic,
 });
