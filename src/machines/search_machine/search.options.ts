@@ -71,7 +71,6 @@ export const search_options: any = {
   services: {
     apiRequest: (ctx, { tabId, restore, fromUrl }) => {
       const currentQuery = get(ctx.queryObj)[tabId];
-      console.log(fromUrl)
       ctx.restore = restore;
 
       return query(

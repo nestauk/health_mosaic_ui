@@ -21,6 +21,7 @@
   export let pitchWithRotate = true;
   export let renderWorldCopies = true;
   export let styleURL;
+  export let seaColor = 'white';
 
   let container;
   let isMapboxGLSupported = true;
@@ -39,7 +40,10 @@
 
   const createEvent = svEvent => mbEvent => {
     if (mbEvent.source !== 'auto') {
-      dispatch(svEvent, getBounds());
+      const sw = map.unproject([padding, map._container.offsetHeight - padding]);
+      const ne = map.unproject([map._container.offsetWidth - padding, padding])
+
+      dispatch(svEvent, [[sw.lng, sw.lat], [ne.lng, ne.lat]]);
     }
   }
 
@@ -69,6 +73,7 @@
         map.on('moveend', txend);
         map.on('zoomstart', zoomstart);
         map.on('zoomend', zoomend);
+        map.setPaintProperty('water', 'fill-color', seaColor)
         loaded = true;
       });
     }
