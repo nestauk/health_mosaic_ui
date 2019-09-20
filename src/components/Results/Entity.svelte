@@ -95,7 +95,7 @@
     </p>
     <div class="icon">
       {#if url && type === 'company'}
-      <span class="link">
+      <span class="website">
         <a
           target="_blank"
           href="{url}"
@@ -207,7 +207,7 @@
           transform: translateY(5px);
           margin-left: 10px;
 
-          &.link {
+          &.website {
             opacity: 0.6;
 
             &:hover {
