@@ -1,21 +1,23 @@
 
 <script>
   import { createEventDispatcher, onMount, tick } from 'svelte';
-  import Spinner from '../Spinner.svelte';
-  import Alert from '../Icons/Alert.svelte';
+  import { fade } from 'svelte/transition';
   import {
     AlertTriangleIcon,
+    CheckSquareIcon,
     CopyIcon,
     EditIcon,
     PlusCircleIcon,
+    SquareIcon,
     Trash2Icon
   } from 'svelte-feather-icons';
+  import { extent } from 'd3-array';
 
-  import addIcon from 'ionicons/dist/ionicons/svg/ios-add-circle-outline.svg';
-  import arrowForward from 'ionicons/dist/ionicons/svg/ios-arrow-forward.svg';
-  import closeIcon from 'ionicons/dist/ionicons/svg/ios-close-circle-outline.svg';
+  import { Alert, ArrowDown } from '../Icons/';
+  import Spinner from '../Spinner.svelte';
 
   const dispatch = createEventDispatcher();
+  const panelHeight = 200;
 
   export let activeTab;
   export let editingTab;
@@ -24,9 +26,15 @@
   export let tabs;
 
   let editedTarget = null;
+  let lastSelected;
+  let hasMoreAbove = false;
+  let hasMoreBelow = false;
+  let tabsContainer;
+  let tabsHeight = 0;
   let selectedTabs = [];
+  let shift = false;
 
-// various keypresses trigger window click events for accessibility reasons
+  // various keypresses trigger window click events for accessibility reasons
   // we need to check to ensure the click event is coming from an actual click rather than a keypress
   // we can do this by checking the detail property of the event object. 0 means it was not a true click
   // we also need to ensure that such click events to not cause the element to lose focus
@@ -81,7 +89,7 @@
   };
 
   const deselectTab = id => {
-    let el = selectedTabs.findIndex(_id =>_id === parseInt(id, 10));
+    let el = selectedTabs.findIndex(_id =>_id === id);
     if (el < 0) {
       return
     };
@@ -89,27 +97,10 @@
     selectedTabs = selectedTabs;
   }
 
-  const registerTabs = (node, id) => {
-
-    function toggleChecked(e) {
-      if (e.target.checked) {
-        selectedTabs.push(parseInt(id, 10));
-        selectedTabs = selectedTabs;
-      } else {
-        deselectTab(id);
-      }
-    }
-
-    node.addEventListener('change', toggleChecked);
-
-    return {
-      destroy: () => node.removeEventListener('change', toggleChecked)
-    }
-  }
-
   const createTab = async () => {
     dispatch('newtab');
     await tick();
+    tabScroll({ target: tabsContainer });
   }
 
   const textChange = ({ target }, id) => {
@@ -143,68 +134,170 @@
     dispatch('duplicatetabs', selectedTabs);
     selectedTabs = [];
   }
+
+  const tabScroll = ({ target }) => {
+    if (target.scrollTop > 0) {
+      hasMoreAbove = true;
+    } else {
+      hasMoreAbove = false;
+    }
+
+    if (tabsHeight >= panelHeight && target.scrollTop + tabsHeight < target.scrollHeight) {
+      hasMoreBelow = true;
+    } else {
+      hasMoreBelow = false;
+    }
+  }
+
+  const toggleAll = () => {
+    if (selectedTabs.length) {
+       selectedTabs = [];
+    } else {
+       selectedTabs = tabs.map(({ id }) => id);
+    }
+  }
+
+  const findTabIndex = id => tabs.findIndex(tab => tab.id === id);
+
+  const checkSelectedRange = (current, last) => {
+    const [low, high] = extent([current, last]);
+    let allSelected = true;
+
+    for (let j = low; j <= high; j++) {
+      allSelected = j === last || selectedTabs.includes(tabs[j].id);
+      if (!allSelected) {
+        break;
+      }
+    }
+
+    return allSelected;
+  }
+
+  const inputClick = id => e => {
+    if (shift) {
+      const currentIndex = findTabIndex(id);
+      const lastIndex = findTabIndex(lastSelected);
+      let includedTabs = [];
+
+      if (checkSelectedRange(currentIndex, lastIndex)) {
+        const [low, high] = extent([currentIndex, lastIndex]);
+
+        includedTabs = [...selectedTabs];
+        for (let i = low; i <= high; i++) {
+          includedTabs = includedTabs.filter(_id => _id !== tabs[i].id);
+        }
+
+      } else {
+        const indices = tabs.reduce((acc, tab, i) => {
+          if (selectedTabs.includes(tab.id)) { acc.push(i) }
+
+          return acc;
+        }, []);
+
+        const [ minSelected, maxSelected ] = extent(indices);
+        const min = minSelected <= currentIndex ? minSelected : currentIndex;
+        const max = maxSelected >= currentIndex ? maxSelected : currentIndex;
+
+        for (let i = min; i <= max; i++) {
+          includedTabs.push(tabs[i].id);
+        }
+      };
+
+      selectedTabs = includedTabs;
+    }
+    lastSelected = id;
+  }
 </script>
 
-<svelte:window on:click|stopPropagation="{stopEdit}"/>
+<svelte:window
+  on:click|stopPropagation="{stopEdit}"
+  on:keydown={({ key }) => key === 'Shift' && (shift = true)}
+  on:keyup={({ key }) => key === 'Shift' && (shift = false)}
+/>
 
 <nav>
   <h2>Tabs</h2>
-  <ul>
-    {#each tabs as { hovering, hoveringTitle, id, isError, isLoading, name }, i (id)}
-      <li
-        class:selected="{parseInt(id, 10) === activeTab}"
-        on:click|preventDefault="{() => dispatch('changetab', parseInt(id, 10))}"
-        on:mouseenter="{() => tabs[i].hovering = true}"
-        on:mouseleave="{() => tabs[i].hovering = false}"
-      >
-        {#if hoveringTitle}
-          <span class="edittab">
-            <EditIcon />
-          </span>
-        {/if}
-        <div
-          on:click|stopPropagation="{e => handleClick(e, id)}"
-          on:keydown="{stopEdit}"
-          on:input="{ e => textChange(e, id) }"
-          on:mouseenter="{() => hoverOn(i)}"
-          on:mouseleave="{() => hoverOff(i)}"
-          class="button"
-        >
-          {name}
-        </div>
-        <span
-          on:click|stopPropagation={() => {}}
-          class="error icon"
-        >
-          {#if isLoading}
-            <Spinner />
-          {/if}
-          {#if isError}
-            <AlertTriangleIcon />
-          {/if}
-        </span>
+  <div class="tab-wrap">
 
-        {#if hovering && tabs.length > 1}
-          <span
-            class="icon delete"
-            on:click|stopPropagation={() => hovering && deleteTab(id)}
+    {#if hasMoreAbove}
+      <span
+        transition:fade
+        class="scrollicons up"
+      >
+        <ArrowDown />
+      </span>
+    {/if}
+
+    <ul
+      style="max-height:{panelHeight}px;"
+      bind:offsetHeight={tabsHeight}
+      bind:this={tabsContainer}
+      on:scroll={tabScroll}
+    >
+      {#each tabs as { hovering, hoveringTitle, id, isError, isLoading, name }, i (id)}
+        <li
+          class:selected="{id === activeTab}"
+          on:click|preventDefault="{() => dispatch('changetab', id)}"
+          on:mouseenter="{() => tabs[i].hovering = true}"
+          on:mouseleave="{() => tabs[i].hovering = false}"
+        >
+          {#if hoveringTitle}
+            <span class="edittab">
+              <EditIcon />
+            </span>
+          {/if}
+          <div
+            on:click|stopPropagation="{e => handleClick(e, id)}"
+            on:keydown="{stopEdit}"
+            on:input="{ e => textChange(e, id) }"
+            on:mouseenter="{() => hoverOn(i)}"
+            on:mouseleave="{() => hoverOff(i)}"
+            class="button"
           >
-            <Trash2Icon />
+            {name}
+          </div>
+          <span
+            on:click|stopPropagation={() => {}}
+            class="error icon"
+          >
+            {#if isLoading}
+              <Spinner />
+            {/if}
+            {#if isError}
+              <AlertTriangleIcon />
+            {/if}
+            {#if hovering && tabs.length > 1}
+              <span
+                class="icon delete"
+                on:click|stopPropagation={() => hovering && deleteTab(id)}
+              >
+                <Trash2Icon />
+              </span>
+            {/if}
           </span>
-        {/if}
+
         {#if tabs.length > 1}
           <input
-            title="Select tab"
-            on:click|stopPropagation
-            use:registerTabs="{id}"
-            type="checkbox"
-            checked={selectedTabs.includes(parseInt(id, 10))}
-          />
+              title="Select tab"
+              type="checkbox"
+              bind:group={ selectedTabs}
+              value={id}
+              on:click|stopPropagation={inputClick(id)}
+            />
         {/if}
       </li>
     {/each}
-
   </ul>
+    {#if hasMoreBelow}
+      <span
+        transition:fade
+        class="scrollicons"
+      >
+        <ArrowDown />
+      </span>
+    {/if}
+  </div>
+
   <div class="close-container">
     {#if tabs.length > 1}
       <span
@@ -232,6 +325,19 @@
     >
       <PlusCircleIcon size="{1.5}"/>
     </span>
+    {#if tabs.length > 1}
+      <span
+        title="Duplicate selected tab(s)"
+        on:click="{toggleAll}"
+        class="icon duplicate"
+      >
+        {#if selectedTabs.length}
+          <SquareIcon size="{1.5}"/>
+        {:else }
+          <CheckSquareIcon size="{1.5}"/>
+        {/if}
+      </span>
+    {/if}
   </div>
 </nav>
 
@@ -239,6 +345,7 @@
   span {
     height: 3.5rem;
     margin-top: -0.25rem;
+    display: block;
   }
 
   h2 {
@@ -260,6 +367,7 @@
     list-style: none;
     display: flex;
     flex-direction: column;
+    overflow-y: scroll;
   }
 
   li {
@@ -337,6 +445,11 @@
     align-items: center;
     opacity: 1;
 
+    &.duplicate {
+      position: absolute;
+      right: 0;
+    }
+
     &.no-tabs {
       opacity: 0.5;
     }
@@ -346,9 +459,27 @@
     display: flex;
     justify-content: center;
     height: 100%;
-    margin-left: 10px;
     border-right: none;
-    margin: 15px 0;
+    margin: 35px 0 15px 0;
+    position: relative;
+  }
+
+  .tab-wrap {
+    position: relative;
+  }
+
+  .scrollicons {
+    position: absolute;
+    right: 7.5px;
+    bottom: -24px;
+    height: 1.2rem;
+    opacity: 0.5;
+
+    &.up {
+      bottom: unset;
+      top: -24px;
+      transform: rotate(180deg);
+    }
   }
 
 </style>

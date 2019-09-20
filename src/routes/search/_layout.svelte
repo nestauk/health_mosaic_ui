@@ -123,7 +123,7 @@
   $: tabs = $screenMachine &&
     Object.entries($screenStore)
     .map(([id, t]) => ({
-      id,
+      id: parseInt(id, 10),
       name: t.name,
       isError: matchesError(searchMachines[id]),
       isLoading: matchesPending(searchMachines[id])
