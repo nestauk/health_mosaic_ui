@@ -1,7 +1,7 @@
 {
   "name": "health-mosaic",
   "description": "Mapping health innovation globally for the Robert Wood Johnson Foundation.",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "scripts": {
     "dev": "sapper dev",
     "build": "npm run lambda_build && sapper build --legacy",
