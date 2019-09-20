@@ -22,8 +22,8 @@ export const search_options: any = {
     shareMatching: sendParent('MATCHING'),
     shareDirty: sendParent('DIRTY'),
     updateData: (
-      { screenStore, queryObj, currentTab, routeStore, id: _id },
-      { data: { id, results, restore } }
+      { screenStore, queryObj, currentTab, routeStore, restore },
+      { data: { id, results } }
     ) => {
       const screen = get(screenStore);
 
@@ -69,15 +69,16 @@ export const search_options: any = {
     },
   },
   services: {
-    apiRequest: ({ queryObj }, { tabId, restore }) => {
-      const currentQuery = get(queryObj)[tabId];
+    apiRequest: (ctx, { tabId, restore, fromUrl }) => {
+      const currentQuery = get(ctx.queryObj)[tabId];
+      console.log(fromUrl)
+      ctx.restore = restore;
 
       return query(
         currentQuery.query,
         currentQuery.index,
         currentQuery.logic,
         tabId,
-        restore
       );
     },
   },

@@ -80,8 +80,9 @@
         screenMachine.send({type: 'CHANGE_SEARCH_COMPLEX', tabId: $currentTab})
       }
 
-      searchMachine.send('QUERY_ENTERED')
-      searchMachine.send({ type:'SEARCHED', tabId: $currentTab });
+      searchMachine.send('QUERY_ENTERED');
+      searchMachine.send('QUERY_CHANGED');
+      searchMachine.send({ type:'SEARCHED', tabId: $currentTab, restore: true });
     }
   })
 

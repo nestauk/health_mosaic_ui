@@ -20,14 +20,13 @@ export async function query(
   query,
   endpoint = 'all',
   logic = 'AND',
-  id,
-  restore
+  id
 ) {
   const queryString = JSON.stringify(query, null, 0);
   const cachedQuery = cache[logic][endpoint].get(queryString);
 
   if (cachedQuery) {
-    return { results: cachedQuery, id, restore };
+    return { results: cachedQuery, id };
   }
 
   const client = new ApolloClient({
@@ -45,7 +44,7 @@ export async function query(
 
   cache[logic][endpoint].set(queryString, results);
 
-  return { results, id, restore };
+  return { results, id };
 }
 
 // TODO: Errors are weird with gql, needs more research
