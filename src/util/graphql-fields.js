@@ -1,8 +1,6 @@
 import * as _ from 'lamb';
 import { fieldGroups } from '../config';
 
-// prettier-ignore
-
 const fieldMaps = {
   body: [
     'textBody_descriptive_organisation',

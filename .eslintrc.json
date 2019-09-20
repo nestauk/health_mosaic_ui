@@ -50,8 +50,6 @@
     "plugin:import/errors",
     "plugin:import/warnings",
     "plugin:@typescript-eslint/recommended",
-    "prettier",
-    "prettier/@typescript-eslint"
   ],
   "plugins": ["@typescript-eslint", "import", "svelte3"],
   "parser": "@typescript-eslint/parser",
