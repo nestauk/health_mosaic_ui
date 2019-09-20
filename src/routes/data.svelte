@@ -22,7 +22,7 @@
     <p>
       The company data in the {project_title} is licensed from
       <a href="https://www.crunchbase.com/" target="_blank">
-        <span class="highlight">Crunchbase</span>
+        <span class="link">Crunchbase</span>
       </a>,
       which is a platform that contains business information on private and public companies with particularly good coverage of the tech industry and startups. A key strength of Crunchbase is its global coverage, containing details on companies in over 200 countries. We have only included companies which are active in health as determined by training a machine learning model (“random forest”) based on labels provided in the Crunchbase data.
     </p>
@@ -34,7 +34,7 @@
     <p>
       The social data in the {project_title} is from the online service
       <a href="https://www.meetup.com/" target="_blank">
-        <span class="highlight">Meetup</span>
+        <span class="link">Meetup</span>
       </a>, which is used by people around the world to organise in-person events on almost any topic you can think of. We obtained the Meetup data using their API, and only collected data for the United States, Canada, Europe and India and for Meetup groups that were formed before May 2019.
     </p>
 
@@ -45,7 +45,7 @@
     <p>
       The research data in the {project_title} is the
       <a href="https://worldreport.nih.gov/app/#!/" target="_blank">
-        <span class="highlight">National Institutes of Health’s World RePORT</span>
+        <span class="link">National Institutes of Health’s World RePORT</span>
       </a>
       dataset. This is an open dataset that can be downloaded from their website. It brings together details on global biomedical research investments and partnerships across 10 key funding organisations (including the UK’s Medical Research Council, the European Commission, and the US National Institutes of Health).
     </p>

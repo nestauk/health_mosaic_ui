@@ -34,15 +34,15 @@
     <h3>MeSH Labels</h3>
     <p>
       <a href="https://meshb.nlm.nih.gov/treeView" target="_blank">
-        <span class="highlight">Medical Subject Heading (MeSH)</span>
+        <span class="link">Medical Subject Heading (MeSH)</span>
       </a>
       labels are a set of biomedical vocabulary that are compiled by the NIH’s
       <a href="https://www.nlm.nih.gov/" target="_blank">
-        <span class="highlight">National Library of Medicine</span>
+        <span class="link">National Library of Medicine</span>
       </a>.
       By applying MeSH labels to all of the data in the tool, we have tried to identify common elements and simplify our ability to do analyses on these. The labelling is performed via an automated service provided by NIH, and replicates the results given by their
       <a href="https://meshb.nlm.nih.gov/MeSHonDemand" target="_blank">
-        <span class="highlight">MeSH on Demand tool</span>
+        <span class="link">MeSH on Demand tool</span>
       </a>.
     </p>
 
@@ -50,21 +50,21 @@
     <p>
       The source code used to collect the data can be found
       <a href="https://www.github.com/nestauk/nesta" target="_blank">
-        <span class="highlight">here</span>
+        <span class="link">here</span>
       </a>.
     </p>
     <!-- <p>
       The source code used to calculate the novelty score can be found
       <a href="https://www.github.com/nestauk/rhodonite" target="_blank">
-        <span class="highlight">here</span>
+        <span class="link">here</span>
       </a>.
     </p> -->
-    <p>
+    <!-- <p>
       The source code of this website can be found
       <a href="https://www.github.com/nestauk/{project_title}_ui" target="_blank">
-        <span class="highlight">here</span>
+        <span class="link">here</span>
       </a>.
-    </p>
+    </p> -->
   </div>
 
   <div class="cta">

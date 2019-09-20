@@ -66,6 +66,18 @@ code {
   }
 }
 
+/* link */
+
+.link {
+  background-color: var(--color-link-background);
+  padding: 0.35em;
+}
+
+.link:hover {
+  background-color: var(--color-link-background-hover);
+  color: var(--color-link-color-hover);
+}
+
 :root {
   /* colors */
 
@@ -104,6 +116,9 @@ code {
   --color-facet-background: white;
   --color-highlight: var(--color-blue-light);
   --color-highlight-hover: var(--color-blue-lighter);
+  --color-link-background: var(--color-blue-light);
+  --color-link-background-hover: var(--color-blue-dark-pastel);
+  --color-link-color-hover: var(--color-blue-light);
   --color-nav-current: var(--color-blue-dark-pastel);
   --color-ruleset-icon-hover: var(--color-grey-20);
   --color-ruleset-icon: var(--color-grey-grey);

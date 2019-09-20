@@ -27,25 +27,25 @@
     <p>
       This project has been carried out by
       <a href="https://www.nesta.org.uk/project/innovation-mapping/" target="_blank">
-        <span class="highlight">Nesta’s Innovation Mapping team</span>
+        <span class="link">Nesta’s Innovation Mapping team</span>
       </a>
       in collaboration with
       <a href="https://www.nesta.org.uk/health" target="_blank">
-        <span class="highlight">Nesta Health Lab</span>
+        <span class="link">Nesta Health Lab</span>
       </a>.
       <a href="https://www.nesta.org.uk/" target="_blank">
-        <span class="highlight">Nesta</span>
+        <span class="link">Nesta</span>
       </a>
       is a registered charity in England and Wales 1144091 and Scotland SC042833.
     </p>
     <p>
       The project was supported by a generous grant from the
       <a href="https://www.rwjf.org/" target="_blank">
-        <span class="highlight">Robert Wood Johnson Foundation</span>
+        <span class="link">Robert Wood Johnson Foundation</span>
       </a>,
       administered by
       <a href="https://www.cafonline.org/" target="_blank">
-        <span class="highlight">CAF International</span>
+        <span class="link">CAF International</span>
       </a>.
     </p>
     <p>
@@ -54,7 +54,7 @@
     <p>
       We would also like to thank the
       <a href="https://foundation.mozilla.org/opportunity/mozilla-open-leaders/" target="_blank">
-        <span class="highlight">Mozilla Open Leaders programme</span>
+        <span class="link">Mozilla Open Leaders programme</span>
       </a>
       for working with members of our team to develop open working practices.
     </p>
