@@ -131,8 +131,13 @@
     if (!selectedTabs.length) {
       return;
     }
+
     dispatch('duplicatetabs', selectedTabs);
     selectedTabs = [];
+  }
+
+  const duplicateTab = id => {
+    dispatch('duplicatetabs', [id]);
   }
 
   const tabScroll = ({ target }) => {
@@ -258,7 +263,7 @@
           </div>
           <span
             on:click|stopPropagation={() => {}}
-            class="error icon"
+            class="error icon icon-container"
           >
             {#if isLoading}
               <Spinner />
@@ -266,13 +271,22 @@
             {#if isError}
               <AlertTriangleIcon />
             {/if}
-            {#if hovering && tabs.length > 1}
+            {#if hovering}
               <span
                 class="icon delete"
-                on:click|stopPropagation={() => hovering && deleteTab(id)}
+                on:click|stopPropagation={() => hovering && duplicateTab(id)}
               >
-                <Trash2Icon />
+                <CopyIcon />
               </span>
+
+              {#if tabs.length > 1}
+                <span
+                  class="icon delete"
+                  on:click|stopPropagation={() => hovering && deleteTab(id)}
+                >
+                  <Trash2Icon />
+                </span>
+              {/if}
             {/if}
           </span>
 
@@ -380,11 +394,21 @@
     cursor: pointer;
     position: relative;
 
+
+
     .icon {
       height: 1.5rem;
-      width: 1.5rem;
+      width: 3rem;
       margin-right: 8px;
       margin: 1px 8px 0 0;
+
+      &.icon-container {
+        margin-right: 4px;
+      }
+
+      &:last-child {
+        margin-right: 0;
+      }
     }
 
     .delete {
@@ -395,6 +419,8 @@
     .error {
       margin-left: auto;
       cursor: auto;
+      display: flex;
+      flex-direction: row;
     }
 
     .edittab {
