@@ -5,7 +5,15 @@ import { mergeObj } from '@svizzle/utils';
 
 export const newListSortingStore = () => writable({
   by: 'novelty',
-  criteria: ['country_id', 'cost_ref', 'novelty'],
+  criteria: [
+    'continent_id',
+    'cost_ref',
+    'country_id',
+    'name',
+    'novelty',
+    'score',
+    'start',
+  ],
   direction: 'ascending',
   directions: ['ascending', 'descending']
 });
