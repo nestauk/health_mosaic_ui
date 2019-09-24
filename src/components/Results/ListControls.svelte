@@ -7,10 +7,10 @@
 
   const dispatch = createEventDispatcher();
 
-  export let listSortingStore;
-  console.log(stringify($listSortingStore));
+  export let by;
+  export let criteria;
+  export let direction;
 
-  $: ({criteria, by, direction, directions} = $listSortingStore);
   $: sortControls = _.map(criteria, criterion => ({
     isSelected: criterion === by,
     criterion

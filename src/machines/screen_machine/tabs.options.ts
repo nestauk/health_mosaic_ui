@@ -7,6 +7,7 @@ import { assign, spawn } from 'xstate';
 import { mergeWithMerge } from '@svizzle/utils';
 
 import { version } from '../../../package.json';
+import { newListSortingStore } from '../../stores/facetControls';
 import { copyObj } from '../../util/any';
 import { removeEmpty } from '../../util/object-object';
 import { makePath } from '../../util/config';
@@ -45,11 +46,15 @@ export const tabs_options = {
       );
     },
     createTab: (
-      { screenStore, idStore },
+      { listSortingStores, idStore, screenStore },
       { queryParams, selectionParams, ESIndex, ESLogic, isPageInit }
     ) => {
       const id = get(idStore);
 
+      // new sorting criteria
+      listSortingStores[id] = newListSortingStore();
+
+      // new tab
       screenStore.update(
         _.setKey(
           id,
@@ -64,6 +69,7 @@ export const tabs_options = {
           )
         )
       );
+
       idStore.update(add1);
     },
     duplicateTabs: assign((ctx: any, { tabId }) => {

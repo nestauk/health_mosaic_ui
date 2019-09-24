@@ -134,7 +134,10 @@
   $: rulesetIndex = uiQuery!== undefined
     ? uiQuery.findIndex(( { selected } ) => selected)
     : false;
-  $: listSortingStore = $screenMachine.context.listSortingStore;
+  $: listSortingStore = $screenMachine &&
+    $screenMachine.context.listSortingStores[$currentTab];
+  $: ({by, criteria, direction} = $listSortingStore);
+
   $: mode = $screenMachine.matches('Form.Simple') ? 'simple' : 'complex';
 
   //  History
@@ -396,20 +399,11 @@
 
   /* sorting */
 
-  const sendListUpdateSortBy = ({ detail }) => {
-    console.log('sendListUpdateSortBy', detail);
+  const sendListUpdateSortBy = ({ detail }) =>
     screenMachine.send({
+      sortOptions: detail,
+      tabId: $currentTab,
       type: 'LIST_SORT_BY_UPDATED',
-      tabId: $currentTab,
-      sortOptions: detail
-    });
-  }
-
-  const sendListUpdateSortOrder = ({ detail }) =>
-    screenMachine.send({
-      type: 'LIST_SORT_ORDER_UPDATED',
-      tabId: $currentTab,
-      order: detail
     });
 </script>
 
@@ -445,7 +439,9 @@
         <FacetControls>
           {#if isListFacet}
             <ListControls
-              {listSortingStore}
+              {by}
+              {criteria}
+              {direction}
               on:sortedBy={sendListUpdateSortBy}
             />
           {/if}

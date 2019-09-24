@@ -4,6 +4,7 @@ import { goto } from '@sapper/app';
 import * as _ from 'lamb';
 import { isKeyValue, mergeObj } from '@svizzle/utils';
 
+import { updateListOrder } from '../../stores/facetControls';
 import { makePath } from '../../util/config';
 import { version } from '../../../package.json';
 import { removeEmpty } from '../../util/object-object';
@@ -14,6 +15,8 @@ import {
   uiQueryToUrlString,
   selectionToUrlString,
 } from '../../util/url/builder';
+
+const isDirectionAscending = isKeyValue(['direction', 'ascending']);
 
 export const facets_options = {
   actions: {
@@ -71,15 +74,15 @@ export const facets_options = {
 
     // TODO tabId
     listUpdateSortBy: (
-      { listSortingStore, screenStore },
+      { listSortingStores, screenStore },
       { sortOptions, tabId }
     ) => {
-      listSortingStore.update(mergeObj(sortOptions));
-      console.log('sortOptions', sortOptions);
+      // update sorting criteria
+      updateListOrder(listSortingStores[tabId], sortOptions);
 
+      // sort selected items
       const { by, direction } = sortOptions;
-      const isDirectionAscending = isKeyValue(['direction', 'ascending']);
-      const isAscending = isDirectionAscending(sortOptions)
+      const isAscending = isDirectionAscending(sortOptions);
       const accessor = _.condition(
         _.hasKey(by),
         _.getKey(by),
