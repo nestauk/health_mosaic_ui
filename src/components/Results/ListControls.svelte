@@ -1,6 +1,6 @@
 <script>
   import { createEventDispatcher } from 'svelte';
-  import { isNotNil, stringify } from '@svizzle/utils';
+  import { isNotNil } from '@svizzle/utils';
   import * as _ from 'lamb';
 
   import { fieldToLabel } from '../../util/domain';

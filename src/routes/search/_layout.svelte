@@ -3,11 +3,12 @@
 </script>
 
 <script>
-  import { tick, onMount, onDestroy, setContext } from 'svelte';
+  import { onDestroy, onMount, setContext, tick } from 'svelte';
   import isEqual from 'just-compare';
   import * as _ from 'lamb';
 
   import { stores } from '@sapper/app';
+
   import DirtyOverlay from '../../components/DirtyOverlay.svelte'
   import ItemsFigures from '../../components/ItemsFigures.svelte'
   import { ListControls } from '../../components/Results/';
@@ -22,7 +23,6 @@
   import SelectionsPanel from '../../components/Sidebar/SelectionsPanel.svelte';
   import Sidebar from '../../components/Sidebar/Sidebar.svelte';
   import TabsPanel from '../../components/Sidebar/TabsPanel.svelte';
-
   import {
     CB_type,
     project_title,
@@ -56,7 +56,6 @@
     {id: 'volume_countries', label: 'Volume by Mentioned Countries'},
     {id: 'volume_funders', label: 'Volume by Funder'},
   ];
-
   const renderTitle = (query = '', type = '') => {
     let typeTitle;
     if (!type) {
@@ -158,7 +157,11 @@
 
     if (page.query.q) {
       searchMachine.send('QUERY_CHANGED');
-      searchMachine.send({ type:'SEARCHED', tabId: $currentTab, restore: true });
+      searchMachine.send({
+        type:'SEARCHED',
+        tabId: $currentTab,
+        restore: true
+      });
     }
 
     popped = false;
@@ -167,7 +170,7 @@
   $: pop_callback($page);
 
   if (process.browser) {
-    window.onpopstate =  () =>  popped = true;
+    window.onpopstate =  () => popped = true;
   }
 
   /* context */
@@ -189,13 +192,13 @@
 
   /* machine events */
 
-  const sendTabCreated = () =>  screenMachine.send({
+  const sendTabCreated = () => screenMachine.send({
     type: 'TAB_CREATED',
     tabId: $idStore,
     route: $page.path,
   });
 
-  const sendTab = (type, id) =>  screenMachine.send({
+  const sendTab = (type, id) => screenMachine.send({
     type,
     tabId: id,
     route: $page.path,
@@ -229,6 +232,7 @@
   ]));
 
   /*
+  TODO
   We could make this a derived([screenStore, currentTab, queryObj], ...)
   and when we spawn searchMachine in `createSearchMachine` we could subscribe
   to the derived and send searchMachine `QUERY_*` events so this is embedded

@@ -8,6 +8,7 @@ import { mergeWithMerge } from '@svizzle/utils';
 
 import { version } from '../../../package.json';
 import { newListSortingStore } from '../../stores/facetControls';
+import { cloneWritable } from '../../stores/utils';
 import { copyObj } from '../../util/any';
 import { removeEmpty } from '../../util/object-object';
 import { makePath } from '../../util/config';
@@ -78,6 +79,7 @@ export const tabs_options = {
       tabId.forEach(id => {
         const newTabId = get(ctx.idStore);
 
+        // new tab
         const { index, logic, name, selections, uiQuery, results, route } =
           get(ctx.screenStore)[id];
 
@@ -95,6 +97,7 @@ export const tabs_options = {
           )
         );
 
+        // new search machine
         newSearchMachines[newTabId] = spawn(
           search_machine.withContext({
             ...ctx,
@@ -108,6 +111,10 @@ export const tabs_options = {
           newSearchMachines[newTabId].send('QUERY_CHANGED');
           newSearchMachines[newTabId].send('SEARCHED', { tabId: newTabId });
         }
+
+        // new sorting criteria
+        ctx.listSortingStores[newTabId] =
+          cloneWritable(ctx.listSortingStores[id]);
 
         ctx.idStore.update(add1);
       });

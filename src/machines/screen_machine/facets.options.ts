@@ -1,12 +1,12 @@
 import { get } from 'svelte/store';
 //@ts-ignore
-import { goto } from '@sapper/app';
 import * as _ from 'lamb';
 import { isKeyValue } from '@svizzle/utils';
 
+import { goto } from '@sapper/app';
+import { version } from '../../../package.json';
 import { updateListOrder } from '../../stores/facetControls';
 import { makePath } from '../../util/config';
-import { version } from '../../../package.json';
 import { removeEmpty } from '../../util/object-object';
 import { makeSelectionFilter } from '../../util/object';
 import { makeRouteUrl } from '../../util/url/utils';
