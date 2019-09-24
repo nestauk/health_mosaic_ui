@@ -5,7 +5,6 @@ import {
   arrayMinWith,
   hasIterableLength1,
   isArray,
-  isIterableEmpty,
   isIterableNotEmpty,
   isNotNil,
   makeIsWithinRange
@@ -28,7 +27,7 @@ export const exactAmountBins = ({
   const [min, max] = activeRange;
 
   if (min === max) {
-    return [{values: array}]
+    return [{ values: array }]
   }
 
   const minFloor = Math.floor(min);
@@ -58,7 +57,7 @@ export const exactAmountBins = ({
       isNotNil(index) && acc[index].values.push(item)
       return acc;
     },
-    _.map(ranges, range => ({range, values: []}))
+    _.map(ranges, range => ({ range, values: [] }))
   );
 }
 

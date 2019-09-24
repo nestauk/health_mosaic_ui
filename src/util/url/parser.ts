@@ -1,12 +1,13 @@
 import * as _ from 'lamb';
 import { newRuleset } from './query';
+import { convertPlusToSpace } from '../string';
+import { nullString } from './builder';
+
 import {
   splitByComma,
   splitByTwoDots,
-  stringToNumber,
-  convertPlusToSpace,
-} from './transform';
-import { nullString } from './urlBuilder';
+  stringToNumber
+} from '../string';
 
 export const extractParentContents = str => {
   const re = /\((.*?)\)/g;

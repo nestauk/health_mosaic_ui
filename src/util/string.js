@@ -1,3 +1,6 @@
+import * as _ from 'lamb';
+import { makeSplitBy } from '@svizzle/utils';
+
 export const capitalise = s => s.charAt(0).toUpperCase() + s.slice(1);
 export const kebabcaseToCamelcase = s =>
   s
@@ -19,3 +22,9 @@ export const truncateText = str => {
 
   return stringArray.slice(0, index).join(' ') + '...';
 };
+export const splitByComma = makeSplitBy(',');
+export const splitByTwoDots = makeSplitBy('..');
+export const stringToNumber = str => +str;
+export const convertPlusToSpace = str => str.replace(/\+/g, ' ');
+export const removeLast = _.sliceAt(0, -1);
+export const addQueryMark = q => (q ? '?' + q : '');

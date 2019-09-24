@@ -10,7 +10,7 @@ import {
   detectType,
   convertNumericList,
   convertStringList,
-} from './urlParser.ts';
+} from './parser.ts';
 
 test('extractParentContents', () => {
   const queryString = '(one,-two,in:one,-two)(three,-four,in:one,-two)';

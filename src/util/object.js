@@ -12,7 +12,7 @@ import {
   makeIsIncludedIn,
   makeIsNotIncludedIn
 } from './array';
-import { getKey, getValue } from './object.any';
+import { getValue } from './object.any';
 
 /* object -> object */
 
@@ -35,10 +35,10 @@ const makePass = () => _.always(true);
 export const makeIsWithin = ([start, end]) =>
   isArray(start)
     ? ({ lon, lat }) =>
-        lon >= start[0] &&
-        lon <= end[0] &&
-        lat >= start[1] &&
-        lat <= end[1]
+      lon >= start[0] &&
+      lon <= end[0] &&
+      lat >= start[1] &&
+      lat <= end[1]
     : makeIsWithinRange([start, end]);
 
 // {type, value} -> fn

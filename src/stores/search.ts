@@ -1,5 +1,5 @@
 import { writable, derived } from 'svelte/store';
-import { createQueryObject } from '../util/transform';
+import { createQueryObject } from '../util/url/utils';
 // TODO: Write a TS interface for this structure.
 
 const initialValue = { value: [''] };
@@ -36,4 +36,4 @@ export const queryObj = derived(screenStore, $screenStore => {
 });
 
 // hmmm...
-export const unsubscribe = queryObj.subscribe(v => {});
+export const unsubscribe = queryObj.subscribe(v => { });

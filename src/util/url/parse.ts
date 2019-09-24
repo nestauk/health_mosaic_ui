@@ -1,5 +1,6 @@
 import * as _ from 'lamb';
-import { fieldGroups } from '../config';
+
+import { fieldGroups } from '../../config';
 
 export const parseQuery = inputObject => {
   const { value } = inputObject;

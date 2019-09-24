@@ -8,19 +8,18 @@ import { mergeWithMerge } from '@svizzle/utils';
 
 import { version } from '../../../package.json';
 import { copyObj } from '../../util/any';
+import { removeEmpty } from '../../util/object-object';
 import { makePath } from '../../util/config';
-import { newRuleset } from '../../util/query';
-import {
-  add1,
-  makeRouteUrl,
-  removeLast,
-  removeEmpty,
-} from '../../util/transform';
+import { add1 } from '../../util/number';
+import { newRuleset } from '../../util/url/query';
+import { removeLast } from '../../util/string';
+import { makeRouteUrl } from '../../util/url/utils';
+
 import {
   uiQueryToUrlString,
   selectionToUrlString,
-} from '../../util/urlBuilder';
-import { parseQueryUrl, parseSelectionUrl } from '../../util/urlParser';
+} from '../../util/url/builder';
+import { parseQueryUrl, parseSelectionUrl } from '../../util/url/parser';
 import { search_machine } from '../search_machine/';
 import { newTab, removeHistoryEntries } from './utils';
 

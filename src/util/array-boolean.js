@@ -1,5 +1,6 @@
 import * as _ from 'lamb';
-import {isIterableEmpty} from '@svizzle/utils';
+
+import { isIterableEmpty } from '@svizzle/utils';
 
 // TODO svizzle
 export const isIntersectionEmpty = _.pipe([

@@ -7,12 +7,13 @@ import { mergeObj } from '@svizzle/utils';
 
 import { version } from '../../../package.json';
 import { query } from '../../actions/queryApi';
+import { removeEmpty } from '../../util/object-object';
 import { makeSelectionFilter } from '../../util/object';
-import { makeRouteUrl, removeEmpty } from '../../util/transform';
+import { makeRouteUrl } from '../../util/url/utils';
 import {
   uiQueryToUrlString,
   selectionToUrlString,
-} from '../../util/urlBuilder';
+} from '../../util/url/builder';
 
 export const search_options: any = {
   actions: {

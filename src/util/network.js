@@ -3,15 +3,13 @@ import {
   applyFnMap,
   hasIterableLength1,
   isIterableNotEmpty,
-  objectToKeyValueArray,
 } from '@svizzle/utils';
 
 import { makeBiPermutationsWith, sortValueDescKeyAsc } from './array';
 import { isNilWith } from './function.any.boolean';
-import { getKey, getValue } from './object.any';
 import { getId } from './object.string';
 
-export const makeEmptyNetwork = () => ({nodes: {}, links: {}});
+export const makeEmptyNetwork = () => ({ nodes: {}, links: {} });
 
 export const getLinkId = (a, b) => `${a} <-> ${b}`;
 export const makeGetLinkLabel = nodeKeyToLabel =>

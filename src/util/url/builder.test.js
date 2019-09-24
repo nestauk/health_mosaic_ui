@@ -8,9 +8,9 @@ import {
   withinToString,
   isToString,
   selectionToUrlString,
-} from './urlBuilder.ts';
+} from './builder.ts';
 
-import { query } from './urlParser.data.js';
+import { query } from './parser.data.js/index.js';
 
 test('isValidRuleset', () => {
   const ruleset = query['0'].uiQuery;

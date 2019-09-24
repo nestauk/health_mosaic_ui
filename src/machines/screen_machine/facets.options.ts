@@ -5,12 +5,14 @@ import * as _ from 'lamb';
 
 import { makePath } from '../../util/config';
 import { version } from '../../../package.json';
+import { removeEmpty } from '../../util/object-object';
 import { makeSelectionFilter } from '../../util/object';
-import { makeRouteUrl, removeEmpty } from '../../util/transform';
+import { makeRouteUrl } from '../../util/url/utils';
+
 import {
   uiQueryToUrlString,
   selectionToUrlString,
-} from '../../util/urlBuilder';
+} from '../../util/url/builder';
 
 export const facets_options = {
   actions: {

@@ -1,4 +1,4 @@
-import { newField } from '../src/util/query';
+import { newField } from '../src/util/url/query';
 import { subjectAliases, contentAliases } from '../src/config';
 
 export const createExpectedBigger = id => ({

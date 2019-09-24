@@ -1,13 +1,7 @@
 import * as _ from 'lamb';
-import {
-  applyFnMap,
-  hasIterableLength1,
-  isIterableNotEmpty,
-  objectToKeyValueArray,
-} from '@svizzle/utils';
+import { objectToKeyValueArray } from '@svizzle/utils';
 
-import { makeBiPermutationsWith, sortValueDescKeyAsc } from './array';
-import { getKey, getValue } from './object.any';
+import { sortValueDescKeyAsc } from './array';
 import { getId } from './object.string';
 
 // TODO svizzle

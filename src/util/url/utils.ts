@@ -1,25 +1,9 @@
 import * as _ from 'lamb';
-import { makeSplitBy } from '@svizzle/utils';
+import { isNot } from '@svizzle/utils';
 
-import { fieldGroups } from '../config';
-
-const tap = message => x => {
-  console.log(message, ': ', x);
-  return x;
-};
-
-export const toggleBoolean = (x: boolean): boolean => !x;
-export const removeEmpty = _.pickIf(x => !!x.value.length);
-export const add1 = _.add(1);
-export const removeLast = _.sliceAt(0, -1);
-export const isNot = x => _.not(_.is(x));
-export const splitByComma = makeSplitBy(',');
-export const splitByTwoDots = makeSplitBy('..');
-export const castToInt = str => parseInt(str, 10);
-export const stringToNumber = str => +str;
-export const convertPlusToSpace = str => str.replace(/\+/g, ' ');
-const removeUndefinedAt1 = _.filterWith(x => !!x[1]);
-const addQueryMark = q => (q ? '?' + q : '');
+import { fieldGroups } from '../../config';
+import { removeUndefinedAt1 } from '../array-array';
+import { addQueryMark } from '../string'
 
 export const paramToString = (acc, [key, value], i) =>
   `${acc}${i !== 0 ? '&' : ''}${key}=${value}`;

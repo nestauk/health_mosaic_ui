@@ -1,7 +1,7 @@
 import * as _ from 'lamb';
 import { joinWith } from '@svizzle/utils';
 
-import { isValidField } from './transform';
+import { isValidField } from './utils';
 
 export const isValidRuleset = ruleset =>
   !ruleset.disabled && ruleset.terms.every(hasNonEmptyTerm);

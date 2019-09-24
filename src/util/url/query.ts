@@ -1,5 +1,5 @@
-import { contentAliases, subjectAliases } from '../config';
-import { UIField, UITerm } from '../stores/interfaces';
+import { contentAliases, subjectAliases } from '../../config';
+import { UIField, UITerm } from '../../stores/interfaces';
 
 export const newTerm = (
   term: string = '',

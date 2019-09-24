@@ -1,8 +1,8 @@
 import * as _ from 'lamb';
+import { isNot } from '@svizzle/utils';
 
 import { searchRouteName } from '../../config';
 import { Tab } from '../../stores/interfaces';
-import { isNot } from '../../util/transform';
 
 export const newTab = (
   id,

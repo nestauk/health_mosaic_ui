@@ -5,12 +5,14 @@ import * as _ from 'lamb';
 
 import { version } from '../../../package.json';
 import { makePath } from '../../util/config';
-import { newRuleset } from '../../util/query';
-import { makeRouteUrl, toggleBoolean, removeEmpty } from '../../util/transform';
+import { removeEmpty } from '../../util/object-object';
+import { toggleBoolean } from '../../util/boolean';
+import { newRuleset } from '../../util/url/query';
+import { makeRouteUrl } from '../../util/url/utils';
 import {
   uiQueryToUrlString,
   selectionToUrlString,
-} from '../../util/urlBuilder';
+} from '../../util/url/builder';
 import {
   toggleLabelBinaryUpdater,
   toggleLabelTernaryUpdater,
@@ -178,8 +180,8 @@ export const form_options = {
         currentSelection === ruleIndex
           ? 0
           : currentSelection > ruleIndex
-          ? currentSelection - 1
-          : currentSelection;
+            ? currentSelection - 1
+            : currentSelection;
 
       const hideOptions = _.updatePath(
         `${tabId}.uiQuery`,

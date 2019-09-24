@@ -1,5 +1,5 @@
 import { parseQuery } from './parse.ts';
-import { dslBuilder } from './graphql-fields.js';
+import { dslBuilder } from '../graphql-fields.js';
 
 describe.skip('parseQuery', () => {
   test('parse simple queries', () => {
