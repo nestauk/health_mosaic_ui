@@ -5,7 +5,7 @@ export const tabs_config = {
     Idle: {
       on: {
         TAB_COPIED: {
-          actions: ['duplicateTabs'],
+          actions: ['duplicateTabs', 'setUrlQuery'],
         },
         TAB_DELETED: {
           actions: ['deleteTab', 'setUrlQuery'],
@@ -14,10 +14,11 @@ export const tabs_config = {
           actions: [
             'createTab',
             'setCurrentTab',
-            'createSearchMachine',
             'pushHistory',
             'setUrlQuery',
+            'incrementId'
           ],
+          target: '#Tabs.Spawning'
         },
         TAB_RESTORED: {
           actions: ['restoreTab', 'createSearchMachine'],
@@ -26,9 +27,15 @@ export const tabs_config = {
           actions: ['setCurrentTab', 'pushHistory', 'setUrlQuery'],
         },
         TAB_RENAMED: {
-          actions: ['setTabLabel'],
+          actions: ['setTabLabel', 'setUrlQuery'],
         },
       },
     },
+    Spawning: {
+      onEntry: ['createSearchMachine'],
+      on: {
+        '': '#Tabs.Idle'
+      }
+    }
   },
 };

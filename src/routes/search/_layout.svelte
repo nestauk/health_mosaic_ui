@@ -4,10 +4,11 @@
 
 <script>
   import { tick, onMount, onDestroy, setContext } from 'svelte';
+  import { stores } from '@sapper/app';
   import isEqual from 'just-compare';
   import * as _ from 'lamb';
+  import { isNotPathValue } from '@svizzle/utils';
 
-  import { stores } from '@sapper/app';
   import DirtyOverlay from '../../components/DirtyOverlay.svelte'
   import ItemsFigures from '../../components/ItemsFigures.svelte'
   import FacetsPanel from '../../components/Sidebar/FacetsPanel.svelte';
@@ -72,17 +73,30 @@
   let searchMachine;
 
   onMount(() => {
-    if($page.query && $page.query.q) {
-      const hasLabels = !!$page.query.q.match(/\(.+,in:.+\)/);
-      const hasRulesets = !!$page.query.q.match(/(?:\(.+\)){2,}/);
+    if($page.query && $page.query.tabs) {
+      const hasRules = currentScreen.uiQuery.length > 1;
 
-      if(hasLabels || hasRulesets) {
+      const isFieldUsed = isNotPathValue(['1.status', 'default']);
+      const hasFieldsInUse = ({fields: {subject, content}}) =>
+        _.pairs(subject)
+          .concat(_.pairs(content))
+          .some(isFieldUsed);
+
+      const hasLabels = currentScreen.uiQuery.some(hasFieldsInUse);
+
+      if(hasLabels || hasRules) {
         screenMachine.send({type: 'CHANGE_SEARCH_COMPLEX', tabId: $currentTab})
       }
 
-      searchMachine.send('QUERY_ENTERED');
-      searchMachine.send('QUERY_CHANGED');
-      searchMachine.send({ type:'SEARCHED', tabId: $currentTab, restore: true });
+      tabs.forEach(({ id }) => {
+
+        if (!$screenStore[id].uiQuery[0].terms[0].term) {
+          return;
+        };
+        searchMachines[id].send('QUERY_ENTERED');
+        searchMachines[id].send('QUERY_CHANGED');
+        searchMachines[id].send({ type:'SEARCHED', tabId: id, restore: true });
+      })
     }
   })
 
@@ -94,10 +108,8 @@
     type: 'TAB_CREATED',
     tabId: $idStore,
     route: $page.path,
-    queryParams: $page.query && $page.query.q,
-    selectionParams: $page.query && $page.query.s,
-    ESIndex: $page.query && $page.query.i,
-    ESLogic: $page.query && $page.query.o,
+    tabParams: $page.query && $page.query.tabs,
+    activeParams: $page.query && $page.query.active,
     isPageInit: true
   });
 
@@ -134,7 +146,7 @@
 
   $: mode = $screenMachine.matches('Form.Simple') ? 'simple' : 'complex';
 
-  //  History
+//  History
 
   const pop_callback = async (page) => {
     if (!popped) return;

@@ -5,14 +5,8 @@ import * as _ from 'lamb';
 
 import { makePath } from '../../util/config';
 import { version } from '../../../package.json';
-import { removeEmpty } from '../../util/object-object';
 import { makeSelectionFilter } from '../../util/object';
-import { makeRouteUrl } from '../../util/url/utils';
-
-import {
-  uiQueryToUrlString,
-  selectionToUrlString,
-} from '../../util/url/builder';
+import { makeRouteUrl, serialiseTabs } from '../../util/url/utils';
 
 export const facets_options = {
   actions: {
@@ -29,12 +23,11 @@ export const facets_options = {
         routeStore.set(makePath(path));
       }
 
+      const serialisedTabs = serialiseTabs(get(screenStore));
       const urlQuery = {
         v: version,
-        q: uiQueryToUrlString(currentQuery.uiQuery),
-        s: selectionToUrlString(removeEmpty(currentQuery.selections)),
-        i: currentQuery.index && currentQuery.index,
-        o: currentQuery.logic,
+        active: tab,
+        tabs: serialisedTabs,
       };
 
       goto(makeRouteUrl(path ? path : get(screenStore)[tab].route, urlQuery));

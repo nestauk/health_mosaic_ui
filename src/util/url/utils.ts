@@ -1,31 +1,37 @@
 import * as _ from 'lamb';
-import { isNot } from '@svizzle/utils';
+import { isNot, joinWith } from '@svizzle/utils';
 
 import { fieldGroups } from '../../config';
-import { removeUndefinedAt1 } from '../array-array';
-import { addQueryMark } from '../string'
+import { removeUndefinedOrNotNumberAt1 } from '../array-array';
+import { removeEmptyValue, removeEmpty } from '../object-object';
+import { prefixQueryMarkIfTruthy } from '../string';
+import {
+  processQueries,
+  processSelections,
+} from './builder';
+
 
 export const paramToString = (acc, [key, value], i) =>
   `${acc}${i !== 0 ? '&' : ''}${key}=${value}`;
 
 export const makeParams: Function = _.pipe([
   _.pairs,
-  removeUndefinedAt1,
+  removeUndefinedOrNotNumberAt1,
   _.reduceWith(paramToString, ''),
 ]);
 
-const makeParamString = _.pipe([makeParams, addQueryMark]);
+const makeParamString = _.pipe([makeParams, prefixQueryMarkIfTruthy]);
 
 export const makeRouteUrl = (
   path: string,
-  params: { [x: string]: string }
+  params: { [x: string]: any }
 ): string => {
-  const paramString = params.q ? makeParamString(params) : '';
+  const paramString = params.tabs ? makeParamString(params) : '';
 
   return `${path}${paramString}`;
 };
 
-export const isValidField = ({ disabled, status }) => {
+export function isValidField({ disabled, status }) {
   return status !== 'default' && !disabled;
 };
 
@@ -65,3 +71,27 @@ export const queryToString = query =>
         (arr.length - 1 === i ? '' : ','),
       ''
     );
+
+const sanitizeTabName = (name, id) =>
+  name ? name.replace(' ', '+') : `Tab+${id}`;
+
+const createQueryStrings = ([id, { index, logic, name, selections, uiQuery }]) => ({
+  id,
+  indices: index,
+  logic,
+  title: sanitizeTabName(name, id),
+  selections:  processSelections(removeEmptyValue( selections)),
+  query: processQueries(uiQuery),
+});
+
+const stringify = obj => JSON.stringify(obj).replace(/"/g, '');
+
+export const serialiseTabs = _.pipe([
+  _.pairs,
+  _.mapWith(_.pipe([
+    createQueryStrings,
+    removeEmpty,
+    stringify
+  ])),
+  joinWith('')
+])

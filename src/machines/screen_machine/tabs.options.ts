@@ -1,30 +1,25 @@
 import { get } from 'svelte/store';
-import { tick } from 'svelte';
 //@ts-ignore
-import { goto } from '@sapper/app';
 import * as _ from 'lamb';
 import { assign, spawn } from 'xstate';
 import { mergeWithMerge } from '@svizzle/utils';
 
-import { version } from '../../../package.json';
 import { copyObj } from '../../util/any';
-import { removeEmpty } from '../../util/object-object';
-import { makePath } from '../../util/config';
 import { add1 } from '../../util/number';
+import { parseQueryUrl, parseSelectionUrl } from '../../util/url/parser';
 import { newRuleset } from '../../util/url/query';
 import { removeLast } from '../../util/string';
-import { makeRouteUrl } from '../../util/url/utils';
-
-import {
-  uiQueryToUrlString,
-  selectionToUrlString,
-} from '../../util/url/builder';
-import { parseQueryUrl, parseSelectionUrl } from '../../util/url/parser';
 import { search_machine } from '../search_machine/';
-import { newTab, removeHistoryEntries } from './utils';
+import {
+  extractTabsFromUrl,
+  findHighestId,
+  newTab,
+  removeHistoryEntries
+} from './utils';
 
 export const tabs_options = {
   actions: {
+    incrementId: ({idStore}) => idStore.update(add1),
     restoreTab: (
       { screenStore },
       { queryParams, selectionParams, ESIndex, ESLogic, isPageInit, currentTab }
@@ -44,28 +39,54 @@ export const tabs_options = {
         )
       );
     },
-    createTab: (
-      { screenStore, idStore },
-      { queryParams, selectionParams, ESIndex, ESLogic, isPageInit }
+    createTab: assign((
+      ctx: any,
+      { tabParams, isPageInit, route }
     ) => {
-      const id = get(idStore);
 
-      screenStore.update(
-        _.setKey(
-          id,
-          newTab(
-            id,
-            queryParams && isPageInit
-              ? parseQueryUrl(queryParams)
-              : [newRuleset(true)],
-            ESIndex ? ESIndex : 'all',
-            selectionParams && parseSelectionUrl(selectionParams),
-            ESLogic
+      let tabsArray: any = [];
+
+      if (isPageInit && tabParams) {
+        let extractedTabs = extractTabsFromUrl(tabParams);
+        let highestId = findHighestId(extractedTabs);
+        tabsArray = _.map(extractedTabs, _.fromPairs);
+
+        const newScreenStore =
+          tabsArray
+          .map(tab => [
+            tab.id,
+            newTab(
+              tab.title,
+              tab.query && isPageInit
+                ? parseQueryUrl(tab.query)
+                : [newRuleset(true)],
+              tab.indices ? tab.indices : 'all',
+              tab.selections && parseSelectionUrl(tab.selections),
+              tab.logic,
+              route
+            )]
           )
-        )
-      );
-      idStore.update(add1);
-    },
+          .reduce((acc, [id, tabObj]) =>
+            ({...acc, [id]: tabObj}) , {});
+
+        ctx.screenStore.set(newScreenStore);
+        ctx.idStore.set(highestId);
+      } else {
+        const id = get(ctx.idStore);
+        ctx.screenStore.update(
+          _.setKey(
+            id,
+            newTab(
+              id,
+              [newRuleset(true)],
+              'all',
+            )
+          )
+        );
+      }
+
+      return ctx;
+    }),
     duplicateTabs: assign((ctx: any, { tabId }) => {
       const newSearchMachines = {};
 
@@ -108,19 +129,40 @@ export const tabs_options = {
 
       return mergeWithMerge(ctx, { searchMachines: newSearchMachines });
     }),
-    setCurrentTab: ({ currentTab }, { tabId = 0 }) => {
-      currentTab.set(tabId);
+    setCurrentTab: ({ currentTab }, { tabId = 0, activeParams = false }) => {
+      const activeTab = parseInt(`${activeParams}`, 10);
+      currentTab.set(isNaN(activeTab) ? tabId : +activeParams);
     },
-    createSearchMachine: assign((ctx: any) => {
+    createSearchMachine: assign((ctx: any, { isPageInit }) => {
       const id: string = get(ctx.idStore);
-      const machine = spawn(
-        search_machine.withContext({
-          ...ctx,
-          id,
-        }),
-        id
-      );
-      return _.setPathIn(ctx, `searchMachines.${id}`, machine);
+
+      if (isPageInit) {
+        const machines = {};
+
+        Object
+        .keys(get(ctx.screenStore))
+        .forEach(id => {
+          machines[id] = spawn(
+            search_machine.withContext({
+              ...ctx,
+              id,
+            }),
+            id
+          );
+        })
+
+        return _.setPathIn(ctx, `searchMachines`, machines);
+      } else {
+        const machine = spawn(
+          search_machine.withContext({
+            ...ctx,
+            id,
+          }),
+          id
+        );
+
+        return _.setPathIn(ctx, `searchMachines.${id}`, machine);
+      }
     }),
     popHistory: ({ historyStore }) => {
       historyStore.update(removeLast);
@@ -133,9 +175,11 @@ export const tabs_options = {
       { tabId }
     ) => {
       let ids = tabId;
+      const tabIds = Object.keys(get(screenStore));
 
-      if (Object.keys(get(screenStore)).length === tabId.length)
+      if (tabIds.length === tabId.length) {
         ids = tabId.filter((_, i) => i !== 0);
+      }
 
       screenStore.update(_.skipKeys(ids));
 
@@ -146,33 +190,16 @@ export const tabs_options = {
         historyStore.update(removeHistoryEntries(_id));
       });
 
+      const fallback = parseInt(
+        tabIds.filter(id => !ids.includes(id))[0],
+      10);
+
       const current = get(currentTab);
-      const history: [] = get(historyStore);
-      const prev = history[history.length - 1];
+      const history: [] = get(historyStore) || [fallback];
+      const prev = _.last(history) >= 0 ? _.last(history) : _.last(fallback);
+
 
       currentTab.set(ids.includes(current) ? prev : current);
-    },
-    setUrlQuery: (
-      { screenStore, currentTab, routeStore },
-      { route: path, isPageInit }
-    ) => {
-      const tab: any = get(currentTab);
-      const currentQuery = get(screenStore)[tab];
-      routeStore.set(makePath(path));
-
-      const urlQuery = {
-        v: version,
-        q: uiQueryToUrlString(currentQuery.uiQuery),
-        s: selectionToUrlString(removeEmpty(currentQuery.selections)),
-        i: currentQuery.index && currentQuery.index,
-        o: currentQuery.logic,
-      };
-
-      const newPath = makeRouteUrl(makePath(path), urlQuery);
-      //@ts-ignore
-      if (process.browser) {
-        goto(newPath, { replaceState: isPageInit });
-      }
     },
     setTabLabel: ({ screenStore }, { labelText, id }) => {
       screenStore.update(_.setPath(`${id}.name`, labelText));

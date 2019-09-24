@@ -4,15 +4,10 @@ import { goto } from '@sapper/app';
 import * as _ from 'lamb';
 
 import { version } from '../../../package.json';
-import { makePath } from '../../util/config';
-import { removeEmpty } from '../../util/object-object';
 import { toggleBoolean } from '../../util/boolean';
 import { newRuleset } from '../../util/url/query';
-import { makeRouteUrl } from '../../util/url/utils';
-import {
-  uiQueryToUrlString,
-  selectionToUrlString,
-} from '../../util/url/builder';
+import { makeRouteUrl, serialiseTabs } from '../../util/url/utils';
+
 import {
   toggleLabelBinaryUpdater,
   toggleLabelTernaryUpdater,
@@ -211,20 +206,20 @@ export const form_options = {
 
       screenStore.update(newRule);
     },
-    setUrlQuery: ({ screenStore, currentTab, routeStore }, { route: path }) => {
-      const tab: any = get(currentTab);
-      const currentQuery = get(screenStore)[tab];
-      routeStore.set(makePath(path));
+    setUrlQuery: ({ screenStore, currentTab }, { route: path, isPageInit }) => {
 
+      if (isPageInit) return;
+      const tab: any = get(currentTab);
+
+      const serialisedTabs = serialiseTabs(get(screenStore));
       const urlQuery = {
         v: version,
-        q: uiQueryToUrlString(currentQuery.uiQuery),
-        s: selectionToUrlString(removeEmpty(currentQuery.selections)),
-        i: currentQuery.index && currentQuery.index,
-        o: currentQuery.logic,
+        active: tab,
+        tabs: serialisedTabs,
       };
 
-      const newPath = makeRouteUrl(makePath(path), urlQuery);
+      const newPath = makeRouteUrl(get(screenStore)[tab].route, urlQuery);
+
       //@ts-ignore
       if (process.browser && newPath !== path) {
         goto(newPath);

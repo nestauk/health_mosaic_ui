@@ -3,6 +3,7 @@ import { isNot } from '@svizzle/utils';
 
 import { searchRouteName } from '../../config';
 import { Tab } from '../../stores/interfaces';
+import { splitByCurlyBrackets, stringToNumber } from '../../util/string';
 
 export const newTab = (
   id,
@@ -69,7 +70,7 @@ export const termBuilder = (acc, next, i, arr) => {
 export const parseQuery = _.pipe([
   s => s.split(','),
   _.reduceWith(termBuilder, []),
-  _.filterWith((a, i, arr) => a.term.length),
+  _.filterWith(a => a.term.length),
 ]);
 
 export const ruleOptionsDeselect = _.setPath('options', false);
@@ -84,3 +85,30 @@ export const toggleTerm = status => (status === 'and' ? 'not' : 'and');
 
 export const removeHistoryEntries = removedTab =>
   _.filterWith(isNot(removedTab));
+
+const removeCurlyBrackets = string => string.replace(/{|}/g, '');
+const delimitProperties = string =>
+  string.replace(/(id(?=:[0-9]+)|indices|logic|title|selections|query)/g, '|$1**');
+
+const splitMembers = string => string.split('|');
+const isTruthy = x => !!x;
+const splitKeyValues = string => string.split('**:');
+const removeTrailingComma = arr => [arr[0], arr[1].replace(/,$/, '')];
+
+const formatTab = _.pipe([
+  removeCurlyBrackets,
+  delimitProperties,
+  splitMembers,
+  _.filterWith(isTruthy),
+  _.mapWith(_.pipe([splitKeyValues, removeTrailingComma])),
+])
+
+export const extractTabsFromUrl = _.pipe([
+  splitByCurlyBrackets,
+  _.mapWith(formatTab)
+])
+
+export const findHighestId = _.reduceWith((acc, tab) => {
+  const currentId = stringToNumber(tab.find(t => t[0] === 'id')[1]);
+  return currentId > acc ? currentId : acc;
+}, 0);

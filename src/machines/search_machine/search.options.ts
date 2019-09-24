@@ -2,18 +2,14 @@ import { get } from 'svelte/store';
 //@ts-ignore
 import { goto } from '@sapper/app';
 import * as _ from 'lamb';
-import { sendParent, Machine } from 'xstate';
+import { sendParent } from 'xstate';
 import { mergeObj } from '@svizzle/utils';
 
 import { version } from '../../../package.json';
 import { query } from '../../actions/queryApi';
-import { removeEmpty } from '../../util/object-object';
+import { searchRouteName } from '../../config';
 import { makeSelectionFilter } from '../../util/object';
-import { makeRouteUrl } from '../../util/url/utils';
-import {
-  uiQueryToUrlString,
-  selectionToUrlString,
-} from '../../util/url/builder';
+import { makeRouteUrl, serialiseTabs } from '../../util/url/utils';
 
 export const search_options: any = {
   actions: {
@@ -37,15 +33,14 @@ export const search_options: any = {
       const tabId: number = get(currentTab);
 
       if (tabId === id && !restore) {
-        const currentQuery = screen[tabId];
+        const serialisedTabs = serialiseTabs(get(screenStore));
         const urlQuery = {
           v: version,
-          q: uiQueryToUrlString(currentQuery.uiQuery),
-          s: selectionToUrlString(removeEmpty(currentQuery.selections)),
-          i: currentQuery.index.toLowerCase(),
-          o: currentQuery.logic,
+          active: `${get(currentTab)}`,
+          tabs: serialisedTabs,
         };
-        goto(makeRouteUrl(get(routeStore), urlQuery));
+        const currentRoute = get(routeStore) ? get(routeStore) : searchRouteName;
+        goto(makeRouteUrl(currentRoute, urlQuery));
       }
 
       const newData = Object.values(results.data)[0];

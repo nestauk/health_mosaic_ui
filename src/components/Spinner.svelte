@@ -13,7 +13,7 @@
   .spinner {
     display: inline-block;
     position: relative;
-    transform: scale(0.35) translate(-4.2em, -2em);
+    transform: scale(0.35) translate(-5.2em, -2em);
     margin-left: auto;
   }
   .spinner div {

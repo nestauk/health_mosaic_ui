@@ -24,7 +24,9 @@ export const truncateText = str => {
 };
 export const splitByComma = makeSplitBy(',');
 export const splitByTwoDots = makeSplitBy('..');
+export const splitByCurlyBrackets = makeSplitBy('}{');
+export const splitByPipe = makeSplitBy('|');
 export const stringToNumber = str => +str;
 export const convertPlusToSpace = str => str.replace(/\+/g, ' ');
 export const removeLast = _.sliceAt(0, -1);
-export const addQueryMark = q => (q ? '?' + q : '');
+export const prefixQueryMarkIfTruthy = q => (q ? '?' + q : '');

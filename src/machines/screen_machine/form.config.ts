@@ -13,9 +13,6 @@ export const form_config = {
       { target: 'Form.Complex', cond: 'isComplex' },
       { target: 'Form.Simple' },
     ],
-    // TAB_RENAMED: {
-    //   target: 'Form.Simple',
-    // },
     TERM_CLICKED: {
       actions: ['toggleTermStatus'],
     },

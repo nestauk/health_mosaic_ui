@@ -12,7 +12,6 @@
     Trash2Icon
   } from 'svelte-feather-icons';
   import { extent } from 'd3-array';
-
   import { Alert, ArrowDown } from '../Icons/';
   import Spinner from '../Spinner.svelte';
 
@@ -20,9 +19,7 @@
   const panelHeight = 200;
 
   export let activeTab;
-  export let editingTab;
-  export let isError;
-  export let isLoading;
+  export let editingTab = null;
   export let tabs;
 
   let editedTarget = null;
@@ -40,6 +37,7 @@
   // we also need to ensure that such click events to not cause the element to lose focus
 
   const stopEdit = ({ target, type, keyCode, detail }) => {
+
     if (
       editedTarget === null ||
       (type === 'click' && detail === 0 && target === editedTarget) ||
@@ -60,6 +58,7 @@
 
       editedTarget = null;
     }
+
   };
 
   const handleClick = async (e, id) => {
@@ -105,6 +104,15 @@
 
   const textChange = ({ target }, id) => {
     dispatch('textchange', { value: target.innerText, id });
+
+    // Updating the URL cause the DOM elemen to lose focus
+    // We need to wait until the state has been updated and the changes have been flushed before refocusing
+    // One requestAnimationFrame doesn't seem to manage it
+    // queueing a new Task doesn't seem to work either
+
+    requestAnimationFrame(
+      () => requestAnimationFrame(() => editedTarget.focus())
+    );
   }
 
   const deleteTabs = async id => {
@@ -263,7 +271,7 @@
           </div>
           <span
             on:click|stopPropagation={() => {}}
-            class="error icon icon-container"
+            class="icon-container"
           >
             {#if isLoading}
               <Spinner />
@@ -399,12 +407,7 @@
     .icon {
       height: 1.5rem;
       width: 3rem;
-      margin-right: 8px;
       margin: 1px 8px 0 0;
-
-      &.icon-container {
-        margin-right: 4px;
-      }
 
       &:last-child {
         margin-right: 0;
@@ -428,6 +431,20 @@
       left: 9px;
       width: 15px;
       top: -8px;
+    }
+  }
+
+  .icon-container {
+    height: 1.5rem;
+    margin-right: 4px;
+    padding-top: 3px;
+    display: flex;
+    margin-left: auto;
+    align-items: center;
+
+    & :global(svg) {
+      width: 1.5rem;
+      margin-right: 8px;
     }
   }
 

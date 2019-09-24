@@ -41,7 +41,7 @@ const queryToStringArray = query => ({
 const stringArrayToUrl = (acc, { terms, fields }) =>
   `${acc}(${terms}` + (fields ? `,in:${fields})` : ')');
 
-export const uiQueryToUrlString = _.pipe([
+export const processQueries = _.pipe([
   filterQuery,
   _.mapWith(queryToStringArray),
   _.reduceWith(stringArrayToUrl, ''),
@@ -80,7 +80,7 @@ export const selectionToStringArray = _.pipe([
   _.when(([, { type }]) => type === 'within', withinToString),
 ]);
 
-export const selectionToUrlString = _.pipe([
+export const processSelections = _.pipe([
   _.pairs,
   _.mapWith(selectionToStringArray),
   joinWith(''),
