@@ -8,7 +8,7 @@ export const tabs_config = {
           actions: ['duplicateTabs'],
         },
         TAB_DELETED: {
-          actions: ['deleteTab', 'setUrlQuery'],
+          actions: ['deleteTabs', 'setUrlQuery'],
         },
         TAB_CREATED: {
           actions: [

@@ -141,24 +141,30 @@ export const tabs_options = {
     pushHistory: ({ historyStore }, { tabId = 0 }) => {
       historyStore.update(_.append(tabId));
     },
-    deleteTab: (
-      { screenStore, historyStore, currentTab, searchMachines },
+    deleteTabs: (
+      { currentTab, historyStore, listSortingStores, screenStore, searchMachines },
       { tabId }
     ) => {
       let ids = tabId;
 
-      if (Object.keys(get(screenStore)).length === tabId.length)
+      // delete tabs
+      if (Object.keys(get(screenStore)).length === tabId.length) {
         ids = tabId.filter((_, i) => i !== 0);
-
+      }
       screenStore.update(_.skipKeys(ids));
 
+      // delete search machines and sorting stores
       ids.forEach(id => {
         let _id = parseInt(id, 10);
         searchMachines[id].stop();
+
         delete searchMachines[_id];
+        delete listSortingStores[id];
+
         historyStore.update(removeHistoryEntries(_id));
       });
 
+      // set new current tab
       const current = get(currentTab);
       const history: [] = get(historyStore);
       const prev = history[history.length - 1];

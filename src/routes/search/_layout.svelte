@@ -135,7 +135,6 @@
     : false;
   $: listSortingStore = $screenMachine &&
     $screenMachine.context.listSortingStores[$currentTab];
-  $: ({by, criteria, direction} = $listSortingStore);
 
   $: mode = $screenMachine.matches('Form.Simple') ? 'simple' : 'complex';
 
@@ -441,11 +440,11 @@
           facets="{facetPills}"
         />
         <FacetControls>
-          {#if isListFacet}
+          {#if isListFacet && listSortingStore}
             <ListControls
-              {by}
-              {criteria}
-              {direction}
+              by={$listSortingStore.by}
+              criteria={$listSortingStore.criteria}
+              direction={$listSortingStore.direction}
               on:sortedBy={sendListUpdateSortBy}
             />
           {/if}
