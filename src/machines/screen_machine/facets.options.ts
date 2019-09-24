@@ -2,7 +2,7 @@ import { get } from 'svelte/store';
 //@ts-ignore
 import { goto } from '@sapper/app';
 import * as _ from 'lamb';
-import { isKeyValue, mergeObj } from '@svizzle/utils';
+import { isKeyValue } from '@svizzle/utils';
 
 import { updateListOrder } from '../../stores/facetControls';
 import { makePath } from '../../util/config';
