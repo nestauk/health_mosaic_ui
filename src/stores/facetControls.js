@@ -4,18 +4,26 @@ import { mergeObj } from '@svizzle/utils';
 /* list view */
 
 export const newListSortingStore = () => writable({
-  by: 'novelty',
+  by: 'city',
+
+  // FIXME use objects [{field, gropuBy}]
+  // gropuBy: 'volume' | 'initial' | 'bins'
   criteria: [
-    'continent_id',
-    'cost_ref',
-    'country_id',
+    'city',
+    'continent',
+    // 'cost_ref',
+    'country',
     'name',
-    'novelty',
-    'score',
-    'start',
+    // 'novelty',
+    // 'score',
+    // 'start',
+    // 'state', // or undefined..
   ],
-  direction: 'ascending',
+
+  // FIXME use a boolean isAscending
+  direction: 'descending',
   directions: ['ascending', 'descending']
+
 });
 
 export const updateListOrder = (store, sortOptions) =>

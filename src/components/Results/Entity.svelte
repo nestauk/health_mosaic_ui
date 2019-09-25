@@ -14,13 +14,7 @@
   export let data;
   export let show = false;
 
-  export function close() {
-    dispatch('hide');
-  }
-
-  export function open() {
-    dispatch('show');
-  }
+  const toggle = () => dispatch('toggle');
 
   let hover = false;
 
@@ -152,7 +146,7 @@
     <div class="icon">
       <span
         class="folding"
-        on:click="{() => show ? close() : open()}"
+        on:click="{toggle}"
       >
         {#if show}
           <EyeOffIcon />
@@ -167,7 +161,7 @@
 <style lang="less">
   article {
     width: 100%;
-    margin-bottom: 3em;
+    margin-bottom: 2em;
     display: flex;
 
     .content {
@@ -178,6 +172,10 @@
       ul {
         list-style: none;
         padding: 0;
+      }
+
+      ul, p {
+        text-align: justify;
       }
     }
 

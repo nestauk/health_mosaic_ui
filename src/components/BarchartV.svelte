@@ -2,11 +2,12 @@
   import { createEventDispatcher } from 'svelte';
   import { scaleLinear } from 'd3-scale';
   import * as _ from 'lamb';
-  import { arrayMaxBy } from '@svizzle/utils';
+  import { arrayMaxWith } from '@svizzle/utils';
   import { makeStyle } from '@svizzle/dom';
 
+  import { getValue } from '../util/object.any';
+
   const dispatch = createEventDispatcher();
-  const maxByValue = arrayMaxBy('value');
 
   export let focusedKey;
   export let interactive = false;
@@ -15,21 +16,27 @@
   export let keyToLabel;
   export let labels;
   export let title;
+  export let valueAccessor = getValue;
 
   let width;
 
+  $: maxByValue = arrayMaxWith(valueAccessor);
   $: max = maxByValue(items);
   $: scale = scaleLinear().domain([0, max]).range([0, 100]);
-  $: bars = items.map(item => ({
-    ...item,
-    label: labels
-      ? labels[item.key]
-      : (keyToLabel ? keyToLabel(item.key) : item.key),
-    barStyle: makeStyle({
-      'background-color': keyToColor ? keyToColor[item.key] : undefined,
-      width: `${scale(item.value)}%`
-    }),
-  }));
+  $: bars = items.map(item => {
+    const displayValue = valueAccessor(item);
+
+    return _.merge(item, {
+      displayValue,
+      label: labels
+        ? labels[item.key]
+        : (keyToLabel ? keyToLabel(item.key) : item.key),
+      barStyle: makeStyle({
+        'background-color': keyToColor ? keyToColor[item.key] : undefined,
+        width: `${scale(displayValue)}%`
+      })
+    })
+  });
 </script>
 
 <div class="container">
@@ -38,8 +45,8 @@
     <h3>{title}</h3>
   </header>
   {/if}
-  <main>
-    {#each bars as {barStyle, key, label, value} (key)}
+  <main class:titled={title}>
+    {#each bars as {barStyle, displayValue, key, label} (key)}
     <div
       class="item"
       class:clickable="{interactive}"
@@ -50,7 +57,7 @@
     >
       <div class="labels">
         <span>{label}</span>
-        <span>{value}</span>
+        <span>{displayValue}</span>
       </div>
       <div class="bar" style="{barStyle}"></div>
     </div>
@@ -60,7 +67,7 @@
 
 <style lang="less">
   .container {
-    @header-height: 2em;
+    @headerHeight: 2em;
 
     width: 100%;
     height: 100%;
@@ -68,7 +75,7 @@
 
     header {
       width: 100%;
-      height: @header-height;
+      height: @headerHeight;
 
       display: flex;
       align-items: center;
@@ -76,10 +83,15 @@
 
     main {
       width: 100%;
-      height: calc(100% - @header-height);
-      max-height: calc(100% - @header-height);
+      height: 100%;
+      max-height: 100%;
       overflow-y: auto;
       padding-right: 5px;
+
+      &.titled {
+        height: calc(100% - @headerHeight);
+        max-height: calc(100% - @headerHeight);
+      }
 
       .item {
         padding: 0.5em 0;

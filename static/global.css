@@ -152,6 +152,7 @@ code {
   /* theme: shadows */
 
   --shadow-overlay: 0px 0px 6px 1px var(--color-grey-lightgrey);
+  --shadow-header: 0px 3px 6px -3px var(--color-grey-lightgrey);
 
   /* theme: borders */
 

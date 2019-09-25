@@ -133,6 +133,7 @@
   $: rulesetIndex = uiQuery!== undefined
     ? uiQuery.findIndex(( { selected } ) => selected)
     : false;
+
   $: listSortingStore = $screenMachine &&
     $screenMachine.context.listSortingStores[$currentTab];
 
@@ -174,11 +175,13 @@
 
   /* context */
 
+  $: if (listSortingStore) {
+
   setContext(SEARCH, {
-    transitionComplete:
-      () => screenMachine.send({ type: 'ROUTE_CHANGE_COMPLETED' }),
-    data: screenStore,
     checkDirty: () => matchesDirty(searchMachine),
+    currentTabStore: currentTab,
+    listSortingStore,
+    screenStore,
     select: (selection, tabId) =>
       screenMachine.send({
         type: 'SELECTION_UPDATED',
@@ -186,8 +189,11 @@
         selection,
         route: $page.path
       }),
-    shouldResize: shouldResizeStore
+    shouldResize: shouldResizeStore,
+    transitionComplete:
+      () => screenMachine.send({ type: 'ROUTE_CHANGE_COMPLETED' }),
   });
+  }
 
   /* machine events */
 
@@ -564,10 +570,12 @@
     background-color: var(--color-facet-background);
     position: relative;
 
-    --header-height: 3em;
+    --search-layout-header-height: 3em;
 
     display: grid;
-    grid-template-rows: var(--header-height) calc(100% - var(--header-height));
+    grid-template-rows:
+      var(--search-layout-header-height)
+      calc(100% - var(--search-layout-header-height));
     grid-template-columns: 100%;
 
     header {

@@ -1,7 +1,6 @@
 import { get } from 'svelte/store';
-//@ts-ignore
-import * as _ from 'lamb';
 import { isKeyValue } from '@svizzle/utils';
+import * as _ from 'lamb';
 
 import { goto } from '@sapper/app';
 import { version } from '../../../package.json';
@@ -82,14 +81,13 @@ export const facets_options = {
 
       // sort selected items
       const { by, direction } = sortOptions;
-      const isAscending = isDirectionAscending(sortOptions);
       const accessor = _.condition(
         _.hasKey(by),
         _.getKey(by),
         _.always(undefined),
       );
       const sorter = _.sortWith([
-        isAscending
+        isDirectionAscending(sortOptions)
           ? accessor
           : _.sorterDesc(accessor)
       ]);

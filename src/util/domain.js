@@ -3,6 +3,7 @@ import { objectToKeyValueArray } from '@svizzle/utils';
 
 import { sortValueDescKeyAsc } from './array';
 import { getId } from './object.string';
+import { isNotNull } from './any.boolean';
 
 // TODO svizzle
 const countByAsKeyValue = key =>
@@ -17,6 +18,7 @@ export const noneLabel = 'none';
 /* accessors */
 
 export const getLabel = _.getKey('label');
+export const getName = _.getKey('name');
 
 export const countByCityAsKeyValue = countByAsKeyValue('city');
 export const countByCountryIdAsKeyValue = countByAsKeyValue('country_id');

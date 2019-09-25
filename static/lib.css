@@ -1,3 +1,9 @@
 .clickable {
   cursor: pointer;
 }
+
+.centeredflex {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

@@ -33,6 +33,8 @@
   ul {
     height: 100%;
     width: 100%;
+    padding-inline-start: 2em;
+    padding-inline-end: 2em;
   }
 
   ul.dirty {
