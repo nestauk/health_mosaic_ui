@@ -8,10 +8,15 @@
     CopyIcon,
     EditIcon,
     PlusCircleIcon,
+    Share2Icon,
     SquareIcon,
     Trash2Icon
   } from 'svelte-feather-icons';
   import { extent } from 'd3-array';
+  import * as _ from 'lamb'
+
+  import { version } from '../../../package.json';
+  import { makeRouteUrl, serialiseTabs } from '../../util/url/utils';
   import { Alert, ArrowDown } from '../Icons/';
   import Spinner from '../Spinner.svelte';
 
@@ -21,6 +26,7 @@
   export let activeTab;
   export let editingTab = null;
   export let tabs;
+  export let screenStore;
 
   let editedTarget = null;
   let lastSelected;
@@ -219,6 +225,56 @@
       selectedTabs = includedTabs;
     }
     lastSelected = id;
+  };
+
+  const  copyToClipboard = text => {
+    if (window.clipboardData && window.clipboardData.setData) {
+      return clipboardData.setData("Text", text);
+    } else if (document.queryCommandSupported && document.queryCommandSupported("copy")) {
+      var textarea = document.createElement("textarea");
+      textarea.textContent = text;
+      textarea.style.position = "fixed";
+      document.body.appendChild(textarea);
+      textarea.select();
+      try {
+          return document.execCommand("copy");
+      } catch (err) {
+          console.warn("Copy to clipboard failed.", err);
+          return false;
+      } finally {
+          document.body.removeChild(textarea);
+      }
+    }
+  };
+
+
+  const shareTabs = () => {
+    const sharedTabs = _.pipe([
+      _.pairs,
+      _.filterWith(([id]) => selectedTabs.includes(+id)),
+      _.fromPairs
+    ])(screenStore);
+
+    const serialisedTabs = serialiseTabs(sharedTabs);
+    const urlQuery = {
+      v: version,
+      active: activeTab,
+      tabs: serialisedTabs,
+    };
+    const path = `
+      ${window.location.origin}${makeRouteUrl(screenStore[activeTab].route, urlQuery)}
+    `;
+
+    const copied = copyToClipboard(path);
+    if (copied) {
+      const tabNames = _.pipe([
+        _.pairs,
+        _.mapWith(([,{ name }]) => `"${name}"`),
+        x => x.join(', ')
+      ])(sharedTabs);
+
+      console.log(`A shareable link for ${tabNames} has been copied to your clipboard!`);
+    }
   }
 </script>
 
@@ -321,7 +377,16 @@
   </div>
 
   <div class="close-container">
+
     {#if tabs.length > 1}
+      <span
+        title="Share Tabs"
+        class:no-tabs="{selectedTabs.length === 0}"
+        on:click="{shareTabs}"
+        class="icon"
+      >
+        <Share2Icon />
+      </span>
       <span
         title="Duplicate Tabs"
         class:no-tabs="{selectedTabs.length === 0}"

@@ -420,6 +420,7 @@
       <div slot="sticky">
         <TabsPanel
           {tabs}
+          screenStore={$screenStore}
           activeTab="{$currentTab}"
           on:changetab="{({detail}) => changeTab(detail)}"
           on:deleteTabs="{({detail}) => sendTab('TAB_DELETED', detail)}"
