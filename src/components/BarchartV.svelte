@@ -1,7 +1,8 @@
 <script>
-  import { createEventDispatcher } from 'svelte';
   import { scaleLinear } from 'd3-scale';
+  import isEqual from 'just-compare';
   import * as _ from 'lamb';
+  import { afterUpdate, createEventDispatcher } from 'svelte';
   import { arrayMaxWith } from '@svizzle/utils';
   import { makeStyle } from '@svizzle/dom';
 
@@ -9,6 +10,7 @@
 
   const dispatch = createEventDispatcher();
 
+  export let resettableScroll = false;
   export let focusedKey;
   export let interactive = false;
   export let items;
@@ -19,6 +21,15 @@
   export let valueAccessor = getValue;
 
   let width;
+  let scrollable;
+  let previousItems;
+
+  $: resettableScroll && afterUpdate (() => {
+    if (items && !isEqual(previousItems, items)) {
+      scrollable.scrollTop = 0;
+      previousItems = items;
+    }
+  });
 
   $: maxByValue = arrayMaxWith(valueAccessor);
   $: max = maxByValue(items);
@@ -39,13 +50,16 @@
   });
 </script>
 
-<div class="container">
+<div class="BarchartV">
   {#if title}
   <header>
     <h3>{title}</h3>
   </header>
   {/if}
-  <main class:titled={title}>
+  <main
+    bind:this={scrollable}
+    class:titled={title}
+  >
     {#each bars as {barStyle, displayValue, key, label} (key)}
     <div
       class="item"
@@ -66,7 +80,7 @@
 </div>
 
 <style lang="less">
-  .container {
+  .BarchartV {
     @headerHeight: 2em;
 
     width: 100%;

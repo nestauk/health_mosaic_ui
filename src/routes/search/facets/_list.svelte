@@ -17,6 +17,7 @@
   import { NIH_type, CB_type, MU_type } from '../../../config';
   import { fieldToLabel, getName } from '../../../util/domain';
   import { makeAccAddAndCountWith } from '../../../util/function-function';
+  import { getKey } from '../../../util/object.any';
   import { toLowerCase, toUpperCase } from '../../../util/string';
   import { SEARCH } from '../_layout.svelte';
 
@@ -61,15 +62,18 @@
   $: getInitial = _.pipe([_.getKey(by), _.head, toUpperCase]);
 
   let keyAccessor;
+  let groupSorting;
   $: switch (by) {
     case 'city':
     case 'continent':
     case 'country':
     // case 'state':
       keyAccessor = getBy;
+      groupSorting = 'count';
       break;
     case 'name':
       keyAccessor = getInitial;
+      groupSorting = 'alphanum';
       break;
     // case 'cost_ref':
     // case 'novelty':
@@ -83,10 +87,10 @@
       break;
   }
 
+  const getLowercaseKey = _.pipe([getKey, toLowerCase]);
+  const getLowercaseName = _.pipe([getName, toLowerCase]);
   const sortItemsByName = _.mapValuesWith(
-    _.updatePath('items', _.sortWith([
-      _.pipe([getName, toLowerCase])
-    ]))
+    _.updatePath('items', _.sortWith([getLowercaseName]))
   );
 
   // if we do't use by &&, having the same case won't change `keyAccessor`
@@ -97,11 +101,18 @@
     sortItemsByName
   ]);
   $: groupsObj = groupFn(selectedItems);
+
   // TODO use an array of criterias
-  $: sorters = [
-      isSortedAscending ? getValueCount : _.sorterDesc(getValueCount),
-  ]
-  $: makeGroupsArray = _.pipe([ objectToKeyValueArray, _.sortWith(sorters) ]);
+  $: makeGroupsArray =
+    _.pipe([
+      objectToKeyValueArray,
+      (groupSorting === 'count') && _.sortWith([
+        isSortedAscending ? getValueCount : _.sorterDesc(getValueCount)
+      ]) ||
+      (groupSorting === 'alphanum') && _.sortWith([
+        isSortedAscending ? getLowercaseKey : _.sorterDesc(getLowercaseKey)
+      ])
+    ]);
   $: groupsArray = makeGroupsArray(groupsObj);
 
   // group: anchor and Results each group
@@ -176,8 +187,9 @@
     <div class="col2">
       {#if useBarchart}
         <BarchartV
-          title="{fieldToLabel[by]} volume"
           items={groupsArray}
+          resettableScroll={true}
+          title="{fieldToLabel[by]} volume"
           valueAccessor={getValueCount}
         />
       {:else if useHistogram}
