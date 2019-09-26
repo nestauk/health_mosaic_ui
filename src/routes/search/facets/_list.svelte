@@ -32,6 +32,11 @@
 
   // utils
   const getValueCount = _.getPath('value.count');
+  const getLowercaseKey = _.pipe([getKey, toLowerCase]);
+  const getLowercaseName = _.pipe([getName, toLowerCase]);
+  const sortItemsByName = _.mapValuesWith(
+    _.updatePath('items', _.sortWith([getLowercaseName]))
+  );
   const isAscending = _.is('ascending');
 
   let changed;
@@ -86,12 +91,6 @@
     default:
       break;
   }
-
-  const getLowercaseKey = _.pipe([getKey, toLowerCase]);
-  const getLowercaseName = _.pipe([getName, toLowerCase]);
-  const sortItemsByName = _.mapValuesWith(
-    _.updatePath('items', _.sortWith([getLowercaseName]))
-  );
 
   // if we do't use by &&, having the same case won't change `keyAccessor`
   // hence `groupFn` won't change and the reduce will accumulate on the same object

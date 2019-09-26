@@ -50,7 +50,7 @@
   $: place = [city, state, country, continent].filter(Boolean);
 </script>
 
-<article>
+<article class="Entity">
   <div class="content">
     {#if type === 'paper'}
       <h2>{title}</h2>
@@ -159,10 +159,12 @@
 </article>
 
 <style lang="less">
-  article {
+  .Entity {
     width: 100%;
     margin-bottom: 2em;
     display: flex;
+
+    word-break: break-word;
 
     .content {
       flex: 4;
@@ -181,12 +183,11 @@
 
     .subject {
       flex: 1;
-      min-width: 12em;
       order: 1;
       padding: 0.5em 1em;
       text-align: right;
-      max-width: 20em;
-      overflow-wrap: break-word;
+      /* min-width: 12em; */
+      /* max-width: 20em; */
 
       &.company {
         border-right: 3px solid var(--color-type-company);
