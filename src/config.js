@@ -46,7 +46,7 @@ export const endpointScannerSearch = `${endpointScanner}/_search`;
 export const searchRouteName = 'search';
 // export const aliases = `${BASE_URL}/_aliases`;
 
-export const size = dev ? 200 : 1000;
+export const responseSize = dev ? 200 : 1000;
 export const graphqlEndpoint = dev
   ? '"http://localhost:9000/.netlify/functions/graphql"'
   : '"/.netlify/functions/graphql"';

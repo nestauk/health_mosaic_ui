@@ -5,7 +5,7 @@ import {
   makeRequiredFields,
   makeResolvers,
 } from './src/util/graphql-fields.js';
-import { requiredFields, size } from './src/config';
+import { requiredFields, responseSize } from './src/config';
 
 export default {
   input: 'src/lambda/graphql.js',
@@ -21,7 +21,7 @@ export default {
         makeRequiredFields(requiredFields)
       ),
       REPLACE_ES_GQL_FIELDS: makeResolvers(),
-      REPLACE_ES_QUERY_SIZE: size,
+      REPLACE_ES_QUERY_SIZE: responseSize,
     }),
   ],
 };

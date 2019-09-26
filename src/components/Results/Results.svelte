@@ -29,6 +29,7 @@
     display: flex;
     justify-content: center;
     overflow-y: auto;
+    overflow-x: hidden;
   }
   ul {
     height: 100%;

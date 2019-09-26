@@ -1,11 +1,12 @@
 <script>
-  export let total = 0;
+  export let useTop = false;
   export let parts = [];
+  export let total = 0;
 </script>
 
 <div class="ItemsFigures">
   {#if total}
-  <p>Showing: {total} items</p>
+  <p>Showing {useTop ? 'top' : ''} {total} items</p>
   <ul>
     {#each parts as {key, text}}
     <li class="{key}">{text}</li>

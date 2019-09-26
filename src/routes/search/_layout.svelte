@@ -28,9 +28,10 @@
     project_title,
     MU_type,
     NIH_type,
+    responseSize,
     searchRouteName,
     typeLabels,
-  } from '../../config.js';
+  } from '../../config';
   import {
     matchesDirty,
     matchesError,
@@ -113,6 +114,7 @@
   $: logic = currentScreen && currentScreen.logic;
   $: selectedItems = (currentScreen && currentScreen.selected) || [];
   $: selectedItemsVolume = selectedItems.length;
+  $: isShowingTopResults = selectedItemsVolume === responseSize;
   $: selectedItemsVolumes = _.map(
     countByTypeAsKeyValue(selectedItems),
     ({key, value}) => ({key, text: `${typeLabels[key]} (${value})`})
@@ -513,6 +515,7 @@
       {#if selectedItemsVolume}
       <header>
         <ItemsFigures
+          useTop={isShowingTopResults}
           total={selectedItemsVolume}
           parts={selectedItemsVolumes}
         />
