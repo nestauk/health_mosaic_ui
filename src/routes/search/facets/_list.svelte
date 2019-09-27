@@ -12,12 +12,19 @@
 
   import BarchartV from '../../../components/BarchartV.svelte'
   import Fallback from '../../../components/Fallback.svelte'
+  import { HistogramDiv } from '../../../components/Histogram/';
   import { AddCircle, RemoveCircle } from '../../../components/Icons/'
   import { Results, Entity } from '../../../components/Results';
   import { NIH_type, CB_type, MU_type } from '../../../config';
+  import {
+    areValidBins,
+    exactAmountBins,
+    isNonEmptyBin,
+    makeExactAmountBinner
+  } from '../../../util/array';
   import { fieldToLabel, getName } from '../../../util/domain';
   import { makeAccAddAndCountWith } from '../../../util/function-function';
-  import { getKey } from '../../../util/object.any';
+  import { getKey, getRangeStart } from '../../../util/object.any';
   import { toLowerCase, toUpperCase } from '../../../util/string';
   import { SEARCH } from '../_layout.svelte';
 
@@ -36,6 +43,9 @@
   const getLowercaseName = _.pipe([getName, toLowerCase]);
   const sortItemsByName = _.mapValuesWith(
     _.updatePath('items', _.sortWith([getLowercaseName]))
+  );
+  const sortValuesByName = _.mapWith(
+    _.updatePath('values', _.sortWith([getLowercaseName]))
   );
   const isAscending = _.is('ascending');
 
@@ -63,57 +73,6 @@
   $: direction = $listSortingStore &&  $listSortingStore.direction;
   $: isSortedAscending = isAscending(direction);
 
-  $: getBy = _.getKey(by);
-  $: getInitial = _.pipe([_.getKey(by), _.head, toUpperCase]);
-
-  let keyAccessor;
-  let groupSorting;
-  $: switch (by) {
-    case 'city':
-    case 'continent':
-    case 'country':
-    // case 'state':
-      keyAccessor = getBy;
-      groupSorting = 'count';
-      break;
-    case 'name':
-      keyAccessor = getInitial;
-      groupSorting = 'alphanum';
-      break;
-    // case 'cost_ref':
-    // case 'novelty':
-    // case 'score':
-    //   groupFn = _.groupBy(_.pipe([_.getKey(by), _.head]));
-    //   break;
-    // case 'start':
-    //   groupFn = _.groupBy(_.pipe([_.getKey(by), _.head]));
-    //   break;
-    default:
-      break;
-  }
-
-  // if we do't use by &&, having the same case won't change `keyAccessor`
-  // hence `groupFn` won't change and the reduce will accumulate on the same object
-  // which will grow in size indefintely
-  $: groupFn = by && direction && _.pipe([
-    reduceFromObj(makeAccAddAndCountWith(keyAccessor)),
-    sortItemsByName
-  ]);
-  $: groupsObj = groupFn(selectedItems);
-
-  // TODO use an array of criterias
-  $: makeGroupsArray =
-    _.pipe([
-      objectToKeyValueArray,
-      (groupSorting === 'count') && _.sortWith([
-        isSortedAscending ? getValueCount : _.sorterDesc(getValueCount)
-      ]) ||
-      (groupSorting === 'alphanum') && _.sortWith([
-        isSortedAscending ? getLowercaseKey : _.sorterDesc(getLowercaseKey)
-      ])
-    ]);
-  $: groupsArray = makeGroupsArray(groupsObj);
-
   // group: anchor and Results each group
   $: useBarchart = [
     'city',
@@ -129,6 +88,104 @@
     'score',
     'start', // year
   ].includes(by);
+
+  $: getBy = _.getKey(by);
+  $: getInitial = _.pipe([_.getKey(by), _.head, toUpperCase]);
+
+  // let keyAccessor;
+  // let groupSorting;
+  // $: switch (by) {
+  //   case 'city':
+  //   case 'continent':
+  //   case 'country':
+  //   // case 'state':
+  //     keyAccessor = getBy;
+  //     groupSorting = 'count';
+  //     break;
+  //   case 'name':
+  //     keyAccessor = getInitial;
+  //     groupSorting = 'alphanum';
+  //     break;
+  //   case 'cost_ref':
+  //     keyAccessor = getBy;
+  //     groupSorting = 'value';
+  //     break;
+  //   // case 'novelty':
+  //   // case 'score':
+  //   //   groupFn = _.groupBy(_.pipe([_.getKey(by), _.head]));
+  //   //   break;
+  //   // case 'start':
+  //   //   groupFn = _.groupBy(_.pipe([_.getKey(by), _.head]));
+  //   //   break;
+  //   default:
+  //     break;
+  // }
+
+  // if we do't use by &&, having the same case won't change `keyAccessor`
+  // hence `groupFn` won't change and the reduce will accumulate on the same object
+  // which will grow in size indefinitely
+
+  let groupsObj;
+  let groupsArray;
+  $: if (by && direction && useBarchart) {
+    let groupFn;
+    let groupSorting;
+    let keyAccessor;
+    let makeGroupsArray;
+
+    switch (by) {
+      case 'city':
+      case 'continent':
+      case 'country':
+        keyAccessor = getBy;
+        groupSorting = 'count';
+        break;
+      case 'name':
+        keyAccessor = getInitial;
+        groupSorting = 'alphanum';
+        break;
+      default:
+        break;
+    }
+
+    groupFn = _.pipe([
+      reduceFromObj(makeAccAddAndCountWith(keyAccessor)),
+      sortItemsByName
+    ]);
+    groupsObj = groupFn(selectedItems);
+
+    // TODO use an array of criterias
+    makeGroupsArray =
+      _.pipe([
+        objectToKeyValueArray,
+        (groupSorting === 'count') && _.sortWith([
+          isSortedAscending ? getValueCount : _.sorterDesc(getValueCount)
+        ]) ||
+        (groupSorting === 'alphanum') && _.sortWith([
+          isSortedAscending ? getLowercaseKey : _.sorterDesc(getLowercaseKey)
+        ])
+      ]);
+    groupsArray = makeGroupsArray(groupsObj);
+  }
+
+  let bins;
+  let showHistogram;
+  let orientation_y;
+  $: if (by && direction && useHistogram) {
+    bins = exactAmountBins({
+      array: selectedItems,
+      accessor: getBy,
+      size: 10,
+    });
+    showHistogram = areValidBins(bins);
+    orientation_y = isSortedAscending ? 'top-down' : 'bottom-up';
+
+    groupsArray = _.filter(bins, isNonEmptyBin);
+    groupsArray = sortValuesByName(groupsArray);
+    groupsArray = _.sort(groupsArray, [
+      isSortedAscending ? getRangeStart : _.sorterDesc(getRangeStart)
+    ]);
+  }
 
   const toggle = path => () => {
     paths = toggleItem(paths, path)
@@ -160,27 +217,52 @@
   <main>
     <div class="col1">
       <Results dirty="{isDirty}" {changed}>
-        {#each groupsArray as {key, value}, groupIndex}
-          <div class="group">
-            <header>
-              <a href="#{key}">
-                <span class="anchor">
-                  #
+        {#if useBarchart}
+          {#each groupsArray as {key, value}, groupIndex}
+            <div class="group">
+              <header>
+                <a href="#{key}">
+                  <span class="anchor">
+                    #
+                  </span>
+                </a>
+                <span class="title">
+                  {key} ({groupsObj[key].count})
                 </span>
-              </a>
-              <span class="title">
-                {key} ({groupsObj[key].count})
-              </span>
-            </header>
-            {#each value.items as item, index}
-              <Entity
-                data={item}
-                show={showAll || shown[groupIndex] && shown[groupIndex][index]}
-                on:toggle={toggle(`${groupIndex}.${index}`)}
-              ></Entity>
-            {/each}
-          </div>
-        {/each}
+              </header>
+              {#each value.items as item, index}
+                <Entity
+                  data={item}
+                  on:toggle={toggle(`${groupIndex}.${index}`)}
+                  show="{showAll || shown[groupIndex] && shown[groupIndex][index]}"
+                ></Entity>
+              {/each}
+            </div>
+          {/each}
+        {/if}
+        {#if useHistogram}
+          {#each bins as {range, values}, groupIndex}
+            <div class="group">
+              <header>
+                <a href="#{range}">
+                  <span class="anchor">
+                    #
+                  </span>
+                </a>
+                <span class="title">
+                  {`From ${range[0]} to ${range[1]}`} ({values.length})
+                </span>
+              </header>
+              {#each values as item, index}
+                <Entity
+                  data={item}
+                  on:toggle={toggle(`${groupIndex}.${index}`)}
+                  show="{showAll || shown[groupIndex] && shown[groupIndex][index]}"
+                ></Entity>
+              {/each}
+            </div>
+          {/each}
+        {/if}
       </Results>
     </div>
     <div class="col2">
@@ -191,13 +273,13 @@
           title="{fieldToLabel[by]} volume"
           valueAccessor={getValueCount}
         />
-      {:else if useHistogram}
-        <!-- <HistogramDiv
-          bins="{nodeDegreeBins}"
-          orientation_y="top-down"
-          title="Connections"
-          valueAccessor="{degreeAccessor}"
-        /> -->
+      {:else if useHistogram && showHistogram}
+        <HistogramDiv
+          bins="{bins}"
+          interactive="{true}"
+          {orientation_y}
+          title="{fieldToLabel[by]} distribution"
+        />
       {/if}
     </div>
   </main>

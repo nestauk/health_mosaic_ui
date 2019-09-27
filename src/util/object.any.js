@@ -6,4 +6,5 @@ export const getValue = _.getKey('value');
 
 // binning accessors
 export const getRange = _.getKey('range');
+export const getRangeStart = _.getPath('range.0');
 export const getValues = _.getKey('values');

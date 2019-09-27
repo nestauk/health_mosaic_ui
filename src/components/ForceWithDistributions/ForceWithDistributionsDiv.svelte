@@ -41,7 +41,7 @@
 
   onMount(getSensorOrigin);
 
-  $: showLinkVolumeHistogram = areValidBins(linkVolumeBins)
+  $: showLinkVolumeHistogram = areValidBins(linkVolumeBins);
   $: showDegreeHistogram = areValidBins(nodeDegreeBins);
   $: showNodeVolumeHistogram = areValidBins(nodeVolumeBins);
   $: $shouldResize && getSensorOrigin();

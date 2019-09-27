@@ -7,16 +7,16 @@ export const newListSortingStore = () => writable({
   by: 'city',
 
   // FIXME use objects [{field, gropuBy}]
-  // gropuBy: 'volume' | 'initial' | 'bins'
+  // groupBy: 'volume' | 'initial' | 'bins'
   criteria: [
     'city',
     'continent',
-    // 'cost_ref',
+    'cost_ref',
     'country',
     'name',
-    // 'novelty',
-    // 'score',
-    // 'start',
+    'novelty',
+    'score',
+    'start',
     // 'state', // or undefined..
   ],
 

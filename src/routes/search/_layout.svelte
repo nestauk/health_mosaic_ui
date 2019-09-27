@@ -179,22 +179,22 @@
 
   $: if (listSortingStore) {
 
-  setContext(SEARCH, {
-    checkDirty: () => matchesDirty(searchMachine),
-    currentTabStore: currentTab,
-    listSortingStore,
-    screenStore,
-    select: (selection, tabId) =>
-      screenMachine.send({
-        type: 'SELECTION_UPDATED',
-        tabId,
-        selection,
-        route: $page.path
-      }),
-    shouldResize: shouldResizeStore,
-    transitionComplete:
-      () => screenMachine.send({ type: 'ROUTE_CHANGE_COMPLETED' }),
-  });
+    setContext(SEARCH, {
+      checkDirty: () => matchesDirty(searchMachine),
+      currentTabStore: currentTab,
+      listSortingStore,
+      screenStore,
+      select: (selection, tabId) =>
+        screenMachine.send({
+          type: 'SELECTION_UPDATED',
+          tabId,
+          selection,
+          route: $page.path
+        }),
+      shouldResize: shouldResizeStore,
+      transitionComplete:
+        () => screenMachine.send({ type: 'ROUTE_CHANGE_COMPLETED' }),
+    });
   }
 
   /* machine events */

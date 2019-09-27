@@ -15,6 +15,9 @@ import { getKey, getValue, getValues } from './object.any';
 
 /* binning */
 
+export const makeExactAmountBinner =
+  opts => array => exactAmountBins({...opts, array});
+
 export const exactAmountBins = ({
   array,
   size,
@@ -89,7 +92,7 @@ export const getBinsItems = _.pipe([
 export const getBinsMax = arrayMaxWith(_.getPath('values.length'));
 export const getBinsMin = arrayMinWith(_.getPath('values.length'));
 
-const isNonEmptyBin = _.pipe([getValues, isIterableNotEmpty]);
+export const isNonEmptyBin = _.pipe([getValues, isIterableNotEmpty]);
 const findFirstNonEmptyBinIndex = _.findIndexWhere(isNonEmptyBin);
 const findLastNonEmptyBinIndex = _.findLastIndexWhere(isNonEmptyBin);
 

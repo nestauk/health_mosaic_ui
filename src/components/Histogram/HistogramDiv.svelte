@@ -11,7 +11,6 @@
   export let orientation_x = 'left-right';
   export let orientation_y = 'bottom-up';
   export let selectedKeys = [];
-  export let valueAccessor;
 
   $: isRightToLeft = orientation_x === 'right-left';
 
@@ -46,7 +45,6 @@
         {orientation_x}
         {orientation_y}
         {selectedKeys}
-        {valueAccessor}
         {width}
       />
     </svg>
