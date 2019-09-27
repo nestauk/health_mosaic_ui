@@ -275,7 +275,7 @@
         x => x.join(', ')
       ])(sharedTabs);
 
-      shareText = [true, `Copied shareable link to your clipboard!`]
+      shareText = [true, `Copied shareable link to your clipboard.`]
     } else {
       shareText = [true, `There was a problem creating a share link. Please try again.`]
     }
