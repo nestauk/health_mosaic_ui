@@ -19,7 +19,7 @@
   import { makeRouteUrl, serialiseTabs } from '../../util/url/utils';
   import { Alert, ArrowDown } from '../Icons/';
   import Spinner from '../Spinner.svelte';
-  import Tooltip from '../Tooltip.svelte';
+  import StatusBar from '../StatusBar.svelte';
 
   const dispatch = createEventDispatcher();
   const panelHeight = 200;
@@ -36,7 +36,7 @@
   let tabsContainer;
   let tabsHeight = 0;
   let selectedTabs = [];
-  let shareText = [false, ''];
+  let statusText = '';
   let shift = false;
 
   // various keypresses trigger window click events for accessibility reasons
@@ -275,12 +275,10 @@
         x => x.join(', ')
       ])(sharedTabs);
 
-      shareText = [true, `Copied shareable link to your clipboard.`]
+      statusText = `Copied shareable link to your clipboard.`;
     } else {
-      shareText = [true, `There was a problem creating a share link. Please try again.`]
+      statusText = `There was a problem creating a share link. Please try again.`;
     }
-
-    setTimeout(() => shareText = [ false, ''], 3000);
   }
 </script>
 
@@ -344,6 +342,7 @@
             {#if hovering}
               <span
                 class="icon delete"
+                on:mouseenter={() => statusText="Duplicate tab"}
                 on:click|stopPropagation={() => hovering && duplicateTab(id)}
               >
                 <CopyIcon />
@@ -352,6 +351,7 @@
               {#if tabs.length > 1}
                 <span
                   class="icon delete"
+                  on:mouseenter={() => statusText = "Delete tab"}
                   on:click|stopPropagation={() => hovering && deleteTab(id)}
                 >
                   <Trash2Icon />
@@ -364,6 +364,7 @@
           <input
               title="Select tab"
               type="checkbox"
+              on:mouseenter={() => statusText = "Select tab"}
               bind:group={ selectedTabs}
               value={id}
               on:click|stopPropagation={inputClick(id)}
@@ -381,12 +382,14 @@
       </span>
     {/if}
   </div>
+  <StatusBar bind:text={statusText}/>
 
   <div class="close-container">
 
     {#if tabs.length > 1}
       <span
         title="Share Tabs"
+        on:mouseenter={() => statusText = "Share selected tab(s)"}
         class:no-tabs="{selectedTabs.length === 0}"
         on:click="{shareTabs}"
         class="icon"
@@ -394,7 +397,8 @@
         <Share2Icon />
       </span>
       <span
-        title="Duplicate Tabs"
+        title="Duplicate selected Tab(s)"
+        on:mouseenter={() => statusText = "Duplicate selected Tab(s)"}
         class:no-tabs="{selectedTabs.length === 0}"
         on:click="{duplicateTabs}"
         class="icon"
@@ -404,6 +408,7 @@
 
       <span
         title="Delete selected tab(s)"
+        on:mouseenter={() => statusText = "Delete selected tab(s)"}
         class:no-tabs="{selectedTabs.length === 0}"
         on:click="{() => deleteTabs(activeTab)}"
         class="icon"
@@ -413,6 +418,7 @@
     {/if}
     <span
       title="Create a new tab"
+      on:mouseenter={() => statusText = "Create a new tab"}
       on:click="{createTab}"
       class="icon"
     >
@@ -421,6 +427,7 @@
     {#if tabs.length > 1}
       <span
         title="Duplicate selected tab(s)"
+        on:mouseenter={() => statusText = "Duplicate selected tab(s)"}
         on:click="{toggleAll}"
         class="icon duplicate"
       >
@@ -430,17 +437,6 @@
           <CheckSquareIcon size="{1.5}"/>
         {/if}
       </span>
-    {/if}
-    {#if shareText[0]}
-      <Tooltip
-        text={shareText[1]}
-        width="18rem"
-        maxWidth="18rem"
-        prefix=""
-        offset="{["-3.5rem", "-5px"]}"
-        arrow="{false}"
-        transition="{true}"
-      />
     {/if}
   </div>
 </nav>
@@ -472,6 +468,7 @@
     display: flex;
     flex-direction: column;
     overflow-y: scroll;
+    border-bottom: 1px solid #eee;
   }
 
   li {
@@ -585,7 +582,7 @@
     justify-content: center;
     height: 100%;
     border-right: none;
-    margin: 35px 0 15px 0;
+    margin: 0px 0 15px 0;
     position: relative;
   }
 

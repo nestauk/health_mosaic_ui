@@ -1,20 +1,15 @@
 <script>
-  import { fade } from 'svelte/transition';
   export let text = '';
   export let offset = 0;
   export let width = "200px";
   export let maxWidth = "10vw";
   export let prefix = "Powered by";
-  export let arrow = true;
-  export let transition = false;
 
   $: ([x, y] = offset);
 </script>
 
 <span
-  class:arrow
   style="transform: translate({x},{y}); width:{width};  max-width:{maxWidth};"
-  transition:fade="{{duration: transition ? 200 : 0}}"
 >
   {prefix} {text}
 </span>
@@ -35,7 +30,7 @@
     z-index: var(--z-index-menu);
   }
 
-  .arrow::before {
+  span::before {
     content: '';
     position: absolute;
     top: -4px;
