@@ -275,7 +275,7 @@
         x => x.join(', ')
       ])(sharedTabs);
 
-      statusText = `A link was  to your clipboard.`;
+      statusText = `Link copied.`;
     } else {
       statusText = `There was a problem creating a share link. Please try again.`;
     }
@@ -344,7 +344,7 @@
             {#if hovering}
               <span
                 class="icon delete"
-                on:mouseenter={() => statusText="Share tab"}
+                on:mouseenter={() => statusText="Copy this tab’s link to your clipboard"}
                 on:click|stopPropagation={() => hovering && shareTab(id)}
               >
                 <Share2Icon />
@@ -398,10 +398,10 @@
 
     {#if tabs.length > 1}
       <span
-        title="Share Tabs"
-        on:mouseenter={() => statusText = "Share selected tab(s)"}
+        title="Copy selected tab’s links to your clipboard"
+        on:mouseenter={() => statusText = "Copy selected tab’s links to your clipboard"}
         class:no-tabs="{selectedTabs.length === 0}"
-        on:click="{shareTabs}"
+        on:click="{() => shareTabs()}"
         class="icon"
       >
         <Share2Icon />
@@ -437,7 +437,7 @@
     {#if tabs.length > 1}
       <span
         title="Duplicate selected tab(s)"
-        on:mouseenter={() => statusText = "Duplicate selected tab(s)"}
+        on:mouseenter={() => statusText = "Select/ deselect all tabs"}
         on:click="{toggleAll}"
         class="icon duplicate"
       >
