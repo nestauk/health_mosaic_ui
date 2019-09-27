@@ -16,7 +16,7 @@ export const newListSortingStore = () => writable({
     'name',
     'novelty',
     'score',
-    'start',
+    // 'start',
     // 'state', // or undefined..
   ],
 

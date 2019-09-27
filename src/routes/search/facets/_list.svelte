@@ -178,7 +178,7 @@
       size: 10,
     });
     showHistogram = areValidBins(bins);
-    orientation_y = isSortedAscending ? 'top-down' : 'bottom-up';
+    orientation_y = isSortedAscending ? 'bottom-up' : 'top-down';
 
     groupsArray = _.filter(bins, isNonEmptyBin);
     groupsArray = sortValuesByName(groupsArray);
