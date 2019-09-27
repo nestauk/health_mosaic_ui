@@ -2,25 +2,7 @@
   import { fade } from 'svelte/transition';
 
   export let text = '';
-  export let duration = 3000;
-
-  let show = false;
-  let timer = false;
-
-  const showText = () => {
-    show = true;
-    if (timer) {
-      clearTimeout(timer);
-      timer = false;
-    }
-    timer = setTimeout(() => {
-      text = '';
-      show = false;
-      timer = false;
-    }, duration)
-  }
-
-  $: text && showText();
+  export let show = false;
 </script>
 
 <span class="outer">
@@ -38,7 +20,7 @@
   .outer {
     height: 2rem;
     text-align: center;
-    margin-top: 5px;
+    margin: 10px 0 5px 0;
   }
   .inner {
     display: inline-block;

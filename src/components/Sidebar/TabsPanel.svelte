@@ -36,7 +36,10 @@
   let tabsContainer;
   let tabsHeight = 0;
   let selectedTabs = [];
+  let sharing;
+  let statusShowing = false;
   let statusText = '';
+  let statusTextDuration = 0;
   let shift = false;
 
   // various keypresses trigger window click events for accessibility reasons
@@ -249,8 +252,19 @@
     }
   };
 
+  const showStatus = (text) => {
+    statusShowing = true;
+    statusText = text;
+  }
 
-  const shareTabs = (tabsToShare = selectedTabs) => {
+  const hideStatus = () => {
+    statusShowing = false;
+    statusText = '';
+  }
+
+  const shareTabs = async (tabsToShare = selectedTabs) => {
+    sharing = true;
+
     const sharedTabs = _.pipe([
       _.pairs,
       _.filterWith(([id]) => tabsToShare.includes(+id)),
@@ -268,6 +282,7 @@
     `;
 
     const copied = copyToClipboard(path);
+    statusTextDuration = 2000;
     if (copied) {
       const tabNames = _.pipe([
         _.pairs,
@@ -275,13 +290,20 @@
         x => x.join(', ')
       ])(sharedTabs);
 
-      statusText = `Link copied.`;
+      showStatus(`Link copied.`);
     } else {
       statusText = `There was a problem creating a share link. Please try again.`;
     }
+
+    setTimeout(() => {
+      hideStatus();
+      sharing = false;
+    }, 2000)
   }
 
   const shareTab = id => shareTabs([id]);
+
+
 </script>
 
 <svelte:window
@@ -344,7 +366,8 @@
             {#if hovering}
               <span
                 class="icon delete"
-                on:mouseenter={() => statusText="Copy this tab’s link to your clipboard"}
+                on:mouseenter="{() => showStatus("Copy this tab’s link to your clipboard")}"
+                on:mouseleave="{() => !sharing && hideStatus()}"
                 on:click|stopPropagation={() => hovering && shareTab(id)}
               >
                 <Share2Icon />
@@ -352,7 +375,8 @@
 
               <span
                 class="icon delete"
-                on:mouseenter={() => statusText="Duplicate tab"}
+                on:mouseenter="{() => showStatus("Duplicate tab")}"
+                on:mouseleave="{() => hideStatus()}"
                 on:click|stopPropagation={() => hovering && duplicateTab(id)}
               >
                 <CopyIcon />
@@ -361,7 +385,8 @@
               {#if tabs.length > 1}
                 <span
                   class="icon delete"
-                  on:mouseenter={() => statusText = "Delete tab"}
+                  on:mouseenter="{() => showStatus("Delete tab")}"
+                  on:mouseleave="{() => hideStatus()}"
                   on:click|stopPropagation={() => hovering && deleteTab(id)}
                 >
                   <Trash2Icon />
@@ -374,7 +399,7 @@
           <input
               title="Select tab"
               type="checkbox"
-              on:mouseenter={() => statusText = "Select tab"}
+              on:mouseenter="{() => showStatus("Select tab")}"
               bind:group={ selectedTabs}
               value={id}
               on:click|stopPropagation={inputClick(id)}
@@ -392,14 +417,19 @@
       </span>
     {/if}
   </div>
-  <StatusBar bind:text={statusText}/>
+
+  <StatusBar
+    bind:text={statusText}
+    show="{showStatus}"
+  />
 
   <div class="close-container">
 
     {#if tabs.length > 1}
       <span
         title="Copy selected tabs link to your clipboard"
-        on:mouseenter={() => statusText = "Copy selected tab’s links to your clipboard"}
+        on:mouseenter="{() => showStatus("Copy selected tabs link to your clipboard")}"
+        on:mouseleave="{() => !sharing && hideStatus()}"
         class:no-tabs="{selectedTabs.length === 0}"
         on:click="{() => shareTabs()}"
         class="icon"
@@ -408,7 +438,8 @@
       </span>
       <span
         title="Duplicate selected Tab(s)"
-        on:mouseenter={() => statusText = "Duplicate selected Tab(s)"}
+        on:mouseenter="{() => showStatus("Duplicate selected Tab(s)")}"
+        on:mouseleave="{() => hideStatus()}"
         class:no-tabs="{selectedTabs.length === 0}"
         on:click="{duplicateTabs}"
         class="icon"
@@ -418,7 +449,8 @@
 
       <span
         title="Delete selected tab(s)"
-        on:mouseenter={() => statusText = "Delete selected tab(s)"}
+        on:mouseenter="{() => showStatus("Delete selected tab(s)")}"
+        on:mouseleave="{() => hideStatus()}"
         class:no-tabs="{selectedTabs.length === 0}"
         on:click="{() => deleteTabs(activeTab)}"
         class="icon"
@@ -428,7 +460,8 @@
     {/if}
     <span
       title="Create a new tab"
-      on:mouseenter={() => statusText = "Create a new tab"}
+      on:mouseenter="{() => showStatus("Create a new tab")}"
+      on:mouseleave="{() => hideStatus()}"
       on:click="{createTab}"
       class="icon"
     >
@@ -437,7 +470,8 @@
     {#if tabs.length > 1}
       <span
         title="Duplicate selected tab(s)"
-        on:mouseenter={() => statusText = "Select/ deselect all tabs"}
+        on:mouseenter="{() => showStatus("Select/ deselect all tabs")}"
+        on:mouseleave="{() => hideStatus()}"
         on:click="{toggleAll}"
         class="icon duplicate"
       >
