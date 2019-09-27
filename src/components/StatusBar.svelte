@@ -1,6 +1,4 @@
 <script>
-  import { fade } from 'svelte/transition';
-
   export let text = '';
   export let show = false;
 </script>
@@ -9,7 +7,6 @@
   {#if text && show}
     <span
       class="inner"
-      transition:fade
     >
       {text}
     </span>

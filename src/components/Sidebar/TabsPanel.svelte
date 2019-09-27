@@ -263,6 +263,9 @@
   }
 
   const shareTabs = async (tabsToShare = selectedTabs) => {
+    if (!tabsToShare.length) {
+      return;
+    }
     sharing = true;
 
     const sharedTabs = _.pipe([
@@ -290,7 +293,7 @@
         x => x.join(', ')
       ])(sharedTabs);
 
-      showStatus(`Link copied.`);
+      showStatus(`Link copied`);
     } else {
       statusText = `There was a problem creating a share link. Please try again.`;
     }
