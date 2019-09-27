@@ -8,7 +8,6 @@
   let timer = false;
 
   const showText = () => {
-    console.log(show, timer, text)
     show = true;
     if (timer) {
       clearTimeout(timer);
@@ -22,8 +21,6 @@
   }
 
   $: text && showText();
-
-
 </script>
 
 <span class="outer">

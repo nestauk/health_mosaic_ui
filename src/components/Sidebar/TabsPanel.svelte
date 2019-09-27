@@ -250,17 +250,17 @@
   };
 
 
-  const shareTabs = () => {
+  const shareTabs = (tabsToShare = selectedTabs) => {
     const sharedTabs = _.pipe([
       _.pairs,
-      _.filterWith(([id]) => selectedTabs.includes(+id)),
+      _.filterWith(([id]) => tabsToShare.includes(+id)),
       _.fromPairs
     ])(screenStore);
 
     const serialisedTabs = serialiseTabs(sharedTabs);
     const urlQuery = {
       v: version,
-      active: activeTab,
+      active: tabsToShare.includes(activeTab) ? activeTab : tabsToShare[0],
       tabs: serialisedTabs,
     };
     const path = `
@@ -280,6 +280,8 @@
       statusText = `There was a problem creating a share link. Please try again.`;
     }
   }
+
+  const shareTab = id => shareTabs([id]);
 </script>
 
 <svelte:window
@@ -340,6 +342,14 @@
               <AlertTriangleIcon />
             {/if}
             {#if hovering}
+              <span
+                class="icon delete"
+                on:mouseenter={() => statusText="Share tab"}
+                on:click|stopPropagation={() => hovering && shareTab(id)}
+              >
+                <Share2Icon />
+              </span>
+
               <span
                 class="icon delete"
                 on:mouseenter={() => statusText="Duplicate tab"}
