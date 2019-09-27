@@ -398,7 +398,7 @@
 
     {#if tabs.length > 1}
       <span
-        title="Copy selected tab’s links to your clipboard"
+        title="Copy selected tabs link to your clipboard"
         on:mouseenter={() => statusText = "Copy selected tab’s links to your clipboard"}
         class:no-tabs="{selectedTabs.length === 0}"
         on:click="{() => shareTabs()}"
