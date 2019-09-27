@@ -19,6 +19,7 @@
   import { makeRouteUrl, serialiseTabs } from '../../util/url/utils';
   import { Alert, ArrowDown } from '../Icons/';
   import Spinner from '../Spinner.svelte';
+  import Tooltip from '../Tooltip.svelte';
 
   const dispatch = createEventDispatcher();
   const panelHeight = 200;
@@ -35,6 +36,7 @@
   let tabsContainer;
   let tabsHeight = 0;
   let selectedTabs = [];
+  let shareText = [false, ''];
   let shift = false;
 
   // various keypresses trigger window click events for accessibility reasons
@@ -273,8 +275,12 @@
         x => x.join(', ')
       ])(sharedTabs);
 
-      console.log(`A shareable link for ${tabNames} has been copied to your clipboard!`);
+      shareText = [true, `Copied shareable link to your clipboard!`]
+    } else {
+      shareText = [true, `There was a problem creating a share link. Please try again.`]
     }
+
+    setTimeout(() => shareText = [ false, ''], 3000);
   }
 </script>
 
@@ -424,6 +430,17 @@
           <CheckSquareIcon size="{1.5}"/>
         {/if}
       </span>
+    {/if}
+    {#if shareText[0]}
+      <Tooltip
+        text={shareText[1]}
+        width="18rem"
+        maxWidth="18rem"
+        prefix=""
+        offset="{["-3.5rem", "-5px"]}"
+        arrow="{false}"
+        transition="{true}"
+      />
     {/if}
   </div>
 </nav>
