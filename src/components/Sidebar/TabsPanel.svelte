@@ -275,7 +275,7 @@
         x => x.join(', ')
       ])(sharedTabs);
 
-      statusText = `Copied shareable link to your clipboard.`;
+      statusText = `A link was  to your clipboard.`;
     } else {
       statusText = `There was a problem creating a share link. Please try again.`;
     }
