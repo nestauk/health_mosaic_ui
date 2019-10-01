@@ -141,7 +141,11 @@
 
         {/if}
         {#if hover}
-          <Tooltip offset="{["-5px", "0"]}" text="{typeNames[type]}"/>
+          <Tooltip
+            prefix="Powered by"
+            text="{typeNames[type]}"
+            x="-5px"
+          />
         {/if}
       </span>
     </div>

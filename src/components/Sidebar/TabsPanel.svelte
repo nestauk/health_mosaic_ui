@@ -1,5 +1,6 @@
-
 <script>
+  import { extent } from 'd3-array';
+  import * as _ from 'lamb'
   import { createEventDispatcher, onMount, tick } from 'svelte';
   import { fade } from 'svelte/transition';
   import {
@@ -12,35 +13,32 @@
     SquareIcon,
     Trash2Icon
   } from 'svelte-feather-icons';
-  import { extent } from 'd3-array';
-  import * as _ from 'lamb'
 
-  import { version } from '../../../package.json';
-  import { makeRouteUrl, serialiseTabs } from '../../util/url/utils';
+  import { makeSharablePath } from '../../util/url/utils.ts';
   import { Alert, ArrowDown } from '../Icons/';
   import Spinner from '../Spinner.svelte';
-  import StatusBar from '../StatusBar.svelte';
+  import StatusBar from './StatusBar.svelte';
 
   const dispatch = createEventDispatcher();
   const panelHeight = 200;
 
   export let activeTab;
   export let editingTab = null;
+  export let fadeDuration = 2000;
+  export let screen;
   export let tabs;
-  export let screenStore;
 
   let editedTarget = null;
-  let lastSelected;
   let hasMoreAbove = false;
   let hasMoreBelow = false;
-  let tabsContainer;
-  let tabsHeight = 0;
+  let lastSelected;
   let selectedTabs = [];
   let sharing;
+  let shift = false;
   let statusShowing = false;
   let statusText = '';
-  let statusTextDuration = 0;
-  let shift = false;
+  let tabsContainer;
+  let tabsHeight = 0;
 
   // various keypresses trigger window click events for accessibility reasons
   // we need to check to ensure the click event is coming from an actual click rather than a keypress
@@ -84,7 +82,7 @@
     editedTarget.contentEditable = true;
     editedTarget.style.cursor = 'text';
 
-    var range, selection;
+    let range, selection;
     if (document.body.createTextRange) {
       range = document.body.createTextRange();
       range.moveToElementText(target);
@@ -166,7 +164,10 @@
       hasMoreAbove = false;
     }
 
-    if (tabsHeight >= panelHeight && target.scrollTop + tabsHeight < target.scrollHeight) {
+    if (
+      tabsHeight >= panelHeight &&
+      target.scrollTop + tabsHeight < target.scrollHeight
+    ) {
       hasMoreBelow = true;
     } else {
       hasMoreBelow = false;
@@ -232,22 +233,23 @@
     lastSelected = id;
   };
 
-  const  copyToClipboard = text => {
+  const copyToClipboard = text => {
     if (window.clipboardData && window.clipboardData.setData) {
       return clipboardData.setData("Text", text);
     } else if (document.queryCommandSupported && document.queryCommandSupported("copy")) {
-      var textarea = document.createElement("textarea");
+      let textarea = document.createElement("textarea");
       textarea.textContent = text;
       textarea.style.position = "fixed";
       document.body.appendChild(textarea);
       textarea.select();
+
       try {
-          return document.execCommand("copy");
+        return document.execCommand("copy");
       } catch (err) {
-          console.warn("Copy to clipboard failed.", err);
-          return false;
+        console.warn("Copy to clipboard failed.", err);
+        return false;
       } finally {
-          document.body.removeChild(textarea);
+        document.body.removeChild(textarea);
       }
     }
   };
@@ -268,45 +270,20 @@
     }
     sharing = true;
 
-    const sharedTabs = _.pipe([
-      _.pairs,
-      _.filterWith(([id]) => tabsToShare.includes(+id)),
-      _.fromPairs
-    ])(screenStore);
-
-    const serialisedTabs = serialiseTabs(sharedTabs);
-    const urlQuery = {
-      v: version,
-      active: tabsToShare.includes(activeTab) ? activeTab : tabsToShare[0],
-      tabs: serialisedTabs,
-    };
-    const path = `
-      ${window.location.origin}${makeRouteUrl(screenStore[activeTab].route, urlQuery)}
-    `;
-
+    const path = makeSharablePath(activeTab, screen, tabsToShare);
     const copied = copyToClipboard(path);
-    statusTextDuration = 2000;
     if (copied) {
-      const tabNames = _.pipe([
-        _.pairs,
-        _.mapWith(([,{ name }]) => `"${name}"`),
-        x => x.join(', ')
-      ])(sharedTabs);
-
-      showStatus(`Link copied`);
+      showStatus('Link copied');
     } else {
-      statusText = `There was a problem creating a share link. Please try again.`;
+      showStatus('There was a problem creating a sharable link, please try again');
     }
-
     setTimeout(() => {
       hideStatus();
       sharing = false;
-    }, 2000)
+    }, fadeDuration)
   }
 
   const shareTab = id => shareTabs([id]);
-
-
 </script>
 
 <svelte:window
@@ -334,7 +311,14 @@
       bind:this={tabsContainer}
       on:scroll={tabScroll}
     >
-      {#each tabs as { hovering, hoveringTitle, id, isError, isLoading, name }, i (id)}
+      {#each tabs as {
+        hovering,
+        hoveringTitle,
+        id,
+        isError,
+        isLoading,
+        name
+      }, i (id)}
         <li
           class:selected="{id === activeTab}"
           on:click|preventDefault="{() => dispatch('changetab', id)}"
@@ -357,7 +341,7 @@
             {name}
           </div>
           <span
-            on:click|stopPropagation={() => {}}
+            on:click|stopPropagation="{() => {}}"
             class="icon-container"
           >
             {#if isLoading}
@@ -369,7 +353,7 @@
             {#if hovering}
               <span
                 class="icon delete"
-                on:mouseenter="{() => showStatus("Copy this tab’s link to your clipboard")}"
+                on:mouseenter="{() => showStatus('Copy this tab’s link to your clipboard')}"
                 on:mouseleave="{() => !sharing && hideStatus()}"
                 on:click|stopPropagation={() => hovering && shareTab(id)}
               >
@@ -378,7 +362,7 @@
 
               <span
                 class="icon delete"
-                on:mouseenter="{() => showStatus("Duplicate tab")}"
+                on:mouseenter="{() => showStatus('Duplicate tab')}"
                 on:mouseleave="{() => hideStatus()}"
                 on:click|stopPropagation={() => hovering && duplicateTab(id)}
               >
@@ -388,7 +372,7 @@
               {#if tabs.length > 1}
                 <span
                   class="icon delete"
-                  on:mouseenter="{() => showStatus("Delete tab")}"
+                  on:mouseenter="{() => showStatus('Delete tab')}"
                   on:mouseleave="{() => hideStatus()}"
                   on:click|stopPropagation={() => hovering && deleteTab(id)}
                 >
@@ -400,13 +384,13 @@
 
         {#if tabs.length > 1}
           <input
-              title="Select tab"
-              type="checkbox"
-              on:mouseenter="{() => showStatus("Select tab")}"
-              bind:group={ selectedTabs}
-              value={id}
-              on:click|stopPropagation={inputClick(id)}
-            />
+            title="Select tab"
+            type="checkbox"
+            on:mouseenter="{() => showStatus('Select tab')}"
+            bind:group={ selectedTabs}
+            value={id}
+            on:click|stopPropagation={inputClick(id)}
+          />
         {/if}
       </li>
     {/each}
@@ -427,11 +411,10 @@
   />
 
   <div class="close-container">
-
     {#if tabs.length > 1}
       <span
         title="Copy selected tabs link to your clipboard"
-        on:mouseenter="{() => showStatus("Copy selected tabs link to your clipboard")}"
+        on:mouseenter="{() => showStatus('Copy selected tabs link to your clipboard')}"
         on:mouseleave="{() => !sharing && hideStatus()}"
         class:no-tabs="{selectedTabs.length === 0}"
         on:click="{() => shareTabs()}"
@@ -439,9 +422,10 @@
       >
         <Share2Icon />
       </span>
+
       <span
         title="Duplicate selected Tab(s)"
-        on:mouseenter="{() => showStatus("Duplicate selected Tab(s)")}"
+        on:mouseenter="{() => showStatus('Duplicate selected Tab(s)')}"
         on:mouseleave="{() => hideStatus()}"
         class:no-tabs="{selectedTabs.length === 0}"
         on:click="{duplicateTabs}"
@@ -452,7 +436,7 @@
 
       <span
         title="Delete selected tab(s)"
-        on:mouseenter="{() => showStatus("Delete selected tab(s)")}"
+        on:mouseenter="{() => showStatus('Delete selected tab(s)')}"
         on:mouseleave="{() => hideStatus()}"
         class:no-tabs="{selectedTabs.length === 0}"
         on:click="{() => deleteTabs(activeTab)}"
@@ -461,19 +445,21 @@
         <Trash2Icon size="{1.5}"/>
       </span>
     {/if}
+
     <span
       title="Create a new tab"
-      on:mouseenter="{() => showStatus("Create a new tab")}"
+      on:mouseenter="{() => showStatus('Create a new tab')}"
       on:mouseleave="{() => hideStatus()}"
       on:click="{createTab}"
       class="icon"
     >
       <PlusCircleIcon size="{1.5}"/>
     </span>
+
     {#if tabs.length > 1}
       <span
         title="Duplicate selected tab(s)"
-        on:mouseenter="{() => showStatus("Select/ deselect all tabs")}"
+        on:mouseenter="{() => showStatus('Select/Deselect all tabs')}"
         on:mouseleave="{() => hideStatus()}"
         on:click="{toggleAll}"
         class="icon duplicate"
@@ -527,8 +513,6 @@
     padding-left: 1.8em;
     cursor: pointer;
     position: relative;
-
-
 
     .icon {
       height: 1.5rem;
@@ -600,7 +584,6 @@
     display: flex;
     align-items: center;
   }
-
 
   .icon {
     height: 22px;
