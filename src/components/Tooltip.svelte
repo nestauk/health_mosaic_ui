@@ -1,9 +1,23 @@
 <script>
+  import { makeStyle } from '@svizzle/dom';
+
+  export let maxWidth = '10vw';
+  export let prefix = '';
   export let text = '';
-  export let offset = 0;
+  export let x = 0;
+  export let y = 0;
+  export let width = '200px';
+
+  $: style = makeStyle({
+    transform: `translate(${x},${y})`,
+    width,
+    'max-width': maxWidth
+  });
 </script>
 
-<span style="transform: translateX({offset}px)">Powered by {text}</span>
+<span {style}>
+  {prefix} {text}
+</span>
 
 <style>
   span {

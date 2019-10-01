@@ -1,6 +1,7 @@
 import * as _ from 'lamb';
 import { isNot, joinWith } from '@svizzle/utils';
 
+import { version } from '../../../package.json';
 import { fieldGroups } from '../../config';
 import { removeUndefinedOrNotNumberAt1 } from '../array-array';
 import { removeEmptyValue, removeEmpty } from '../object-object';
@@ -75,12 +76,15 @@ export const queryToString = query =>
 const sanitizeTabName = (name, id) =>
   name ? name.replace(' ', '+') : `Tab+${id}`;
 
-const createQueryStrings = ([id, { index, logic, name, selections, uiQuery }]) => ({
+const createQueryStrings = ([
+  id,
+  { index, logic, name, selections, uiQuery }
+]) => ({
   id,
   indices: index,
   logic,
   title: sanitizeTabName(name, id),
-  selections:  processSelections(removeEmptyValue( selections)),
+  selections: processSelections(removeEmptyValue(selections)),
   query: processQueries(uiQuery),
 });
 
@@ -94,4 +98,19 @@ export const serialiseTabs = _.pipe([
     stringify
   ])),
   joinWith('')
-])
+]);
+
+export const makeSharablePath = (activeTab, screen, tabsToShare) => {
+  const getSharedTabs = _.pickIf((_tab, id) => tabsToShare.includes(+id));
+  const serialisedTabs = serialiseTabs(getSharedTabs(screen));
+  const urlQuery = {
+    v: version,
+    active: tabsToShare.includes(activeTab) ? activeTab : tabsToShare[0],
+    tabs: serialisedTabs,
+  };
+  const path =
+    (window ? window.location.origin : '') +
+    makeRouteUrl(screen[activeTab].route, urlQuery);
+
+  return path;
+}
