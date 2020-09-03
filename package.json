@@ -89,7 +89,7 @@
     "rollup-plugin-svelte": "^5.1.0",
     "rollup-plugin-terser": "^5.1.1",
     "rollup-plugin-typescript": "^1.0.1",
-    "sapper": "^0.27.8",
+    "sapper": "^0.27.11",
     "stylelint": "^10.1.0",
     "stylelint-config-recommended": "^2.2.0",
     "svelte": "^3.12.1",
